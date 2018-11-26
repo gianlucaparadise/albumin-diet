@@ -35,7 +35,7 @@ const app = express();
 // Connect to MongoDB
 const mongoUrl = MONGODB_URI;
 (<any>mongoose).Promise = bluebird;
-mongoose.connect(mongoUrl, {useMongoClient: true}).then(
+mongoose.connect(mongoUrl, { useMongoClient: true }).then(
   () => { /** ready to use. The `mongoose.connect()` promise resolves to undefined. */ },
 ).catch(err => {
   console.log("MongoDB connection error. Please make sure MongoDB is running. " + err);
@@ -112,14 +112,14 @@ app.get("/account/unlink/:provider", passportConfig.isAuthenticated, userControl
  * API examples routes.
  */
 app.get("/api", apiController.getApi);
-app.get("/api/facebook", passportConfig.isAuthenticated, passportConfig.isAuthorized, apiController.getFacebook);
+// app.get("/api/facebook", passportConfig.isAuthenticated, passportConfig.isAuthorized, apiController.getFacebook);
 
 /**
  * OAuth authentication routes. (Sign in)
  */
-app.get("/auth/facebook", passport.authenticate("facebook", { scope: ["email", "public_profile"] }));
-app.get("/auth/facebook/callback", passport.authenticate("facebook", { failureRedirect: "/login" }), (req, res) => {
-  res.redirect(req.session.returnTo || "/");
-});
+// app.get("/auth/facebook", passport.authenticate("facebook", { scope: ["email", "public_profile"] }));
+// app.get("/auth/facebook/callback", passport.authenticate("facebook", { failureRedirect: "/login" }), (req, res) => {
+//   res.redirect(req.session.returnTo || "/");
+// });
 
 export default app;
