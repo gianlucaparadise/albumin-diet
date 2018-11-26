@@ -72,15 +72,15 @@
   dependencies:
     "@types/express" "*"
 
-"@types/connect-mongo@^0.0.35":
-  version "0.0.35"
-  resolved "https://registry.yarnpkg.com/@types/connect-mongo/-/connect-mongo-0.0.35.tgz#f4b20ddc879b6a9de968b2a765d96b35318784e1"
-  integrity sha512-aMb90ygqLLo/mBCWpKkSJrlhoCTpz4iHxGzF2cmLqTzUZ0BaA+eQOOOJuEooJyNvb3204MUgf7A74uFbB4TzRw==
+"@types/connect-mongo@^0.0.39":
+  version "0.0.39"
+  resolved "https://registry.yarnpkg.com/@types/connect-mongo/-/connect-mongo-0.0.39.tgz#802ac2bd41e88e9c45de158007a581e7cb922765"
+  integrity sha512-KxhEwfndMcBstt7wpXERqscNZiSt3oCXtQRTaSs4Fg59+1VD4bGE2p9mDE4muHtcADNNkkbvuUJC2B+uBS+A+A==
   dependencies:
     "@types/express" "*"
     "@types/express-session" "*"
     "@types/mongodb" "^2"
-    "@types/mongoose" "*"
+    "@types/mongoose" "^4"
 
 "@types/connect@*":
   version "3.4.32"
@@ -216,15 +216,7 @@
     "@types/events" "*"
     "@types/node" "*"
 
-"@types/mongoose@*":
-  version "5.3.1"
-  resolved "https://registry.yarnpkg.com/@types/mongoose/-/mongoose-5.3.1.tgz#97112342e9d5930b75fe60121f820a310f98b6b7"
-  integrity sha512-4ASViFpeE9LLE+VLs/NgPy1gSS6nlUA5Iz9UBm1X5VMLqgGURvGfqML3liRrzna6WUt5kNTcLf245GQHxCxuBQ==
-  dependencies:
-    "@types/mongodb" "*"
-    "@types/node" "*"
-
-"@types/mongoose@^4.7.34":
+"@types/mongoose@^4", "@types/mongoose@^4.7.34":
   version "4.7.39"
   resolved "https://registry.yarnpkg.com/@types/mongoose/-/mongoose-4.7.39.tgz#08581b757922ebc7f69ccd55f5e4ffe6b06d172d"
   integrity sha512-EawjWAvMbldUvFtYrSf6g2IAL8JAjziot5hrGt1EPa/UQGdUs1gayZwxx4Y7qUzAfLPUrm0NYSPssopTUA1xAQ==
@@ -2021,14 +2013,6 @@ fb-watchman@^2.0.0:
   integrity sha1-VOmr99+i8mzZsWNsWIwa/AXeXVg=
   dependencies:
     bser "^2.0.0"
-
-fbgraph@^1.4.1:
-  version "1.4.4"
-  resolved "https://registry.yarnpkg.com/fbgraph/-/fbgraph-1.4.4.tgz#9bf45c6666152938c2592174385c5540608fcc4a"
-  integrity sha1-m/RcZmYVKTjCWSF0OFxVQGCPzEo=
-  dependencies:
-    qs "^6.5.0"
-    request "^2.79.0"
 
 fecha@^2.3.3:
   version "2.3.3"
@@ -4593,7 +4577,7 @@ qs@6.5.2, qs@~6.5.2:
   resolved "https://registry.yarnpkg.com/qs/-/qs-6.5.2.tgz#cb3ae806e8740444584ef154ce8ee98d403f3e36"
   integrity sha512-N5ZAX4/LxJmF+7wN74pUD6qAh9/wnvdQcjq9TZjevvXzSUo7bfmw91saqMjzGS2xq91/odN2dW/WOl7qQHNDGA==
 
-qs@^6.5.0, qs@^6.5.1:
+qs@^6.5.1:
   version "6.6.0"
   resolved "https://registry.yarnpkg.com/qs/-/qs-6.6.0.tgz#a99c0f69a8d26bf7ef012f871cdabb0aee4424c2"
   integrity sha512-KIJqT9jQJDQx5h5uAVPimw6yVg2SekOKu959OCtktD3FjzbpvaPr8i4zzg07DOMz+igA4W/aNM7OV8H37pFYfA==
@@ -4808,7 +4792,7 @@ request-promise@^4.2.2:
     stealthy-require "^1.1.0"
     tough-cookie ">=2.3.3"
 
-request@^2.79.0, request@^2.83.0, request@^2.87.0, request@^2.88.0:
+request@^2.83.0, request@^2.87.0, request@^2.88.0:
   version "2.88.0"
   resolved "https://registry.yarnpkg.com/request/-/request-2.88.0.tgz#9c2fca4f7d35b592efe57c7f0a55e81052124fef"
   integrity sha512-NAqBSrijGLZdM0WZNsInLJpkJokL72XYjUpnB0iwsRgxh7dB6COrHnTBNwN0E+lHDAJzu7kLAkDeY08z2/A0hg==

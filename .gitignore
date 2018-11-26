@@ -37,3 +37,5 @@ Thumbs.db
 # Ignore built ts files
 dist/**/*
 
+# Ignore the original boilerplate code used as example
+example

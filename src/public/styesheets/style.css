@@ -1,0 +1,26 @@
+body {
+  padding: 50px;
+  font: 14px "Lucida Grande", Helvetica, Arial, sans-serif;
+}
+
+a {
+  color: #00B7FF;
+}
+
+.homeTable
+{
+	width: 100%;
+	text-align: center;
+	border-collapse: collapse;
+}
+
+.homeTableCell, .homeTableHeader
+{
+	border-bottom: 1px solid black;
+	padding: 5px;
+}
+
+.homeTableCell
+{
+	border-bottom-color: lightgray;
+}
