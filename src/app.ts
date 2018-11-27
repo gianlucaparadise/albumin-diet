@@ -22,6 +22,7 @@ dotenv.config({ path: ".env" });
 // Controllers (route handlers)
 import * as homeController from "./controllers/home";
 import * as apiController from "./controllers/api";
+import * as userController from "./controllers/user";
 
 // API keys and Passport configuration
 import * as passportConfig from "./config/passport";
@@ -93,5 +94,12 @@ app.get("/", homeController.index);
  * API examples routes.
  */
 app.get("/api", apiController.getApi);
+
+/**
+ * User/Auth routes
+ */
+app.get("/login", userController.login);
+app.get("/auth/spotify", passport.authenticate("spotify"), userController.authSpotify);
+app.get("/auth/spotify/callback", passport.authenticate("spotify", { failureRedirect: "/login" }), userController.authSpotifyCallback);
 
 export default app;
