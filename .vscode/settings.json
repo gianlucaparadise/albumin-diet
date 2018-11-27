@@ -14,5 +14,8 @@
         "csrf",
         "definitelytyped",
         "promisified"
-    ]
+    ],
+    "editor.insertSpaces": true,
+    "editor.tabSize": 2,
+    "editor.detectIndentation": false
 }
