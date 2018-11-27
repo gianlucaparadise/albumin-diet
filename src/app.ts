@@ -25,7 +25,8 @@ import * as apiController from "./controllers/api";
 import * as userController from "./controllers/user";
 
 // API keys and Passport configuration
-import * as passportConfig from "./config/passport";
+// import * as passportConfig from "./config/passport";
+import "./config/passport";
 
 // Create Express server
 const app = express();

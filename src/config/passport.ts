@@ -1,3 +1,4 @@
+import path from "path";
 import passport from "passport";
 import request from "request";
 import passportLocal from "passport-local";
@@ -6,8 +7,9 @@ import _ from "lodash";
 // import { User, UserType } from '../models/User';
 import { default as User } from "../models/User";
 import { Request, Response, NextFunction } from "express";
+import { SPOTIFY_ID, SPOTIFY_SECRET } from "../util/secrets";
 
-const LocalStrategy = passportLocal.Strategy;
+const SpotifyStrategy = require("passport-spotify").Strategy;
 
 passport.serializeUser<any, any>((user, done) => {
   done(undefined, user.id);
@@ -19,42 +21,26 @@ passport.deserializeUser((id, done) => {
   });
 });
 
-
-/**
- * Sign in using Email and Password.
- */
-passport.use(new LocalStrategy({ usernameField: "email" }, (email, password, done) => {
-  User.findOne({ email: email.toLowerCase() }, (err, user: any) => {
-    if (err) { return done(err); }
-    if (!user) {
-      return done(undefined, false, { message: `Email ${email} not found.` });
-    }
-    user.comparePassword(password, (err: Error, isMatch: boolean) => {
-      if (err) { return done(err); }
-      if (isMatch) {
-        return done(undefined, user);
+passport.use(
+  new SpotifyStrategy(
+    {
+      clientID: SPOTIFY_ID,
+      clientSecret: SPOTIFY_SECRET,
+      callbackURL: "/auth/spotify/callback"
+    },
+    async (accessToken: any, refreshToken: any, expires_in: any, profile: any, done: any) => {
+      console.log(`accessToken: ${accessToken}\nrefreshToken: ${refreshToken}\nexpires_in: ${expires_in}`);
+      console.log(profile);
+      try {
+        const user = await User.findOrCreate(profile);
+        done(undefined, user);
       }
-      return done(undefined, false, { message: "Invalid email or password." });
-    });
-  });
-}));
-
-
-/**
- * OAuth Strategy Overview
- *
- * - User is already logged in.
- *   - Check if there is an existing account with a provider id.
- *     - If there is, return an error message. (Account merging not supported)
- *     - Else link new OAuth account with currently logged-in user.
- * - User is not logged in.
- *   - Check if it's a returning user.
- *     - If returning user, sign in and we are done.
- *     - Else check if there is an existing account with user's email.
- *       - If there is, return an error message.
- *       - Else create a new account.
- */
-
+      catch (error) {
+        done(error, undefined);
+      }
+    }
+  )
+);
 
 /**
  * Login Required middleware.
