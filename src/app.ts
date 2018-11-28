@@ -25,8 +25,7 @@ import * as apiController from "./controllers/api";
 import * as userController from "./controllers/user";
 
 // API keys and Passport configuration
-// import * as passportConfig from "./config/passport";
-import "./config/passport";
+import * as passportConfig from "./config/passport";
 
 // Create Express server
 const app = express();
@@ -95,12 +94,13 @@ app.get("/", homeController.index);
  * API examples routes.
  */
 app.get("/api", apiController.getApi);
+app.get("/api/myAlbums", passportConfig.isAuthenticated, apiController.getMyAlbums);
 
 /**
  * User/Auth routes
  */
 app.get("/login", userController.login);
-app.get("/auth/spotify", passport.authenticate("spotify"), userController.authSpotify);
+app.get("/auth/spotify", passport.authenticate("spotify", { scope: ["user-library-read"] }), userController.authSpotify);
 app.get("/auth/spotify/callback", passport.authenticate("spotify", { failureRedirect: "/login" }), userController.authSpotifyCallback);
 
 export default app;

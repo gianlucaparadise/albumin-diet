@@ -8,6 +8,7 @@ import _ from "lodash";
 import { default as User } from "../models/User";
 import { Request, Response, NextFunction } from "express";
 import { SPOTIFY_ID, SPOTIFY_SECRET } from "../util/secrets";
+import { SpotifyApiManager } from "../managers/SpotifyApiManager";
 
 const SpotifyStrategy = require("passport-spotify").Strategy;
 
@@ -33,6 +34,10 @@ passport.use(
       console.log(profile);
       try {
         const user = await User.findOrCreate(profile);
+
+        SpotifyApiManager.Api.setAccessToken(accessToken);
+        SpotifyApiManager.Api.setRefreshToken(refreshToken);
+
         done(undefined, user);
       }
       catch (error) {

@@ -9,3 +9,13 @@ export let index = (req: Request, res: Response) => {
     title: "Home"
   });
 };
+
+/**
+ * GET /
+ * Home page.
+ */
+export let myAlbums = (req: Request, res: Response) => {
+  res.render("index", {
+    title: "Home"
+  });
+};

@@ -48,6 +48,7 @@
     "pug": "^2.0.0-rc.4",
     "request": "^2.83.0",
     "request-promise": "^4.2.2",
+    "spotify-web-api-node": "^4.0.0",
     "winston": "^2.4.0"
   },
   "devDependencies": {
@@ -74,6 +75,7 @@
     "@types/passport-local": "^1.0.32",
     "@types/request": "^2.47.0",
     "@types/shelljs": "^0.7.8",
+    "@types/spotify-api": "^0.0.0",
     "@types/supertest": "^2.0.4",
     "@types/winston": "^2.3.7",
     "chai": "^4.1.2",
