@@ -47,6 +47,9 @@ passport.use(
   )
 );
 
+export let spotifyAuthenticate = passport.authenticate("spotify", { scope: ["user-library-read"] });
+export let spotifyAuthenticateCallback = passport.authenticate("spotify", { failureRedirect: "/login" });
+
 /**
  * Login Required middleware.
  */

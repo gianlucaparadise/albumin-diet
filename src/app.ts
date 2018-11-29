@@ -100,7 +100,7 @@ app.get("/api/myAlbums", passportConfig.isAuthenticated, apiController.getMyAlbu
  * User/Auth routes
  */
 app.get("/login", userController.login);
-app.get("/auth/spotify", passport.authenticate("spotify", { scope: ["user-library-read"] }), userController.authSpotify);
-app.get("/auth/spotify/callback", passport.authenticate("spotify", { failureRedirect: "/login" }), userController.authSpotifyCallback);
+app.get("/auth/spotify", passportConfig.spotifyAuthenticate, userController.authSpotify);
+app.get("/auth/spotify/callback", passportConfig.spotifyAuthenticateCallback, userController.authSpotifyCallback);
 
 export default app;
