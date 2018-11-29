@@ -33,7 +33,7 @@ passport.use(
       console.log(`accessToken: ${accessToken}\nrefreshToken: ${refreshToken}\nexpires_in: ${expires_in}`);
       console.log(profile);
       try {
-        const user = await User.findOrCreate(profile);
+        const user = await User.findOrCreateOrUpdateToken(profile, accessToken);
 
         SpotifyApiManager.Api.setAccessToken(accessToken);
         SpotifyApiManager.Api.setRefreshToken(refreshToken);
