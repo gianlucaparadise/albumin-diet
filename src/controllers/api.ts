@@ -16,11 +16,8 @@ export let getApi = (req: Request, res: Response) => {
 };
 
 export let getMyAlbums = async (req: Request, res: Response) => {
-  console.log("req.user");
-  console.log(req.user);
   if (!req.user) {
-    res.status(403).json({ error: "not authenticated" });
-    return;
+    console.log("req.user not found");
   }
 
   try {

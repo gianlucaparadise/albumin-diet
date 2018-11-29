@@ -3,6 +3,7 @@ import passport from "passport";
 import request from "request";
 import passportLocal from "passport-local";
 import _ from "lodash";
+import { Strategy as BearerStrategy } from "passport-http-bearer";
 
 // import { User, UserType } from '../models/User';
 import { default as User } from "../models/User";
@@ -21,6 +22,17 @@ passport.deserializeUser((id, done) => {
     done(err, user);
   });
 });
+
+passport.use(new BearerStrategy(
+  function (token, done) {
+    User.findOne({ "token.spotify": token }, function (err, user) {
+      if (err) { return done(err); }
+      if (!user) { return done(undefined, false); }
+      // return done(undefined, user, { scope: "all" });
+      return done(undefined, user);
+    });
+  }
+));
 
 passport.use(
   new SpotifyStrategy(
@@ -49,6 +61,8 @@ passport.use(
 
 export let spotifyAuthenticate = passport.authenticate("spotify", { scope: ["user-library-read"] });
 export let spotifyAuthenticateCallback = passport.authenticate("spotify", { failureRedirect: "/login" });
+
+export let bearerAuthenticate = passport.authenticate("bearer", { session: false });
 
 /**
  * Login Required middleware.
