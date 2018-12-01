@@ -112,6 +112,16 @@ declare namespace SpotifyApi {
   // Generic interfaces for re-use:
 
   /**
+   * All the responses in "spotify-web-api-node" are wrapped in this class
+   */
+  interface SpotifyNodeResponse<T> {
+    body: T;
+    headers: any;
+    statusCode: number;
+  }
+
+
+  /**
    * Void Response
    */
   interface VoidResponse { }
@@ -938,4 +948,9 @@ declare namespace SpotifyApi {
     type: "user";
     uri: string;
   }
+
+  //#region NodeResponses
+  interface UsersSavedAlbumsNodeResponse extends SpotifyNodeResponse<UsersSavedAlbumsResponse> { }
+  //#endregion
+
 }
