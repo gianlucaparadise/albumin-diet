@@ -1,4 +1,5 @@
 import { Document, Schema, Model, model } from "mongoose";
+import { IAlbumTag } from "./AlbumTag";
 
 export interface IUser extends Document {
   /**
@@ -9,6 +10,9 @@ export interface IUser extends Document {
     spotify: string
   };
   displayName: string;
+
+  albumTags: IAlbumTag[];
+
   // comparePassword(password: string): boolean;
 }
 
@@ -24,7 +28,8 @@ export const userSchema: Schema = new Schema({
   token: {
     spotify: String
   },
-  displayName: String
+  displayName: String,
+  albumTags: [{ type: Schema.Types.ObjectId, ref: "AlbumTag" }],
 }, { timestamps: true });
 
 // userSchema.method("comparePassword", function (password: string): boolean {
@@ -59,5 +64,3 @@ userSchema.static("findOrCreateOrUpdateToken", async function (profile: any, acc
 });
 
 export const User: IUserModel = model<IUser, IUserModel>("User", userSchema);
-
-export default User;

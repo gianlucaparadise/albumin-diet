@@ -6,7 +6,7 @@ import _ from "lodash";
 import { Strategy as BearerStrategy } from "passport-http-bearer";
 
 // import { User, UserType } from '../models/User';
-import { default as User } from "../models/User";
+import { User } from "../models/User";
 import { Request, Response, NextFunction } from "express";
 import { SPOTIFY_ID, SPOTIFY_SECRET } from "../util/secrets";
 import { SpotifyApiManager } from "../managers/SpotifyApiManager";
