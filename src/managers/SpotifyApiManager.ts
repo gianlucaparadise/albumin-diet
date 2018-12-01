@@ -1,5 +1,3 @@
-/// <reference path="../../node_modules/@types/spotify-api/index.d.ts" />
-
 import { SPOTIFY_ID, SPOTIFY_SECRET } from "../util/secrets";
 
 const SpotifyWebApi = require("spotify-web-api-node");
@@ -30,27 +28,18 @@ export class SpotifyApiManager {
     return this.Instance.Api;
   }
 
-  public static async GetMySavedAlbums(): Promise<SpotifyApi.UsersSavedAlbumsResponse> {
+  public static async GetMySavedAlbums(): Promise<SpotifyApi.UsersSavedAlbumsNodeResponse> {
 
     try {
-      const response: SpotifyApi.UsersSavedAlbumsResponse = await SpotifyApiManager.Api.getMySavedAlbums({
+      const response: SpotifyApi.UsersSavedAlbumsNodeResponse = await SpotifyApiManager.Api.getMySavedAlbums({
         limit: 1,
         offset: 0
       });
-      console.log(response);
-      // todo: UsersSavedAlbumsResponse is not the correct model
-      // should have reponse.body
+
       return Promise.resolve(response);
     }
     catch (error) {
       return Promise.reject(error);
     }
-
-    // .then(function (data:  ) {
-    //   // Output items
-    //   console.log(data.body.items);
-    // }, function (err) {
-    //   console.log("Something went wrong!", err);
-    // });
   }
 }
