@@ -950,6 +950,20 @@ declare namespace SpotifyApi {
   }
 
   //#region NodeResponses
+  interface UserProfileAuthenticationNodeResponse {
+    provider: "spotify";
+    id: string;
+    username: string;
+    displayName: string;
+    profileUrl: string;
+    photos: string[];
+    country: string;
+    followers: number;
+    product: string;
+    _raw: string;
+    _json: UserObjectPublic;
+  }
+
   interface UsersSavedAlbumsNodeResponse extends SpotifyNodeResponse<UsersSavedAlbumsResponse> { }
   //#endregion
 

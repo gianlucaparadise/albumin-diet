@@ -2,31 +2,25 @@ import { Document, Schema, Model, model } from "mongoose";
 import { IAlbumTag } from "./AlbumTag";
 
 export interface IUser extends Document {
-  /**
-   * Spotify username
-   */
-  spotify: string;
-  token: {
-    spotify: string
+  spotify: {
+    id: String,
+    accessToken: String,
+    refreshToken: String,
   };
   displayName: string;
-
   albumTags: IAlbumTag[];
-
   addAlbumTag(albumTag: IAlbumTag): Promise<boolean>;
 }
 
 export interface IUserModel extends Model<IUser> {
-  findOrCreateOrUpdateToken(profile: any, accessToken: string): Promise<IUser>;
+  upsertSpotifyUser(profile: any, accessToken: string, refreshToken: string): Promise<IUser>;
 }
 
 export const userSchema: Schema = new Schema({
-  /**
-   * Spotify username
-   */
-  spotify: String,
-  token: {
-    spotify: String
+  spotify: {
+    id: String,
+    accessToken: String,
+    refreshToken: String,
   },
   displayName: String,
   albumTags: [{ type: Schema.Types.ObjectId, ref: "AlbumTag" }],
@@ -37,7 +31,7 @@ userSchema.methods.addAlbumTag = async function (albumTag: IAlbumTag): Promise<I
     const thisUser = <IUser>this;
 
     const added: any = (<any>thisUser.albumTags).addToSet(albumTag._id);
-    console.log(`Added ${added} albumTags to user`);
+    console.log(`albumTag ${added ? "added" : "not added"} to user`);
 
     const savedUser = await thisUser.save();
     return Promise.resolve(savedUser);
@@ -48,30 +42,34 @@ userSchema.methods.addAlbumTag = async function (albumTag: IAlbumTag): Promise<I
   }
 };
 
-userSchema.static("findOrCreateOrUpdateToken", async function (profile: any, accessToken: string): Promise<IUser> {
+userSchema.statics.upsertSpotifyUser = async function (profile: SpotifyApi.UserProfileAuthenticationNodeResponse, accessToken: string, refreshToken: string): Promise<IUser> {
   try {
-    const found: IUser = await User.findOne({ spotify: profile.id });
-    if (found) {
-      if (!found.token) {
-        found.token = { spotify: accessToken };
-      }
-      else {
-        found.token.spotify = accessToken;
-      }
-      const savedUser = await found.save();
+    const user = await User.findOne({
+      "spotify.id": profile.id
+    });
+
+    if (user) {
+      user.spotify = Object.assign(user.spotify, { accessToken: accessToken, refreshToken: refreshToken });
+      user.displayName = profile.displayName;
+      const savedUser = await user.save();
       return Promise.resolve(savedUser);
     }
 
-    const newUser: IUser = new User();
-    newUser.spotify = profile.id;
-    newUser.token = { spotify: accessToken };
+    // no user was found: we create a new one
+    const newUser = new User();
+    newUser.spotify = {
+      id: profile.id,
+      accessToken: accessToken,
+      refreshToken: refreshToken,
+    };
     newUser.displayName = profile.displayName;
-    const createdUser: IUser = await newUser.save();
-    return Promise.resolve(createdUser);
 
-  } catch (error) {
+    const savedUser = await newUser.save();
+    return Promise.resolve(savedUser);
+  }
+  catch (error) {
     return Promise.reject(error);
   }
-});
+};
 
 export const User: IUserModel = model<IUser, IUserModel>("User", userSchema);

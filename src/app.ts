@@ -93,14 +93,15 @@ app.get("/", homeController.index);
 /**
  * API examples routes.
  */
-app.get("/api/myAlbums", passportConfig.bearerAuthenticate, apiController.getMyAlbums);
-app.post("/api/setTagOnAlbum", passportConfig.bearerAuthenticate, apiController.setTagOnAlbum);
+app.get("/api/myAlbums", passportConfig.authenticate, passportConfig.fillCurrentUser, apiController.getMyAlbums);
+app.post("/api/setTagOnAlbum", passportConfig.authenticate, passportConfig.fillCurrentUser, apiController.setTagOnAlbum);
 
 /**
  * User/Auth routes
  */
 app.get("/login", userController.login);
 app.get("/auth/spotify", passportConfig.spotifyAuthenticate, userController.authSpotify);
-app.get("/auth/spotify/callback", passportConfig.spotifyAuthenticateCallback, userController.authSpotifyCallback);
+app.get("/auth/spotify/callback", passportConfig.spotifyAuthenticateCallback, userController.authSpotifyCallback, passportConfig.generateToken, passportConfig.sendToken);
+app.get("/auth/me", passportConfig.authenticate, passportConfig.fillCurrentUser, userController.getOne);
 
 export default app;

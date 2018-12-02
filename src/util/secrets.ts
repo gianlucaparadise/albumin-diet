@@ -15,6 +15,7 @@ const prod = ENVIRONMENT === "production"; // Anything else is treated as 'dev'
 export const BASE_PATH = prod ? "http://albumindiet.com/" : "http://localhost:3000/";
 
 export const SESSION_SECRET = process.env["SESSION_SECRET"];
+export const JWT_SECRET = process.env["JWT_SECRET"];
 export const MONGODB_URI = prod ? process.env["MONGODB_URI"] : process.env["MONGODB_URI_LOCAL"];
 
 if (!SESSION_SECRET) {

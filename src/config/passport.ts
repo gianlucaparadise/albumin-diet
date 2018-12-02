@@ -1,14 +1,10 @@
-import path from "path";
 import passport from "passport";
-import request from "request";
-import passportLocal from "passport-local";
-import _ from "lodash";
-import { Strategy as BearerStrategy } from "passport-http-bearer";
+import jwt from "jsonwebtoken";
+import expressJwt from "express-jwt";
 
-// import { User, UserType } from '../models/User';
 import { User } from "../models/User";
 import { Request, Response, NextFunction } from "express";
-import { SPOTIFY_ID, SPOTIFY_SECRET } from "../util/secrets";
+import { SPOTIFY_ID, SPOTIFY_SECRET, JWT_SECRET } from "../util/secrets";
 import { SpotifyApiManager } from "../managers/SpotifyApiManager";
 
 const SpotifyStrategy = require("passport-spotify").Strategy;
@@ -23,16 +19,16 @@ passport.deserializeUser((id, done) => {
   });
 });
 
-passport.use(new BearerStrategy(
-  function (token, done) {
-    User.findOne({ "token.spotify": token }, function (err, user) {
-      if (err) { return done(err); }
-      if (!user) { return done(undefined, false); }
-      // return done(undefined, user, { scope: "all" });
-      return done(undefined, user);
-    });
-  }
-));
+/**
+ * refer to: https://codeburst.io/node-js-rest-api-facebook-login-121114ee04d8
+ * Full login flow:
+ *  front-end logs in spotify and get access-token
+ *  front-end makes GET call to /auth/spotify with header `Authorization: Bearer base64_access_token_string`
+ *  server authenticates the user and saves it to the db
+ *  server generates jwt
+ *  server sends jwt
+ *
+ */
 
 passport.use(
   new SpotifyStrategy(
@@ -41,14 +37,11 @@ passport.use(
       clientSecret: SPOTIFY_SECRET,
       callbackURL: "/auth/spotify/callback"
     },
-    async (accessToken: any, refreshToken: any, expires_in: any, profile: any, done: any) => {
+    async function (accessToken: any, refreshToken: any, expires_in: any, profile: any, done: any) {
       console.log(`accessToken: ${accessToken}\nrefreshToken: ${refreshToken}\nexpires_in: ${expires_in}`);
       console.log(profile);
       try {
-        const user = await User.findOrCreateOrUpdateToken(profile, accessToken);
-
-        SpotifyApiManager.Api.setAccessToken(accessToken);
-        SpotifyApiManager.Api.setRefreshToken(refreshToken);
+        const user = await User.upsertSpotifyUser(profile, accessToken, refreshToken);
 
         done(undefined, user);
       }
@@ -59,30 +52,50 @@ passport.use(
   )
 );
 
-export let spotifyAuthenticate = passport.authenticate("spotify", { scope: ["user-library-read"] });
+export let spotifyAuthenticate = passport.authenticate("spotify", { session: false, scope: ["user-library-read"] });
 export let spotifyAuthenticateCallback = passport.authenticate("spotify", { failureRedirect: "/login" });
 
-export let bearerAuthenticate = passport.authenticate("bearer", { session: false });
-
-/**
- * Login Required middleware.
- */
-export let isAuthenticated = (req: Request, res: Response, next: NextFunction) => {
-  if (req.isAuthenticated()) {
-    return next();
-  }
-  res.redirect("/login");
+const createToken = function (auth: any) {
+  return jwt.sign(
+    {
+      id: auth.id
+    },
+    JWT_SECRET,
+    {
+      expiresIn: 60 * 120
+    }
+  );
 };
 
-/**
- * Authorization Required middleware.
- */
-export let isAuthorized = (req: Request, res: Response, next: NextFunction) => {
-  const provider = req.path.split("/").slice(-1)[0];
+export const generateToken = function (req: any, res: Response, next: NextFunction) {
+  req.token = createToken(req.auth);
+  next();
+};
 
-  if (_.find(req.user.tokens, { kind: provider })) {
-    next();
-  } else {
-    res.redirect(`/auth/${provider}`);
+export const sendToken = function (req: any, res: Response) {
+  res.setHeader("x-auth-token", req.token);
+  res.status(200).send({ auth: req.auth, token: req.token });
+};
+
+export const authenticate = expressJwt({
+  secret: JWT_SECRET,
+  requestProperty: "auth",
+  getToken: function fromHeader(req) {
+    if (req.headers.authorization && req.headers.authorization.split(" ")[0] === "Bearer") {
+      return req.headers.authorization.split(" ")[1];
+    }
+    return undefined;
   }
+});
+
+export const fillCurrentUser = (req: Request, res: Response, next: NextFunction) => {
+  const authId = (<any>req).auth.id;
+  User.findById(authId)
+    .then(user => {
+      req.user = user;
+      SpotifyApiManager.Api.setAccessToken(user.spotify.accessToken);
+      SpotifyApiManager.Api.setRefreshToken(user.spotify.refreshToken);
+      next();
+    })
+    .catch(next);
 };

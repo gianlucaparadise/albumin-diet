@@ -12,17 +12,13 @@ import { AlbumTag } from "../models/AlbumTag";
 import { IUser } from "../models/User";
 
 export let getMyAlbums = async (req: Request, res: Response) => {
-  if (!req.user) {
-    console.log("req.user not found");
-  }
-
   try {
     const response = await SpotifyApiManager.GetMySavedAlbums();
-    res.json(response);
+    return res.json(response);
   }
   catch (error) {
     console.log(error);
-    res.status(error.statusCode).json(error);
+    return res.status(error.statusCode).json(error);
   }
 };
 
@@ -31,28 +27,23 @@ export let setTagOnAlbum = async (req: Request, res: Response) => {
 
   //#region Request consistency
   if (!body) {
-    res.status(400).json(new ErrorResponse("400", "Missing Body"));
-    return;
+    return res.status(400).json(new ErrorResponse("400", "Missing Body"));
   }
 
   if (!body.album) {
-    res.status(400).json(new ErrorResponse("400", "album field is required"));
-    return;
+    return res.status(400).json(new ErrorResponse("400", "album field is required"));
   }
 
   if (!body.album.spotifyId) {
-    res.status(400).json(new ErrorResponse("400", "album.spotifyId field is required"));
-    return;
+    return res.status(400).json(new ErrorResponse("400", "album.spotifyId field is required"));
   }
 
   if (!body.tag) {
-    res.status(400).json(new ErrorResponse("400", "tag field is required"));
-    return;
+    return res.status(400).json(new ErrorResponse("400", "tag field is required"));
   }
 
   if (!body.tag.name) {
-    res.status(400).json(new ErrorResponse("400", "tag.name field is required"));
-    return;
+    return res.status(400).json(new ErrorResponse("400", "tag.name field is required"));
   }
   //#endregion
 
@@ -65,10 +56,10 @@ export let setTagOnAlbum = async (req: Request, res: Response) => {
     const user = <IUser>req.user;
     const savedUser = await user.addAlbumTag(albumTag);
 
-    res.json(new EmptyResponse());
+    return res.json(new EmptyResponse());
 
   } catch (error) {
     console.log(error);
-    res.status(500).json(new ErrorResponse("500", "Internal error"));
+    return res.status(500).json(new ErrorResponse("500", "Internal error"));
   }
 };

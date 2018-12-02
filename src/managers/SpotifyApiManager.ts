@@ -28,6 +28,19 @@ export class SpotifyApiManager {
     return this.Instance.Api;
   }
 
+  // private static async RefreshToken(): Promise<boolean> {
+  //   try {
+  //     const data = await SpotifyApiManager.Api.refreshAccessToken();
+  //     // todo: I should save the token and send it back to the user
+  //     console.log(`Refreshed accessToken: \n ${data.body["access_token"]}`);
+  //     console.log(`I should save to user`);
+  //     SpotifyApiManager.Api.setAccessToken(data.body["access_token"]);
+  //     Promise.resolve(true);
+  //   } catch (error) {
+  //     return Promise.reject(error);
+  //   }
+  // }
+
   public static async GetMySavedAlbums(): Promise<SpotifyApi.UsersSavedAlbumsNodeResponse> {
 
     try {
@@ -39,6 +52,13 @@ export class SpotifyApiManager {
       return Promise.resolve(response);
     }
     catch (error) {
+      // // todo: If I get 401 I should refresh access token and re-send the request
+      // if (error.statusCode == 401) {
+      //   const hasRefreshed = await SpotifyApiManager.RefreshToken();
+      //   if (hasRefreshed) {
+      //     return SpotifyApiManager.GetMySavedAlbums();
+      //   }
+      // }
       return Promise.reject(error);
     }
   }
