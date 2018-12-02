@@ -13,7 +13,7 @@ export interface IUser extends Document {
 
   albumTags: IAlbumTag[];
 
-  // comparePassword(password: string): boolean;
+  addAlbumTag(albumTag: IAlbumTag): Promise<boolean>;
 }
 
 export interface IUserModel extends Model<IUser> {
@@ -32,10 +32,21 @@ export const userSchema: Schema = new Schema({
   albumTags: [{ type: Schema.Types.ObjectId, ref: "AlbumTag" }],
 }, { timestamps: true });
 
-// userSchema.method("comparePassword", function (password: string): boolean {
-//   // if (bcrypt.compareSync(password, this.password)) return true;
-//   return false;
-// });
+userSchema.methods.addAlbumTag = async function (albumTag: IAlbumTag): Promise<IUser> {
+  try {
+    const thisUser = <IUser>this;
+
+    const added: any = (<any>thisUser.albumTags).addToSet(albumTag._id);
+    console.log(`Added ${added} albumTags to user`);
+
+    const savedUser = await thisUser.save();
+    return Promise.resolve(savedUser);
+  }
+  catch (error) {
+    console.log(error);
+    return Promise.reject(error);
+  }
+};
 
 userSchema.static("findOrCreateOrUpdateToken", async function (profile: any, accessToken: string): Promise<IUser> {
   try {

@@ -17,11 +17,8 @@ const albumTagSchema = new Schema({
   tag: { type: Schema.Types.ObjectId, ref: "Tag" },
 }, { timestamps: true });
 
-albumTagSchema.statics.findOrCreate = async (album: IAlbum, tag: ITag): Promise<IAlbumTag> => {
+albumTagSchema.statics.findOrCreate = async function (album: IAlbum, tag: ITag): Promise<IAlbumTag> {
   try {
-    // todo: update mongoose and use session
-    // const session = await mongoose.startSession();
-
     const albumTag = await AlbumTag.findOne({ album: album._id, tag: tag._id });
 
     if (albumTag) {
@@ -34,15 +31,6 @@ albumTagSchema.statics.findOrCreate = async (album: IAlbum, tag: ITag): Promise<
     newAlbumTag.album = album;
     newAlbumTag.tag = tag;
     const savedAlbumTag = await newAlbumTag.save();
-
-    // Now I save the tag in the album and the album in the tag
-    console.log("Album and Tag update");
-
-    album.tags.push(tag._id);
-    await album.save();
-
-    tag.albums.push(album._id);
-    await tag.save();
 
     return Promise.resolve(savedAlbumTag);
 

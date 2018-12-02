@@ -16,3 +16,5 @@ export class ErrorResponse extends BaseResponse<undefined> {
     };
   }
 }
+
+export class EmptyResponse extends BaseResponse<undefined> { }

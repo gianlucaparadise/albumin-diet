@@ -5,10 +5,11 @@ import request from "request";
 import { Response, Request, NextFunction } from "express";
 import { SpotifyApiManager } from "../managers/SpotifyApiManager";
 import { SetTagOnAlbumRequest } from "../models/requests/SetTagOnAlbumRequest";
-import { ErrorResponse } from "../models/responses/GenericResponses";
+import { ErrorResponse, EmptyResponse } from "../models/responses/GenericResponses";
 import { Tag } from "../models/Tag";
 import { Album } from "../models/Album";
 import { AlbumTag } from "../models/AlbumTag";
+import { IUser } from "../models/User";
 
 export let getMyAlbums = async (req: Request, res: Response) => {
   if (!req.user) {
@@ -61,9 +62,10 @@ export let setTagOnAlbum = async (req: Request, res: Response) => {
     const album = await Album.findOrCreate(body.album.spotifyId);
     const albumTag = await AlbumTag.findOrCreate(album, tag);
 
-    console.log(`User: \n ${req.user}`);
+    const user = <IUser>req.user;
+    const savedUser = await user.addAlbumTag(albumTag);
 
-    res.json({ finished: true });
+    res.json(new EmptyResponse());
 
   } catch (error) {
     console.log(error);

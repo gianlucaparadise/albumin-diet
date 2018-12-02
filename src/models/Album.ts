@@ -1,13 +1,10 @@
 import { Document, Schema, Model, model } from "mongoose";
-import { ITag } from "./Tag";
 
 export interface IAlbum extends Document {
   // name: string;
   publicId: {
     spotify: string
   };
-
-  tags: ITag[];
   // url: {
   //   spotify: string
   // };
@@ -31,7 +28,6 @@ export const albumSchema = new Schema({
   publicId: {
     spotify: String
   },
-  tags: [{ type: Schema.Types.ObjectId, ref: "Tag" }],
   // url: {
   //   spotify: String
   // },
@@ -46,7 +42,7 @@ export const albumSchema = new Schema({
   // }
 }, { timestamps: true });
 
-albumSchema.statics.findOrCreate = async (id: string): Promise<IAlbum> => {
+albumSchema.statics.findOrCreate = async function (id: string): Promise<IAlbum> {
   try {
     const album = await Album.findOne({ "publicId.spotify": id });
     if (album) {

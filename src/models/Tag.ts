@@ -1,11 +1,9 @@
 import { Document, Schema, Model, model } from "mongoose";
-import { IAlbum } from "./Album";
 
 export interface ITag extends Document {
   // todo: check how to customize the setter and normalize the inserted id using a naming convention
   uniqueId: string;
   name: string;
-  albums: IAlbum[];
 }
 
 export interface ITagModel extends Model<ITag> {
@@ -21,10 +19,9 @@ export interface ITagModel extends Model<ITag> {
 export const tagSchema = new Schema({
   uniqueId: { type: String, unique: true },
   name: String,
-  albums: [{ type: Schema.Types.ObjectId, ref: "Album" }],
 }, { timestamps: true });
 
-tagSchema.statics.calculateUniqueIdByName = (name: String): String => {
+tagSchema.statics.calculateUniqueIdByName = function (name: String): String {
   const uniqueId = name
     .trim()
     .replace(" ", "-")
@@ -33,7 +30,7 @@ tagSchema.statics.calculateUniqueIdByName = (name: String): String => {
   return uniqueId;
 };
 
-tagSchema.statics.findOrCreate = async (name: string): Promise<ITag> => {
+tagSchema.statics.findOrCreate = async function (name: string): Promise<ITag> {
   try {
     const uniqueId = Tag.calculateUniqueIdByName(name);
     const tag = await Tag.findOne({ uniqueId: uniqueId });
