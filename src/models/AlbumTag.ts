@@ -1,4 +1,5 @@
-import { model, Document, Schema, Model, default as mongoose } from "mongoose";
+import mongoose from "mongoose";
+import { model, Document, Schema, Model } from "mongoose";
 import { IAlbum } from "./Album";
 import { ITag } from "./Tag";
 
@@ -14,7 +15,7 @@ export interface IAlbumTagModel extends Model<IAlbumTag> {
 const albumTagSchema = new Schema({
   album: { type: Schema.Types.ObjectId, ref: "Album" },
   tag: { type: Schema.Types.ObjectId, ref: "Tag" },
-}, { timestamps: true, usePushEach: true });
+}, { timestamps: true });
 
 albumTagSchema.statics.findOrCreate = async (album: IAlbum, tag: ITag): Promise<IAlbumTag> => {
   try {

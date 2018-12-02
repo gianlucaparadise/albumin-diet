@@ -44,7 +44,7 @@ export const albumSchema = new Schema({
   // artist: {
   //   name: String
   // }
-}, { timestamps: true, usePushEach: true });
+}, { timestamps: true });
 
 albumSchema.statics.findOrCreate = async (id: string): Promise<IAlbum> => {
   try {

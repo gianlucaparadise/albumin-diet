@@ -22,7 +22,7 @@ export const tagSchema = new Schema({
   uniqueId: { type: String, unique: true },
   name: String,
   albums: [{ type: Schema.Types.ObjectId, ref: "Album" }],
-}, { timestamps: true, usePushEach: true });
+}, { timestamps: true });
 
 tagSchema.statics.calculateUniqueIdByName = (name: String): String => {
   const uniqueId = name
@@ -49,9 +49,9 @@ tagSchema.statics.findOrCreate = async (name: string): Promise<ITag> => {
     newTag.uniqueId = uniqueId;
     newTag.name = name.trim();
 
-    const savedtag = await newTag.save();
+    const savedTag = await newTag.save();
 
-    return Promise.resolve(savedtag);
+    return Promise.resolve(savedTag);
   }
   catch (error) {
     return Promise.reject(error);
