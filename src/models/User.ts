@@ -1,4 +1,4 @@
-import { Document, Schema, Model, model } from "mongoose";
+import { Document, Schema, Model, model, Types } from "mongoose";
 import { IAlbumTag } from "./AlbumTag";
 import { TagsByAlbum } from "./responses/TaggedAlbum";
 
@@ -9,7 +9,7 @@ export interface IUser extends Document {
     refreshToken: String,
   };
   displayName: string;
-  albumTags: IAlbumTag[];
+  albumTags: Types.Array<IAlbumTag>;
   addAlbumTag(albumTag: IAlbumTag): Promise<boolean>;
   /**
    * Retrieves user's tags indexed by album spotifyId
@@ -35,7 +35,7 @@ userSchema.methods.addAlbumTag = async function (albumTag: IAlbumTag): Promise<I
   try {
     const thisUser = <IUser>this;
 
-    const added: any = (<any>thisUser.albumTags).addToSet(albumTag._id);
+    const added: any = thisUser.albumTags.addToSet(albumTag._id);
     console.log(`albumTag ${added ? "added" : "not added"} to user`);
 
     const savedUser = await thisUser.save();

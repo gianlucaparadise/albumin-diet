@@ -13,6 +13,8 @@ import { IUser } from "../models/User";
 import { TaggedAlbumsResponse } from "../models/responses/TaggedAlbum";
 
 export let getMyAlbums = async (req: Request, res: Response) => {
+  // todo: filter by tag
+  // todo: pagination
   try {
     const user = <IUser>req.user;
 
@@ -26,6 +28,10 @@ export let getMyAlbums = async (req: Request, res: Response) => {
     console.log(error);
     return res.status(error.statusCode).json(error);
   }
+};
+
+export const getMyTags = async (req: Request, res: Response) => {
+  // todo: retrieve list of tags
 };
 
 export let setTagOnAlbum = async (req: Request, res: Response) => {

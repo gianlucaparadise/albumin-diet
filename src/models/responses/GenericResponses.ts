@@ -5,11 +5,15 @@ export class BaseResponse<T> {
   };
 
   data: T;
+
+  constructor(body: T) {
+    this.data = body;
+}
 }
 
 export class ErrorResponse extends BaseResponse<undefined> {
   constructor(code: string, description: string) {
-    super();
+    super(undefined);
     this.error = {
       errorCode: code,
       errorDescription: description
