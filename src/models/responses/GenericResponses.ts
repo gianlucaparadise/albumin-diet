@@ -1,10 +1,10 @@
-class BaseResponse<T> {
+export class BaseResponse<T> {
   error?: {
     errorDescription: string;
     errorCode: string;
   };
 
-  data?: T;
+  data: T;
 }
 
 export class ErrorResponse extends BaseResponse<undefined> {

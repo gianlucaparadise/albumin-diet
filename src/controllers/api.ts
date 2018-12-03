@@ -10,10 +10,16 @@ import { Tag } from "../models/Tag";
 import { Album } from "../models/Album";
 import { AlbumTag } from "../models/AlbumTag";
 import { IUser } from "../models/User";
+import { TaggedAlbumsResponse } from "../models/responses/TaggedAlbum";
 
 export let getMyAlbums = async (req: Request, res: Response) => {
   try {
-    const response = await SpotifyApiManager.GetMySavedAlbums();
+    const user = <IUser>req.user;
+
+    const tagsByAlbum = await user.getTagsByAlbum();
+    const spotifyAlbums = await SpotifyApiManager.GetMySavedAlbums();
+    const response = TaggedAlbumsResponse.createFromSpotifyAlbums(spotifyAlbums.body.items, tagsByAlbum);
+
     return res.json(response);
   }
   catch (error) {

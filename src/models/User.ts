@@ -1,5 +1,6 @@
 import { Document, Schema, Model, model } from "mongoose";
 import { IAlbumTag } from "./AlbumTag";
+import { TagsByAlbum } from "./responses/TaggedAlbum";
 
 export interface IUser extends Document {
   spotify: {
@@ -10,6 +11,10 @@ export interface IUser extends Document {
   displayName: string;
   albumTags: IAlbumTag[];
   addAlbumTag(albumTag: IAlbumTag): Promise<boolean>;
+  /**
+   * Retrieves user's tags indexed by album spotifyId
+   */
+  getTagsByAlbum(): Promise<TagsByAlbum>;
 }
 
 export interface IUserModel extends Model<IUser> {
@@ -42,6 +47,35 @@ userSchema.methods.addAlbumTag = async function (albumTag: IAlbumTag): Promise<I
   }
 };
 
+userSchema.methods.getTagsByAlbum = async function (): Promise<TagsByAlbum> {
+  try {
+    const thisUser = <IUser>this;
+    await thisUser.
+      populate({ path: "albumTags", populate: [{ path: "tag", select: "uniqueId name" }, { path: "album" }] })
+      .execPopulate();
+
+    // Grouping albums by spotifyId
+    const taggedAlbums: TagsByAlbum = thisUser.albumTags.reduce((taggedAlbumsMap, albumTag) => {
+      const spotifyId = albumTag.album.publicId.spotify;
+
+      if (!taggedAlbumsMap[spotifyId]) {
+        taggedAlbumsMap[spotifyId] = {
+          album: albumTag.album,
+          tags: []
+        };
+      }
+
+      taggedAlbumsMap[spotifyId].tags.push(albumTag.tag);
+      return taggedAlbumsMap;
+    }, new TagsByAlbum());
+
+    return taggedAlbums;
+
+  } catch (error) {
+    return Promise.reject(error);
+  }
+};
+
 userSchema.statics.upsertSpotifyUser = async function (profile: SpotifyApi.UserProfileAuthenticationNodeResponse, accessToken: string, refreshToken: string): Promise<IUser> {
   try {
     const user = await User.findOne({
@@ -57,6 +91,7 @@ userSchema.statics.upsertSpotifyUser = async function (profile: SpotifyApi.UserP
 
     // no user was found: we create a new one
     const newUser = new User();
+    // todo: encrypt tokens
     newUser.spotify = {
       id: profile.id,
       accessToken: accessToken,

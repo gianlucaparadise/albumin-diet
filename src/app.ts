@@ -102,6 +102,6 @@ app.post("/api/setTagOnAlbum", passportConfig.authenticate, passportConfig.fillC
 app.get("/login", userController.login);
 app.get("/auth/spotify", passportConfig.spotifyAuthenticate, userController.authSpotify);
 app.get("/auth/spotify/callback", passportConfig.spotifyAuthenticateCallback, userController.authSpotifyCallback, passportConfig.generateToken, passportConfig.sendToken);
-app.get("/auth/me", passportConfig.authenticate, passportConfig.fillCurrentUser, userController.getOne);
+app.get("/auth/me", passportConfig.authenticate, passportConfig.fillCurrentUser, userController.getMe);
 
 export default app;

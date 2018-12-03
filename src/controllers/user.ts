@@ -23,7 +23,7 @@ export let authSpotifyCallback = (req: Request, res: Response, next: NextFunctio
   next();
 };
 
-export const getOne = function (req: Request, res: Response) {
+export const getMe = function (req: Request, res: Response) {
   const user = req.user.toObject();
 
   delete user["__v"];
