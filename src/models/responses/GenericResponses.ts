@@ -8,7 +8,7 @@ export class BaseResponse<T> {
 
   constructor(body: T) {
     this.data = body;
-}
+  }
 }
 
 export class ErrorResponse extends BaseResponse<undefined> {
@@ -18,6 +18,12 @@ export class ErrorResponse extends BaseResponse<undefined> {
       errorCode: code,
       errorDescription: description
     };
+  }
+}
+
+export class BadRequestErrorResponse extends ErrorResponse {
+  constructor(description: string) {
+    super("400", description);
   }
 }
 

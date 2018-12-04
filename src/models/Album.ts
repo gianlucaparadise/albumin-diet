@@ -1,4 +1,5 @@
 import { Document, Schema, Model, model } from "mongoose";
+import { AlbumTag } from "./AlbumTag";
 
 export interface IAlbum extends Document {
   // name: string;
@@ -17,6 +18,11 @@ export interface IAlbum extends Document {
   // artist: {
   //   name: string
   // };
+  /**
+   * Removes this album if it is not linked to any albumTag
+   * @returns true if it has been deleted, false otherwise
+   */
+  removeIfOrphan(): Promise<boolean>;
 }
 
 export interface IAlbumModel extends Model<IAlbum> {
@@ -41,6 +47,27 @@ export const albumSchema = new Schema({
   //   name: String
   // }
 }, { timestamps: true });
+
+albumSchema.methods.removeIfOrphan = async function (): Promise<boolean> {
+  try {
+    const album = <IAlbum>this;
+
+    // Checking if there is still an AlbumTag that links this album
+    const isAlbumLinked = await AlbumTag.exists({ "album": album._id });
+    console.log(`is album orphan: ${!isAlbumLinked}`);
+
+    if (isAlbumLinked) {
+      return Promise.resolve(false);
+    }
+
+    // this Album is now orphan: I can delete it
+    const deleteResult = await album.remove();
+    return Promise.resolve(true);
+
+  } catch (error) {
+    return Promise.reject(error);
+  }
+};
 
 albumSchema.statics.findOrCreate = async function (id: string): Promise<IAlbum> {
   try {

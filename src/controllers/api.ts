@@ -5,7 +5,7 @@ import request from "request";
 import { Response, Request, NextFunction } from "express";
 import { SpotifyApiManager } from "../managers/SpotifyApiManager";
 import { SetTagOnAlbumRequest } from "../models/requests/SetTagOnAlbumRequest";
-import { ErrorResponse, EmptyResponse } from "../models/responses/GenericResponses";
+import { ErrorResponse, EmptyResponse, BadRequestErrorResponse } from "../models/responses/GenericResponses";
 import { Tag } from "../models/Tag";
 import { Album } from "../models/Album";
 import { AlbumTag } from "../models/AlbumTag";
@@ -35,43 +35,71 @@ export const getMyTags = async (req: Request, res: Response) => {
 };
 
 export let setTagOnAlbum = async (req: Request, res: Response) => {
-  const body = req.body as SetTagOnAlbumRequest;
-
-  //#region Request consistency
-  if (!body) {
-    return res.status(400).json(new ErrorResponse("400", "Missing Body"));
-  }
-
-  if (!body.album) {
-    return res.status(400).json(new ErrorResponse("400", "album field is required"));
-  }
-
-  if (!body.album.spotifyId) {
-    return res.status(400).json(new ErrorResponse("400", "album.spotifyId field is required"));
-  }
-
-  if (!body.tag) {
-    return res.status(400).json(new ErrorResponse("400", "tag field is required"));
-  }
-
-  if (!body.tag.name) {
-    return res.status(400).json(new ErrorResponse("400", "tag.name field is required"));
-  }
-  //#endregion
-
   try {
+    const body = SetTagOnAlbumRequest.checkConsistency(req.body);
 
     const tag = await Tag.findOrCreate(body.tag.name);
+    // todo: check if album really exists on spotify
     const album = await Album.findOrCreate(body.album.spotifyId);
     const albumTag = await AlbumTag.findOrCreate(album, tag);
 
     const user = <IUser>req.user;
     const savedUser = await user.addAlbumTag(albumTag);
 
-    return res.json(new EmptyResponse());
+    return res.json(new EmptyResponse(undefined));
 
   } catch (error) {
     console.log(error);
+
+    if (error instanceof BadRequestErrorResponse) {
+      return res.status(400).json(error);
+    }
+
+    return res.status(500).json(new ErrorResponse("500", "Internal error"));
+  }
+};
+
+export const deleteTagFromAlbum = async (req: Request, res: Response) => {
+  try {
+    const body = SetTagOnAlbumRequest.checkConsistency(req.body);
+
+    const tagUniqueId = Tag.calculateUniqueIdByName(body.tag.name);
+    const tag = await Tag.findOne({ "uniqueId": tagUniqueId });
+    if (!tag) {
+      throw new BadRequestErrorResponse("Input tag does not exist");
+    }
+
+    const album = await Album.findOne({ "publicId.spotify": body.album.spotifyId });
+    if (!album) {
+      throw new BadRequestErrorResponse("Input album has never been tagged");
+    }
+
+    const albumTag = await AlbumTag.findOne({ "tag": tag, "album": album });
+    if (!albumTag) {
+      throw new BadRequestErrorResponse("Input tag has never been added to input album");
+    }
+
+    // todo: startTransaction
+
+    const user = <IUser>req.user;
+    const removeResult = await user.removeAlbumTag(albumTag);
+
+    // Clearing orphan documents
+    const isAlbumTagRemoved = await albumTag.removeIfOrphan();
+    const isAlbumRemoved = await album.removeIfOrphan();
+    const isTagRemoved = await tag.removeIfOrphan();
+
+    // todo: commitTransaction
+
+    return res.json(new EmptyResponse(undefined));
+
+  } catch (error) {
+    console.log(error);
+
+    if (error instanceof BadRequestErrorResponse) {
+      return res.status(400).json(error);
+    }
+
     return res.status(500).json(new ErrorResponse("500", "Internal error"));
   }
 };

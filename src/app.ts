@@ -26,6 +26,7 @@ import * as userController from "./controllers/user";
 
 // API keys and Passport configuration
 import * as passportConfig from "./config/passport";
+import "./models/plugins/mongoose-extensions";
 
 // Create Express server
 const app = express();
@@ -95,6 +96,7 @@ app.get("/", homeController.index);
  */
 app.get("/api/myAlbums", passportConfig.authenticate, passportConfig.fillCurrentUser, apiController.getMyAlbums);
 app.post("/api/setTagOnAlbum", passportConfig.authenticate, passportConfig.fillCurrentUser, apiController.setTagOnAlbum);
+app.delete("/api/setTagOnAlbum", passportConfig.authenticate, passportConfig.fillCurrentUser, apiController.deleteTagFromAlbum);
 
 /**
  * User/Auth routes

@@ -1,6 +1,7 @@
 import { Document, Schema, Model, model, Types } from "mongoose";
 import { IAlbumTag } from "./AlbumTag";
 import { TagsByAlbum } from "./responses/TaggedAlbum";
+import { BadRequestErrorResponse } from "./responses/GenericResponses";
 
 export interface IUser extends Document {
   spotify: {
@@ -10,14 +11,34 @@ export interface IUser extends Document {
   };
   displayName: string;
   albumTags: Types.Array<IAlbumTag>;
+  /**
+   * Pushes the input album tag in this user's albumTags list
+   * @param albumTag AlbumTag to add
+   */
   addAlbumTag(albumTag: IAlbumTag): Promise<boolean>;
   /**
+   * Pulls the input album tag from this user's albumTags list
+   * @param albumTag AlbumTag to remove
+   */
+  removeAlbumTag(albumTag: IAlbumTag): Promise<IUser>;
+  /**
    * Retrieves user's tags indexed by album spotifyId
+   */
+  /**
+   * Starting from this user's albumTag list, builds a map of all
+   * this user's tags grouped by spotify album id
    */
   getTagsByAlbum(): Promise<TagsByAlbum>;
 }
 
 export interface IUserModel extends Model<IUser> {
+  /**
+   * Creates a new user, if missing, or updates found user with the new tokens.
+   * The user is searched by spotify id.
+   * @param profile Spotify profile to insert
+   * @param accessToken User's access token
+   * @param refreshToken User's refresh token
+   */
   upsertSpotifyUser(profile: any, accessToken: string, refreshToken: string): Promise<IUser>;
 }
 
@@ -35,10 +56,34 @@ userSchema.methods.addAlbumTag = async function (albumTag: IAlbumTag): Promise<I
   try {
     const thisUser = <IUser>this;
 
-    const added: any = thisUser.albumTags.addToSet(albumTag._id);
-    console.log(`albumTag ${added ? "added" : "not added"} to user`);
+    const countBeforeAdd = thisUser.albumTags.length;
+    const added = thisUser.albumTags.addToSet(albumTag._id);
+    const countAfterAdd = thisUser.albumTags.length;
+    console.log(`albumTag ${countBeforeAdd === countAfterAdd ? "not added" : "added"} to user`);
 
     const savedUser = await thisUser.save();
+    return Promise.resolve(savedUser);
+  }
+  catch (error) {
+    console.log(error);
+    return Promise.reject(error);
+  }
+};
+
+userSchema.methods.removeAlbumTag = async function (albumTag: IAlbumTag): Promise<IUser> {
+  try {
+    const user = <IUser>this;
+
+    const countBeforePull = user.albumTags.length;
+    const pulledId = user.albumTags.pull(albumTag._id);
+    const countAfterPull = user.albumTags.length;
+
+    if (countBeforePull === countAfterPull) {
+      throw new BadRequestErrorResponse("Input tag is not one of the current user's tags");
+    }
+
+    const savedUser = await user.save();
+    console.log(`AlbumTag deleted from user`);
     return Promise.resolve(savedUser);
   }
   catch (error) {
