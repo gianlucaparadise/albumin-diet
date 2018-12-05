@@ -54,6 +54,8 @@ tagSchema.statics.calculateUniqueIdByName = function (name: String): String {
     .replace(" ", "-")
     .toLowerCase();
 
+  // todo: remove consequent dashes in uniqueId after replace
+
   return uniqueId;
 };
 

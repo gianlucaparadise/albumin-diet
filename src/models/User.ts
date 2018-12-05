@@ -1,7 +1,8 @@
 import { Document, Schema, Model, model, Types } from "mongoose";
 import { IAlbumTag } from "./AlbumTag";
-import { TagsByAlbum } from "./responses/TaggedAlbum";
+import { TagsByAlbum } from "./responses/GetMyAlbums";
 import { BadRequestErrorResponse } from "./responses/GenericResponses";
+import { ITag } from "./Tag";
 
 export interface IUser extends Document {
   spotify: {
@@ -22,13 +23,14 @@ export interface IUser extends Document {
    */
   removeAlbumTag(albumTag: IAlbumTag): Promise<IUser>;
   /**
-   * Retrieves user's tags indexed by album spotifyId
-   */
-  /**
    * Starting from this user's albumTag list, builds a map of all
    * this user's tags grouped by spotify album id
    */
   getTagsByAlbum(): Promise<TagsByAlbum>;
+  /**
+   * Retrieves the list of the tags added by this user
+   */
+  getTags(): Promise<ITag[]>;
 }
 
 export interface IUserModel extends Model<IUser> {
@@ -115,6 +117,21 @@ userSchema.methods.getTagsByAlbum = async function (): Promise<TagsByAlbum> {
     }, new TagsByAlbum());
 
     return taggedAlbums;
+
+  } catch (error) {
+    return Promise.reject(error);
+  }
+};
+
+userSchema.methods.getTags = async function (): Promise<ITag[]> {
+  try {
+    const thisUser = <IUser>this;
+    await thisUser
+      .populate({ path: "albumTags", populate: [{ path: "tag" }] })
+      .execPopulate();
+
+    const result = thisUser.albumTags.map(x => x.tag);
+    return Promise.resolve(result);
 
   } catch (error) {
     return Promise.reject(error);

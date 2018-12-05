@@ -10,7 +10,8 @@ import { Tag } from "../models/Tag";
 import { Album } from "../models/Album";
 import { AlbumTag } from "../models/AlbumTag";
 import { IUser } from "../models/User";
-import { TaggedAlbumsResponse } from "../models/responses/TaggedAlbum";
+import { GetMyAlbumsResponse } from "../models/responses/GetMyAlbums";
+import { GetMyTagsResponse } from "../models/responses/GetMyTags";
 
 export let getMyAlbums = async (req: Request, res: Response) => {
   // todo: filter by tag
@@ -20,7 +21,7 @@ export let getMyAlbums = async (req: Request, res: Response) => {
 
     const tagsByAlbum = await user.getTagsByAlbum();
     const spotifyAlbums = await SpotifyApiManager.GetMySavedAlbums();
-    const response = TaggedAlbumsResponse.createFromSpotifyAlbums(spotifyAlbums.body.items, tagsByAlbum);
+    const response = GetMyAlbumsResponse.createFromSpotifyAlbums(spotifyAlbums.body.items, tagsByAlbum);
 
     return res.json(response);
   }
@@ -31,7 +32,18 @@ export let getMyAlbums = async (req: Request, res: Response) => {
 };
 
 export const getMyTags = async (req: Request, res: Response) => {
-  // todo: retrieve list of tags
+  try {
+    const user = <IUser>req.user;
+
+    const tags = await user.getTags();
+    const response = new GetMyTagsResponse(tags);
+
+    return res.json(response);
+
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json(new ErrorResponse("500", "Internal error"));
+  }
 };
 
 export let setTagOnAlbum = async (req: Request, res: Response) => {
@@ -86,8 +98,11 @@ export const deleteTagFromAlbum = async (req: Request, res: Response) => {
 
     // Clearing orphan documents
     const isAlbumTagRemoved = await albumTag.removeIfOrphan();
-    const isAlbumRemoved = await album.removeIfOrphan();
-    const isTagRemoved = await tag.removeIfOrphan();
+    if (isAlbumTagRemoved) {
+      // If AlbumTag was orphan, I check if album and tag are now also orphan
+      const isAlbumRemoved = await album.removeIfOrphan();
+      const isTagRemoved = await tag.removeIfOrphan();
+    }
 
     // todo: commitTransaction
 

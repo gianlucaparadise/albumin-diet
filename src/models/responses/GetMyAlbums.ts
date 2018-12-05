@@ -18,13 +18,13 @@ class TaggedAlbum {
   tags: ITag[];
 }
 
-export class TaggedAlbumsResponse extends BaseResponse<TaggedAlbum[]> {
+export class GetMyAlbumsResponse extends BaseResponse<TaggedAlbum[]> {
   /**
    * This builds the response starting from data retrieved using spotify api and DB.
    * @param spotifyAlbums albums retrieved using spotify apis
    * @param tagsByAlbum user's tags grouped by album spotify id
    */
-  static createFromSpotifyAlbums(spotifyAlbums: SpotifyApi.SavedAlbumObject[], tagsByAlbum: TagsByAlbum): TaggedAlbumsResponse {
+  static createFromSpotifyAlbums(spotifyAlbums: SpotifyApi.SavedAlbumObject[], tagsByAlbum: TagsByAlbum): GetMyAlbumsResponse {
 
     const taggedAlbumList = spotifyAlbums.map(x => {
       const spotifyAlbum = x;
@@ -34,6 +34,6 @@ export class TaggedAlbumsResponse extends BaseResponse<TaggedAlbum[]> {
       return <TaggedAlbum>{ album: spotifyAlbum, tags: tags };
     });
 
-    return new TaggedAlbumsResponse(taggedAlbumList);
+    return new GetMyAlbumsResponse(taggedAlbumList);
   }
 }
