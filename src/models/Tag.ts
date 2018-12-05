@@ -51,7 +51,7 @@ tagSchema.methods.removeIfOrphan = async function (): Promise<boolean> {
 tagSchema.statics.calculateUniqueIdByName = function (name: String): String {
   const uniqueId = name
     .trim()
-    .replace(" ", "-")
+    .replace(/ /g, "-")
     .toLowerCase();
 
   // todo: remove consequent dashes in uniqueId after replace
