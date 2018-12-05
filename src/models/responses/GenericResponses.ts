@@ -2,6 +2,7 @@ export class BaseResponse<T> {
   error?: {
     errorDescription: string;
     errorCode: string;
+    statusCode: number;
   };
 
   data: T;
@@ -12,18 +13,22 @@ export class BaseResponse<T> {
 }
 
 export class ErrorResponse extends BaseResponse<undefined> {
-  constructor(code: string, description: string) {
+  constructor(code: string, description: string, statusCode: number = 500) {
     super(undefined);
     this.error = {
       errorCode: code,
-      errorDescription: description
+      errorDescription: description,
+      statusCode: statusCode
     };
   }
 }
 
+/**
+ * Create a BadRequest error with code 400
+ */
 export class BadRequestErrorResponse extends ErrorResponse {
   constructor(description: string) {
-    super("400", description);
+    super("400", description, 400);
   }
 }
 

@@ -61,7 +61,10 @@ userSchema.methods.addAlbumTag = async function (albumTag: IAlbumTag): Promise<I
     const countBeforeAdd = thisUser.albumTags.length;
     const added = thisUser.albumTags.addToSet(albumTag._id);
     const countAfterAdd = thisUser.albumTags.length;
-    console.log(`albumTag ${countBeforeAdd === countAfterAdd ? "not added" : "added"} to user`);
+
+    if (countAfterAdd === countBeforeAdd) {
+      throw new BadRequestErrorResponse("Input tag already is one of the current user's tags");
+    }
 
     const savedUser = await thisUser.save();
     return Promise.resolve(savedUser);

@@ -1,7 +1,5 @@
 "use strict";
 
-import async from "async";
-import request from "request";
 import { Response, Request, NextFunction } from "express";
 import { SpotifyApiManager } from "../managers/SpotifyApiManager";
 import { SetTagOnAlbumRequest } from "../models/requests/SetTagOnAlbumRequest";
@@ -26,8 +24,12 @@ export let getMyAlbums = async (req: Request, res: Response) => {
     return res.json(response);
   }
   catch (error) {
+    if (error instanceof ErrorResponse) {
+      return res.status(error.error.statusCode).json(error);
+    }
+
     console.log(error);
-    return res.status(error.statusCode).json(error);
+    return res.status(500).json(new ErrorResponse("500", "Internal error"));
   }
 };
 
@@ -41,6 +43,10 @@ export const getMyTags = async (req: Request, res: Response) => {
     return res.json(response);
 
   } catch (error) {
+    if (error instanceof ErrorResponse) {
+      return res.status(error.error.statusCode).json(error);
+    }
+
     console.log(error);
     return res.status(500).json(new ErrorResponse("500", "Internal error"));
   }
@@ -51,9 +57,20 @@ export let setTagOnAlbum = async (req: Request, res: Response) => {
     const body = SetTagOnAlbumRequest.checkConsistency(req.body);
 
     const tag = await Tag.findOrCreate(body.tag.name);
+    if (!tag) {
+      throw new BadRequestErrorResponse("Input tag does not exist");
+    }
+
     // todo: check if album really exists on spotify
     const album = await Album.findOrCreate(body.album.spotifyId);
+    if (!album) {
+      throw new BadRequestErrorResponse("Input album has never been tagged");
+    }
+
     const albumTag = await AlbumTag.findOrCreate(album, tag);
+    if (!albumTag) {
+      throw new BadRequestErrorResponse("Input tag has never been added to input album");
+    }
 
     const user = <IUser>req.user;
     const savedUser = await user.addAlbumTag(albumTag);
@@ -61,12 +78,11 @@ export let setTagOnAlbum = async (req: Request, res: Response) => {
     return res.json(new EmptyResponse(undefined));
 
   } catch (error) {
-    console.log(error);
-
-    if (error instanceof BadRequestErrorResponse) {
-      return res.status(400).json(error);
+    if (error instanceof ErrorResponse) {
+      return res.status(error.error.statusCode).json(error);
     }
 
+    console.log(error);
     return res.status(500).json(new ErrorResponse("500", "Internal error"));
   }
 };
@@ -109,12 +125,11 @@ export const deleteTagFromAlbum = async (req: Request, res: Response) => {
     return res.json(new EmptyResponse(undefined));
 
   } catch (error) {
-    console.log(error);
-
-    if (error instanceof BadRequestErrorResponse) {
-      return res.status(400).json(error);
+    if (error instanceof ErrorResponse) {
+      return res.status(error.error.statusCode).json(error);
     }
 
+    console.log(error);
     return res.status(500).json(new ErrorResponse("500", "Internal error"));
   }
 };
