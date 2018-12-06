@@ -348,11 +348,6 @@
   resolved "https://registry.yarnpkg.com/@types/sizzle/-/sizzle-2.3.2.tgz#a811b8c18e2babab7d542b3365887ae2e4d9de47"
   integrity sha512-7EJYyKTL7tFR8+gDbB6Wwz/arpGa0Mywk1TJbNzKzHtzbwVmY4HR9WqS5VV7dsBUKQmPNr192jHr/VpBluj/hg==
 
-"@types/spotify-api@^0.0.0":
-  version "0.0.0"
-  resolved "https://registry.yarnpkg.com/@types/spotify-api/-/spotify-api-0.0.0.tgz#5ea9e9ca7549dbb595900a53b74b8dfb3ca3da21"
-  integrity sha1-XqnpynVJ27WVkApTt0uN+zyj2iE=
-
 "@types/superagent@*":
   version "3.8.4"
   resolved "https://registry.yarnpkg.com/@types/superagent/-/superagent-3.8.4.tgz#24a5973c7d1a9c024b4bbda742a79267c33fb86a"

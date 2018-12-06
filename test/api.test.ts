@@ -3,7 +3,7 @@ import app from "../src/app";
 import { ACCESS_TOKEN } from "./util/testSecrets";
 import { SetTagOnAlbumRequest } from "../src/models/requests/SetTagOnAlbumRequest";
 
-// This fixes jest issue #3853
+// This fixes missing logs (jest issue #3853)
 // console.log = s => {
 //   if (s instanceof Object) process.stdout.write(JSON.stringify(s) + "\n");
 //   else process.stdout.write(s + "\n");
@@ -41,7 +41,7 @@ describe("GET MyTags", () => {
   });
 });
 
-const testSpotifyAlbumId = "5cPHT4yMCfETLRYAoBFcOZ";
+const testSpotifyAlbumId = "thisisnotanalbumid";
 const testTagName = "This is a test tag";
 
 describe("POST setTagOnAlbum", () => {

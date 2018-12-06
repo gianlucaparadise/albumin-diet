@@ -41,7 +41,7 @@ export interface IUserModel extends Model<IUser> {
    * @param accessToken User's access token
    * @param refreshToken User's refresh token
    */
-  upsertSpotifyUser(profile: any, accessToken: string, refreshToken: string): Promise<IUser>;
+  upsertSpotifyUser(profile: SpotifyApi.UserProfileAuthenticationNodeResponse, accessToken: string, refreshToken: string): Promise<IUser>;
 }
 
 export const userSchema: Schema = new Schema({
