@@ -9,38 +9,6 @@ import { SetTagOnAlbumRequest } from "../src/models/requests/SetTagOnAlbumReques
 //   else process.stdout.write(s + "\n");
 // };
 
-describe("GET MyAlbums", () => {
-  it("should return 401", async () => {
-    const response = await request(app)
-      .get("/api/myAlbums");
-
-    expect(response.status).toBe(401);
-  });
-  it("should return 200", async () => {
-    const response = await request(app)
-      .get("/api/myAlbums")
-      .set("Authorization", `Bearer ${ACCESS_TOKEN}`);
-
-    expect(response.status).toBe(200);
-  });
-});
-
-describe("GET MyTags", () => {
-  it("should return 401", async () => {
-    const response = await request(app)
-      .get("/api/myTags");
-
-    expect(response.status).toBe(401);
-  });
-  it("should return 200", async () => {
-    const response = await request(app)
-      .get("/api/myTags")
-      .set("Authorization", `Bearer ${ACCESS_TOKEN}`);
-
-    expect(response.status).toBe(200);
-  });
-});
-
 const testSpotifyAlbumId = "thisisnotanalbumid";
 const testTagName = "This is a test tag";
 
