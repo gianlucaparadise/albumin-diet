@@ -91,20 +91,24 @@ app.use(
  */
 app.get("/", homeController.index);
 
-/**
- * API examples routes.
- */
-app.get("/api/myAlbums", passportConfig.authenticate, passportConfig.fillCurrentUser, apiController.getMyAlbums);
-app.get("/api/myTags", passportConfig.authenticate, passportConfig.fillCurrentUser, apiController.getMyTags);
-app.post("/api/setTagOnAlbum", passportConfig.authenticate, passportConfig.fillCurrentUser, apiController.setTagOnAlbum);
-app.delete("/api/setTagOnAlbum", passportConfig.authenticate, passportConfig.fillCurrentUser, apiController.deleteTagFromAlbum);
+//#region API Routes
+const apiMeRoute = express.Router();
+apiMeRoute.use(passportConfig.authenticate, passportConfig.fillCurrentUser);
 
-/**
- * User/Auth routes
- */
+apiMeRoute.get("/profile", userController.getMe);
+
+apiMeRoute.get("/album", apiController.getMyAlbums);
+apiMeRoute.get("/tag", apiController.getMyTags);
+apiMeRoute.post("/tag-on-album", apiController.setTagOnAlbum);
+apiMeRoute.delete("/tag-on-album", apiController.deleteTagFromAlbum);
+
+app.use("/api/me", apiMeRoute);
+//#endregion
+
+//#region User/Auth routes
 app.get("/login", userController.login);
 app.get("/auth/spotify", passportConfig.spotifyAuthenticate, userController.authSpotify);
 app.get("/auth/spotify/callback", passportConfig.spotifyAuthenticateCallback, userController.authSpotifyCallback, passportConfig.generateToken, passportConfig.sendToken);
-app.get("/auth/me", passportConfig.authenticate, passportConfig.fillCurrentUser, userController.getMe);
+//#endregion
 
 export default app;

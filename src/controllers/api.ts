@@ -2,7 +2,7 @@
 
 import { Response, Request, NextFunction } from "express";
 import { SpotifyApiManager } from "../managers/SpotifyApiManager";
-import { SetTagOnAlbumRequest } from "../models/requests/SetTagOnAlbumRequest";
+import { TagOnAlbumRequest } from "../models/requests/SetTagOnAlbumRequest";
 import { ErrorResponse, EmptyResponse, BadRequestErrorResponse } from "../models/responses/GenericResponses";
 import { Tag } from "../models/Tag";
 import { Album } from "../models/Album";
@@ -54,7 +54,7 @@ export const getMyTags = async (req: Request, res: Response) => {
 
 export let setTagOnAlbum = async (req: Request, res: Response) => {
   try {
-    const body = SetTagOnAlbumRequest.checkConsistency(req.body);
+    const body = TagOnAlbumRequest.checkConsistency(req.body);
 
     const tag = await Tag.findOrCreate(body.tag.name);
     if (!tag) {
@@ -89,7 +89,7 @@ export let setTagOnAlbum = async (req: Request, res: Response) => {
 
 export const deleteTagFromAlbum = async (req: Request, res: Response) => {
   try {
-    const body = SetTagOnAlbumRequest.checkConsistency(req.body);
+    const body = TagOnAlbumRequest.checkConsistency(req.body);
 
     const tagUniqueId = Tag.calculateUniqueIdByName(body.tag.name);
     const tag = await Tag.findOne({ "uniqueId": tagUniqueId });

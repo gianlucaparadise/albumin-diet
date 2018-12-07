@@ -1,7 +1,7 @@
 import request from "supertest";
 import app from "../src/app";
 import { ACCESS_TOKEN } from "./util/testSecrets";
-import { SetTagOnAlbumRequest } from "../src/models/requests/SetTagOnAlbumRequest";
+import { TagOnAlbumRequest } from "../src/models/requests/SetTagOnAlbumRequest";
 
 // This fixes missing logs (jest issue #3853)
 // console.log = s => {
@@ -12,9 +12,9 @@ import { SetTagOnAlbumRequest } from "../src/models/requests/SetTagOnAlbumReques
 const testSpotifyAlbumId = "thisisnotanalbumid";
 const testTagName = "This is a test tag";
 
-describe("POST setTagOnAlbum", () => {
+describe("POST TagOnAlbum", () => {
   it("should return 401", async () => {
-    const req: SetTagOnAlbumRequest = {
+    const req: TagOnAlbumRequest = {
       album: {
         spotifyId: testSpotifyAlbumId
       },
@@ -25,36 +25,36 @@ describe("POST setTagOnAlbum", () => {
 
     // I don't send bearer
     const response = await request(app)
-      .post("/api/setTagOnAlbum")
+      .post("/api/me/tag-on-album")
       .send(req);
 
     expect(response.status).toBe(401);
   });
 
   it("should return 400 because of missing fields in request", async () => {
-    const response1 = await request(app).post("/api/setTagOnAlbum").set("Authorization", `Bearer ${ACCESS_TOKEN}`)
+    const response1 = await request(app).post("/api/me/tag-on-album").set("Authorization", `Bearer ${ACCESS_TOKEN}`)
       .send({});
 
     expect(response1.status).toBe(400);
 
-    const response2 = await request(app).post("/api/setTagOnAlbum").set("Authorization", `Bearer ${ACCESS_TOKEN}`)
+    const response2 = await request(app).post("/api/me/tag-on-album").set("Authorization", `Bearer ${ACCESS_TOKEN}`)
       .send({ album: {} });
 
     expect(response2.status).toBe(400);
 
-    const response3 = await request(app).post("/api/setTagOnAlbum").set("Authorization", `Bearer ${ACCESS_TOKEN}`)
+    const response3 = await request(app).post("/api/me/tag-on-album").set("Authorization", `Bearer ${ACCESS_TOKEN}`)
       .send({ album: { spotifyId: "1" } });
 
     expect(response3.status).toBe(400);
 
-    const response4 = await request(app).post("/api/setTagOnAlbum").set("Authorization", `Bearer ${ACCESS_TOKEN}`)
+    const response4 = await request(app).post("/api/me/tag-on-album").set("Authorization", `Bearer ${ACCESS_TOKEN}`)
       .send({ album: { spotifyId: "1" }, tag: {} });
 
     expect(response4.status).toBe(400);
   });
 
   it("should add first time and throw an error on re-add", async () => {
-    const req: SetTagOnAlbumRequest = {
+    const req: TagOnAlbumRequest = {
       album: {
         spotifyId: testSpotifyAlbumId
       },
@@ -64,12 +64,12 @@ describe("POST setTagOnAlbum", () => {
     };
 
     const myRequest = request(app)
-      .post("/api/setTagOnAlbum")
+      .post("/api/me/tag-on-album")
       .send(req)
       .set("Authorization", `Bearer ${ACCESS_TOKEN}`);
 
     const response = await request(app)
-      .post("/api/setTagOnAlbum")
+      .post("/api/me/tag-on-album")
       .send(req)
       .set("Authorization", `Bearer ${ACCESS_TOKEN}`);
 
@@ -77,7 +77,7 @@ describe("POST setTagOnAlbum", () => {
 
     // I try to re-add
     const response2 = await request(app)
-      .post("/api/setTagOnAlbum")
+      .post("/api/me/tag-on-album")
       .send(req)
       .set("Authorization", `Bearer ${ACCESS_TOKEN}`);
 
@@ -85,9 +85,9 @@ describe("POST setTagOnAlbum", () => {
   });
 });
 
-describe("DELETE setTagOnAlbum", () => {
+describe("DELETE TagOnAlbum", () => {
   it("should return 401", async () => {
-    const req: SetTagOnAlbumRequest = {
+    const req: TagOnAlbumRequest = {
       album: {
         spotifyId: testSpotifyAlbumId
       },
@@ -97,36 +97,36 @@ describe("DELETE setTagOnAlbum", () => {
     };
 
     const response = await request(app)
-      .delete("/api/setTagOnAlbum")
+      .delete("/api/me/tag-on-album")
       .send(req);
 
     expect(response.status).toBe(401);
   });
 
   it("should return 400 because of missing fields in request", async () => {
-    const response1 = await request(app).delete("/api/setTagOnAlbum").set("Authorization", `Bearer ${ACCESS_TOKEN}`)
+    const response1 = await request(app).delete("/api/me/tag-on-album").set("Authorization", `Bearer ${ACCESS_TOKEN}`)
       .send({});
 
     expect(response1.status).toBe(400);
 
-    const response2 = await request(app).delete("/api/setTagOnAlbum").set("Authorization", `Bearer ${ACCESS_TOKEN}`)
+    const response2 = await request(app).delete("/api/me/tag-on-album").set("Authorization", `Bearer ${ACCESS_TOKEN}`)
       .send({ album: {} });
 
     expect(response2.status).toBe(400);
 
-    const response3 = await request(app).delete("/api/setTagOnAlbum").set("Authorization", `Bearer ${ACCESS_TOKEN}`)
+    const response3 = await request(app).delete("/api/me/tag-on-album").set("Authorization", `Bearer ${ACCESS_TOKEN}`)
       .send({ album: { spotifyId: "1" } });
 
     expect(response3.status).toBe(400);
 
-    const response4 = await request(app).delete("/api/setTagOnAlbum").set("Authorization", `Bearer ${ACCESS_TOKEN}`)
+    const response4 = await request(app).delete("/api/me/tag-on-album").set("Authorization", `Bearer ${ACCESS_TOKEN}`)
       .send({ album: { spotifyId: "1" }, tag: {} });
 
     expect(response4.status).toBe(400);
   });
 
   it("should delete first time and throw an error on re-delete", async () => {
-    const req: SetTagOnAlbumRequest = {
+    const req: TagOnAlbumRequest = {
       album: {
         spotifyId: testSpotifyAlbumId
       },
@@ -136,7 +136,7 @@ describe("DELETE setTagOnAlbum", () => {
     };
 
     const response = await request(app)
-      .delete("/api/setTagOnAlbum")
+      .delete("/api/me/tag-on-album")
       .send(req)
       .set("Authorization", `Bearer ${ACCESS_TOKEN}`);
 
@@ -144,7 +144,7 @@ describe("DELETE setTagOnAlbum", () => {
 
     // I try to re-delete
     const response2 = await request(app)
-      .delete("/api/setTagOnAlbum")
+      .delete("/api/me/tag-on-album")
       .send(req)
       .set("Authorization", `Bearer ${ACCESS_TOKEN}`);
 

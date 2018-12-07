@@ -1,6 +1,6 @@
 import { BadRequestErrorResponse } from "../responses/GenericResponses";
 
-export class SetTagOnAlbumRequest {
+export class TagOnAlbumRequest {
   tag: {
     name: string;
   };
@@ -14,8 +14,8 @@ export class SetTagOnAlbumRequest {
    * throws errors if something is wrong
    * @param body POST request payload
    */
-  static checkConsistency(bodyAny: any): SetTagOnAlbumRequest {
-    const body = <SetTagOnAlbumRequest>bodyAny;
+  static checkConsistency(bodyAny: any): TagOnAlbumRequest {
+    const body = <TagOnAlbumRequest>bodyAny;
     if (!body) {
       throw new BadRequestErrorResponse("Missing Body");
     }
