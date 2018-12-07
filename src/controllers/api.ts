@@ -3,13 +3,14 @@
 import { Response, Request, NextFunction } from "express";
 import { SpotifyApiManager } from "../managers/SpotifyApiManager";
 import { TagOnAlbumRequest } from "../models/requests/SetTagOnAlbumRequest";
-import { ErrorResponse, EmptyResponse, BadRequestErrorResponse } from "../models/responses/GenericResponses";
+import { EmptyResponse, BadRequestErrorResponse } from "../models/responses/GenericResponses";
 import { Tag } from "../models/Tag";
 import { Album } from "../models/Album";
 import { AlbumTag } from "../models/AlbumTag";
 import { IUser } from "../models/User";
 import { GetMyAlbumsResponse } from "../models/responses/GetMyAlbums";
 import { GetMyTagsResponse } from "../models/responses/GetMyTags";
+import { errorHandler } from "../util/errorHandler";
 
 export let getMyAlbums = async (req: Request, res: Response) => {
   // todo: filter by tag
@@ -24,12 +25,7 @@ export let getMyAlbums = async (req: Request, res: Response) => {
     return res.json(response);
   }
   catch (error) {
-    if (error instanceof ErrorResponse) {
-      return res.status(error.error.statusCode).json(error);
-    }
-
-    console.log(error);
-    return res.status(500).json(new ErrorResponse("500", "Internal error"));
+    return errorHandler(error, res);
   }
 };
 
@@ -41,14 +37,9 @@ export const getMyTags = async (req: Request, res: Response) => {
     const response = new GetMyTagsResponse(tags);
 
     return res.json(response);
-
-  } catch (error) {
-    if (error instanceof ErrorResponse) {
-      return res.status(error.error.statusCode).json(error);
-    }
-
-    console.log(error);
-    return res.status(500).json(new ErrorResponse("500", "Internal error"));
+  }
+  catch (error) {
+    return errorHandler(error, res);
   }
 };
 
@@ -76,14 +67,9 @@ export let setTagOnAlbum = async (req: Request, res: Response) => {
     const savedUser = await user.addAlbumTag(albumTag);
 
     return res.json(new EmptyResponse(undefined));
-
-  } catch (error) {
-    if (error instanceof ErrorResponse) {
-      return res.status(error.error.statusCode).json(error);
-    }
-
-    console.log(error);
-    return res.status(500).json(new ErrorResponse("500", "Internal error"));
+  }
+  catch (error) {
+    return errorHandler(error, res);
   }
 };
 
@@ -123,13 +109,8 @@ export const deleteTagFromAlbum = async (req: Request, res: Response) => {
     // todo: commitTransaction
 
     return res.json(new EmptyResponse(undefined));
-
-  } catch (error) {
-    if (error instanceof ErrorResponse) {
-      return res.status(error.error.statusCode).json(error);
-    }
-
-    console.log(error);
-    return res.status(500).json(new ErrorResponse("500", "Internal error"));
+  }
+  catch (error) {
+    return errorHandler(error, res);
   }
 };
