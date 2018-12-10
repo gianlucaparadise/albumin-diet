@@ -2,6 +2,13 @@ import { IAlbum } from "../Album";
 import { ITag } from "../Tag";
 import { BaseResponse } from "./GenericResponses";
 
+export class GetMyAlbumsRequest {
+  /**
+   * This is a stringified JSON array
+   */
+  tags: string;
+}
+
 /**
  * Tags indexed by spotify Album id
  * Used for calculation, not returned to the user.
