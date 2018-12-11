@@ -8,19 +8,24 @@ import { Tag } from "../models/Tag";
 import { Album } from "../models/Album";
 import { AlbumTag } from "../models/AlbumTag";
 import { IUser } from "../models/User";
-import { GetMyAlbumsResponse } from "../models/responses/GetMyAlbums";
+import { GetMyAlbumsResponse, GetMyAlbumsRequest } from "../models/responses/GetMyAlbums";
 import { GetMyTagsResponse } from "../models/responses/GetMyTags";
 import { errorHandler } from "../util/errorHandler";
+import logger from "../util/logger";
 
 export let getMyAlbums = async (req: Request, res: Response) => {
-  // todo: filter by tag
   // todo: pagination
   try {
+    const request = <GetMyAlbumsRequest>req.query;
+    const tags: string[] = JSON.parse(request.tags || "[]");
+    const normalizedTags = tags.map(t => Tag.calculateUniqueIdByName(t));
+
     const user = <IUser>req.user;
 
-    const tagsByAlbum = await user.getTagsByAlbum();
+    const tagsByAlbum = await user.getTagsByAlbum(normalizedTags);
     const spotifyAlbums = await SpotifyApiManager.GetMySavedAlbums();
-    const response = GetMyAlbumsResponse.createFromSpotifyAlbums(spotifyAlbums.body.items, tagsByAlbum);
+    const useTagFilter = normalizedTags && normalizedTags.length > 0;
+    const response = GetMyAlbumsResponse.createFromSpotifyAlbums(spotifyAlbums.body.items, tagsByAlbum, useTagFilter);
 
     return res.json(response);
   }

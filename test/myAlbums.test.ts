@@ -5,11 +5,11 @@ import { ACCESS_TOKEN } from "./util/testSecrets";
 import { GetMyAlbumsResponse, GetMyAlbumsRequest } from "../src/models/responses/GetMyAlbums";
 
 const testTags = ["This is a test tag", "This is another test tag"];
-const testSpotifyAlbumId = "thisisnotanalbumid";
+const testSpotifyAlbumId = "5cPHT4yMCfETLRYAoBFcOZ";
 
 describe("GET MyAlbums", () => {
   afterAll(async () => {
-    for (const tag in testTags) {
+    for (const tag of testTags) {
       const response0 = await request(app)
         .delete("/api/me/tag-on-album")
         .send({ album: { spotifyId: testSpotifyAlbumId }, tag: { name: tag } })
@@ -36,7 +36,7 @@ describe("GET MyAlbums", () => {
   it("should return multiple albums", async () => {
     // First I need to add two tags to the same album, than I retrieve it
     //#region settings tags
-    for (const tag in testTags) {
+    for (const tag of testTags) {
       const response0 = await request(app)
         .post("/api/me/tag-on-album")
         .send({ album: { spotifyId: testSpotifyAlbumId }, tag: { name: tag } })
@@ -57,6 +57,6 @@ describe("GET MyAlbums", () => {
 
     expect(responseBody.data).not.toBeNull();
     expect(responseBody.data.length).toBeGreaterThan(0);
-    expect(responseBody.data[0].tags.length).toBeGreaterThan(testTags.length);
+    expect(responseBody.data[0].tags.length).toBeGreaterThanOrEqual(testTags.length);
   });
 });

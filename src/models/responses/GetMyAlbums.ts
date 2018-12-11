@@ -30,16 +30,27 @@ export class GetMyAlbumsResponse extends BaseResponse<TaggedAlbum[]> {
    * This builds the response starting from data retrieved using spotify api and DB.
    * @param spotifyAlbums albums retrieved using spotify apis
    * @param tagsByAlbum user's tags grouped by album spotify id
+   * @param onlyTagged set this to true if you only want all the albums that have at least one tag
    */
-  static createFromSpotifyAlbums(spotifyAlbums: SpotifyApi.SavedAlbumObject[], tagsByAlbum: TagsByAlbum): GetMyAlbumsResponse {
+  static createFromSpotifyAlbums(spotifyAlbums: SpotifyApi.SavedAlbumObject[], tagsByAlbum: TagsByAlbum, onlyTagged: boolean): GetMyAlbumsResponse {
 
-    const taggedAlbumList = spotifyAlbums.map(x => {
+    const taggedAlbumList = spotifyAlbums.reduce((taggedAlbums, x) => {
       const spotifyAlbum = x;
       const grouped = tagsByAlbum[x.album.id];
       const tags = grouped ? grouped.tags : [];
 
-      return <TaggedAlbum>{ album: spotifyAlbum, tags: tags };
-    });
+      if (onlyTagged) {
+        // if I want only tagged albums and I don't have any tag, I skip this line
+        if (!tags || tags.length <= 0) {
+          return taggedAlbums;
+        }
+      }
+
+      const taggedAlbum: TaggedAlbum = { album: spotifyAlbum, tags: tags };
+      taggedAlbums.push(taggedAlbum);
+      return taggedAlbums;
+
+    }, <TaggedAlbum[]>[]);
 
     return new GetMyAlbumsResponse(taggedAlbumList);
   }
