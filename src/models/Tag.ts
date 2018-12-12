@@ -3,7 +3,6 @@ import { AlbumTag } from "./AlbumTag";
 import logger from "../util/logger";
 
 export interface ITag extends Document {
-  // todo: check how to customize the setter and normalize the inserted id using a naming convention
   uniqueId: string;
   name: string;
   /**
@@ -51,11 +50,12 @@ tagSchema.methods.removeIfOrphan = async function (): Promise<boolean> {
 
 tagSchema.statics.calculateUniqueIdByName = function (name: String): String {
   const uniqueId = name
-    .trim()
-    .replace(/ /g, "-")
+    .replace(/[\s_,'`]+/g, "-") // replace all unwanted chars with dashes
+    .replace(/-+/g, "-") // this removes consequent dashes
+    .trim() // todo: I should trim dashes
     .toLowerCase();
 
-  // todo: remove consequent dashes in uniqueId after replace
+  // todo: understand which chars should be replaced with dashes (eg. \s_,'`)
 
   return uniqueId;
 };
