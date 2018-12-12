@@ -1,5 +1,6 @@
 import { Document, Schema, Model, model } from "mongoose";
 import { AlbumTag } from "./AlbumTag";
+import logger from "../util/logger";
 
 export interface ITag extends Document {
   // todo: check how to customize the setter and normalize the inserted id using a naming convention
@@ -33,7 +34,7 @@ tagSchema.methods.removeIfOrphan = async function (): Promise<boolean> {
 
     // Checking if there is still an albumTag that has this tag
     const isTagLinked = await AlbumTag.exists({ "tag": tag._id });
-    console.log(`is tag orphan: ${!isTagLinked}`);
+    logger.debug(`is tag orphan: ${!isTagLinked}`);
 
     if (isTagLinked) {
       return Promise.resolve(false);
@@ -65,11 +66,11 @@ tagSchema.statics.findOrCreate = async function (name: string): Promise<ITag> {
     const tag = await Tag.findOne({ uniqueId: uniqueId });
 
     if (tag) {
-      console.log("Tag found");
+      logger.debug(`Tag found: ${uniqueId}`);
       return Promise.resolve(tag);
     }
 
-    console.log("Tag creation");
+    logger.debug(`Tag creation: ${uniqueId}`);
     // I create a tag
     const newTag = new Tag();
     newTag.uniqueId = uniqueId;

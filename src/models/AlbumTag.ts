@@ -3,6 +3,7 @@ import { model, Document, Schema, Model } from "mongoose";
 import { IAlbum } from "./Album";
 import { ITag } from "./Tag";
 import { User } from "./User";
+import logger from "../util/logger";
 
 export interface IAlbumTag extends Document {
   album: IAlbum;
@@ -35,7 +36,7 @@ albumTagSchema.methods.removeIfOrphan = async function (): Promise<boolean> {
 
     // Checking if there is still a user that has this albumTag in his list
     const isAlbumTagLinked = await User.exists({ "albumTags": albumTag._id });
-    console.log(`is albumTag orphan: ${!isAlbumTagLinked}`);
+    logger.debug(`is albumTag orphan: ${!isAlbumTagLinked}`);
 
     if (isAlbumTagLinked) {
       return Promise.resolve(false);
@@ -55,11 +56,11 @@ albumTagSchema.statics.findOrCreate = async function (album: IAlbum, tag: ITag):
     const albumTag = await AlbumTag.findOne({ album: album._id, tag: tag._id });
 
     if (albumTag) {
-      console.log("AlbumTag found");
+      logger.debug(`AlbumTag found: ${album.publicId.spotify} ${tag.uniqueId}`);
       return Promise.resolve(albumTag);
     }
 
-    console.log("AlbumTag creation");
+    logger.debug(`AlbumTag creation: ${album.publicId.spotify} ${tag.uniqueId}`);
     const newAlbumTag = new AlbumTag();
     newAlbumTag.album = album;
     newAlbumTag.tag = tag;
@@ -68,7 +69,7 @@ albumTagSchema.statics.findOrCreate = async function (album: IAlbum, tag: ITag):
     return Promise.resolve(savedAlbumTag);
 
   } catch (error) {
-    console.log(error);
+    logger.error(error);
     return Promise.reject(error);
   }
 };

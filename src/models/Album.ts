@@ -1,5 +1,6 @@
 import { Document, Schema, Model, model } from "mongoose";
 import { AlbumTag } from "./AlbumTag";
+import logger from "../util/logger";
 
 export interface IAlbum extends Document {
   // name: string;
@@ -54,7 +55,7 @@ albumSchema.methods.removeIfOrphan = async function (): Promise<boolean> {
 
     // Checking if there is still an AlbumTag that links this album
     const isAlbumLinked = await AlbumTag.exists({ "album": album._id });
-    console.log(`is album orphan: ${!isAlbumLinked}`);
+    logger.debug(`is album orphan: ${!isAlbumLinked}`);
 
     if (isAlbumLinked) {
       return Promise.resolve(false);
@@ -73,11 +74,11 @@ albumSchema.statics.findOrCreate = async function (id: string): Promise<IAlbum> 
   try {
     const album = await Album.findOne({ "publicId.spotify": id });
     if (album) {
-      console.log("Album found");
+      logger.debug(`Album found: ${id}`);
       return Promise.resolve(album);
     }
 
-    console.log("Album creation");
+    logger.debug(`Album creation: ${id}`);
     const newAlbum = new Album();
     newAlbum.publicId = { spotify: id };
     const savedAlbum = await newAlbum.save();

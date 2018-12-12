@@ -3,6 +3,7 @@ import { IAlbumTag } from "./AlbumTag";
 import { TagsByAlbum } from "./responses/GetMyAlbums";
 import { BadRequestErrorResponse } from "./responses/GenericResponses";
 import { ITag } from "./Tag";
+import logger from "../util/logger";
 
 export interface IUser extends Document {
   spotify: {
@@ -70,7 +71,7 @@ userSchema.methods.addAlbumTag = async function (albumTag: IAlbumTag): Promise<I
     return Promise.resolve(savedUser);
   }
   catch (error) {
-    console.log(error);
+    logger.error(error);
     return Promise.reject(error);
   }
 };
@@ -88,11 +89,11 @@ userSchema.methods.removeAlbumTag = async function (albumTag: IAlbumTag): Promis
     }
 
     const savedUser = await user.save();
-    console.log(`AlbumTag deleted from user`);
+    logger.debug(`AlbumTag deleted from user`);
     return Promise.resolve(savedUser);
   }
   catch (error) {
-    console.log(error);
+    logger.error(error);
     return Promise.reject(error);
   }
 };
