@@ -14,16 +14,19 @@ import { errorHandler } from "../util/errorHandler";
 import logger from "../util/logger";
 
 export let getMyAlbums = async (req: Request, res: Response) => {
-  // todo: pagination
   try {
     const request = <GetMyAlbumsRequest>req.query;
+
     const tags: string[] = JSON.parse(request.tags || "[]");
     const normalizedTags = tags.map(t => Tag.calculateUniqueIdByName(t));
+
+    const limit = request.limit || 20;
+    const offset = request.offset || 0;
 
     const user = <IUser>req.user;
 
     const tagsByAlbum = await user.getTagsByAlbum(normalizedTags);
-    const spotifyAlbums = await SpotifyApiManager.GetMySavedAlbums();
+    const spotifyAlbums = await SpotifyApiManager.GetMySavedAlbums(limit, offset);
     const useTagFilter = normalizedTags && normalizedTags.length > 0;
     const response = GetMyAlbumsResponse.createFromSpotifyAlbums(spotifyAlbums.body.items, tagsByAlbum, useTagFilter);
 

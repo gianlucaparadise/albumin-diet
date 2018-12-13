@@ -41,13 +41,15 @@ export class SpotifyApiManager {
   //   }
   // }
 
-  public static async GetMySavedAlbums(): Promise<SpotifyApi.UsersSavedAlbumsNodeResponse> {
+  public static async GetMySavedAlbums(limit: number = 20, offset: number = 0): Promise<SpotifyApi.UsersSavedAlbumsNodeResponse> {
 
     try {
       const response: SpotifyApi.UsersSavedAlbumsNodeResponse = await SpotifyApiManager.Api.getMySavedAlbums({
-        limit: 1,
-        offset: 0
+        limit: limit,
+        offset: offset
       });
+
+      // todo: filter out singles, but not EPs
 
       return Promise.resolve(response);
     }

@@ -6,7 +6,10 @@ export class GetMyAlbumsRequest {
   /**
    * This is a stringified JSON array
    */
-  tags: string;
+  tags?: string;
+
+  limit?: number;
+  offset?: number;
 }
 
 /**
