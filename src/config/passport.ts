@@ -73,8 +73,15 @@ export const generateToken = function (req: any, res: Response, next: NextFuncti
 };
 
 export const sendToken = function (req: any, res: Response) {
+  // todo: this function should be in user controller (user.ts)
   res.setHeader("x-auth-token", req.token);
-  res.status(200).send({ auth: req.auth, token: req.token });
+  res.cookie("x-auth-token", req.token);
+  if (req.session.callback) {
+    res.redirect(req.session.callback);
+  }
+  else {
+    res.status(200).send({ auth: req.auth, token: req.token });
+  }
 };
 
 export const authenticate = expressJwt({

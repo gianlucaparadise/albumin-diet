@@ -5,6 +5,11 @@ export let login = (req: Request, res: Response) => {
   res.render("Login");
 };
 
+export let prepareAuthSpotify = (req: Request, res: Response, next: NextFunction) => {
+  req.session.callback = req.query.callback;
+  next();
+};
+
 export let authSpotify = (req: Request, res: Response) => {
   // The request will be redirected to spotify for authentication, so this
   // function will not be called.
