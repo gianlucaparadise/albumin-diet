@@ -1,4 +1,5 @@
 import express from "express";
+import cors from "cors";
 import compression from "compression";  // compresses requests
 import session from "express-session";
 import bodyParser from "body-parser";
@@ -85,6 +86,15 @@ app.use((req, res, next) => {
 app.use(
   express.static(path.join(__dirname, "public"), { maxAge: 31557600000 })
 );
+
+// enable cors
+const corsOption = {
+  origin: true,
+  methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+  credentials: true,
+  exposedHeaders: ["authorization"]
+};
+app.use(cors(corsOption));
 
 /**
  * Primary app routes.
