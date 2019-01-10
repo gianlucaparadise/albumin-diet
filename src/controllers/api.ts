@@ -25,7 +25,8 @@ export let getMyAlbums = async (req: Request, res: Response) => {
 
     const user = <IUser>req.user;
 
-    const tagsByAlbum = await user.getTagsByAlbum(normalizedTags);
+    // todo: check how to parallelize spotify request and db query
+    const tagsByAlbum = await user.getTagsGroupedByAlbum(normalizedTags);
     const spotifyAlbums = await SpotifyApiManager.GetMySavedAlbums(limit, offset);
     const useTagFilter = normalizedTags && normalizedTags.length > 0;
     const response = GetMyAlbumsResponse.createFromSpotifyAlbums(spotifyAlbums.body.items, tagsByAlbum, useTagFilter);

@@ -27,7 +27,7 @@ export interface IUser extends Document {
    * Starting from this user's albumTag list, builds a map of all
    * this user's tags grouped by spotify album id
    */
-  getTagsByAlbum(tagFilter: string[]): Promise<TagsByAlbum>;
+  getTagsGroupedByAlbum(tagFilter: string[]): Promise<TagsByAlbum>;
   /**
    * Retrieves the list of the tags added by this user
    */
@@ -98,7 +98,7 @@ userSchema.methods.removeAlbumTag = async function (albumTag: IAlbumTag): Promis
   }
 };
 
-userSchema.methods.getTagsByAlbum = async function (tagFilter: string[]): Promise<TagsByAlbum> {
+userSchema.methods.getTagsGroupedByAlbum = async function (tagFilter: string[]): Promise<TagsByAlbum> {
   try {
     const thisUser = <IUser>this;
     await thisUser
