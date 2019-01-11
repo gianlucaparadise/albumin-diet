@@ -108,6 +108,7 @@ apiMeRoute.use(passportConfig.authenticate, passportConfig.fillCurrentUser);
 apiMeRoute.get("/profile", userController.getMe);
 
 apiMeRoute.get("/album", apiController.getMyAlbums);
+apiMeRoute.get("/album/:albumId", apiController.getAlbumBySpotifyId); // todo: make this accessible also for non-logged users
 apiMeRoute.get("/tag", apiController.getMyTags);
 apiMeRoute.post("/tag-on-album", apiController.setTagOnAlbum);
 apiMeRoute.delete("/tag-on-album", apiController.deleteTagFromAlbum);

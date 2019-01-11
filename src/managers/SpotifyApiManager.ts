@@ -49,7 +49,28 @@ export class SpotifyApiManager {
         offset: offset
       });
 
-      // todo: filter out singles, but not EPs
+      // todo: filter out singles, but not EPs (see: https://support.tunecore.com/hc/en-ca/articles/115006689928-What-is-the-difference-between-a-Single-an-EP-and-an-Album-)
+
+      return Promise.resolve(response);
+    }
+    catch (error) {
+      // // todo: If I get 401 I should refresh access token and re-send the request
+      // if (error.statusCode == 401) {
+      //   const hasRefreshed = await SpotifyApiManager.RefreshToken();
+      //   if (hasRefreshed) {
+      //     return SpotifyApiManager.GetMySavedAlbums();
+      //   }
+      // }
+      return Promise.reject(error);
+    }
+  }
+
+  public static async GetAlbum(id: string): Promise<SpotifyApi.MultipleAlbumsNodeResponse> {
+
+    try {
+      const response: SpotifyApi.MultipleAlbumsNodeResponse = await SpotifyApiManager.Api.getAlbums([id]);
+
+      // todo: filter out singles, but not EPs (see: https://support.tunecore.com/hc/en-ca/articles/115006689928-What-is-the-difference-between-a-Single-an-EP-and-an-Album-)
 
       return Promise.resolve(response);
     }

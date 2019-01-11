@@ -24,7 +24,7 @@ export class TagsByAlbum {
 }
 
 class TaggedAlbum {
-  album: SpotifyApi.SavedAlbumObject;
+  album: SpotifyApi.SavedAlbumObject | SpotifyApi.AlbumObjectFull;
   tags: ITag[];
 }
 
@@ -56,5 +56,16 @@ export class GetMyAlbumsResponse extends BaseResponse<TaggedAlbum[]> {
     }, <TaggedAlbum[]>[]);
 
     return new GetMyAlbumsResponse(taggedAlbumList);
+  }
+}
+
+export class GetAlbumResponse extends BaseResponse<TaggedAlbum> {
+  static createFromSpotifyAlbum(spotifyAlbums: SpotifyApi.MultipleAlbumsNodeResponse, tags: ITag[]): GetAlbumResponse {
+    const body = new TaggedAlbum();
+    body.tags = tags;
+    body.album = spotifyAlbums.body.albums[0];
+
+    const result = new GetAlbumResponse(body);
+    return result;
   }
 }

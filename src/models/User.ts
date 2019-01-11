@@ -32,6 +32,11 @@ export interface IUser extends Document {
    * Retrieves the list of the tags added by this user
    */
   getTags(): Promise<ITag[]>;
+
+  /**
+   * Retrieves the list of tags related to input album
+   */
+  getTagsByAlbum(spotifyAlbumId: string): Promise<ITag[]>;
 }
 
 export interface IUserModel extends Model<IUser> {
@@ -146,6 +151,34 @@ userSchema.methods.getTags = async function (): Promise<ITag[]> {
       .execPopulate();
 
     const result = thisUser.albumTags.map(x => x.tag);
+    return Promise.resolve(result);
+
+  } catch (error) {
+    return Promise.reject(error);
+  }
+};
+
+userSchema.methods.getTagsByAlbum = async function (spotifyAlbumId: string): Promise<ITag[]> {
+  try {
+    const thisUser = <IUser>this;
+    await thisUser
+      .populate({
+        path: "albumTags",
+        populate: [{ path: "tag" }, { path: "album", select: "publicId.spotify" }],
+        // match: { "album.publicId.spotify": spotifyAlbumId },
+      })
+      .execPopulate();
+    // todo: understand how to make `match` work to avoid `reduce`
+
+    const result = thisUser.albumTags.reduce((tags, albumTag) => {
+      if (albumTag.album.publicId.spotify !== spotifyAlbumId) {
+        return tags;
+      }
+
+      tags.push(albumTag.tag);
+      return tags;
+    }, <ITag[]>[]);
+
     return Promise.resolve(result);
 
   } catch (error) {

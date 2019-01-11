@@ -8,7 +8,7 @@ import { Tag } from "../models/Tag";
 import { Album } from "../models/Album";
 import { AlbumTag } from "../models/AlbumTag";
 import { IUser } from "../models/User";
-import { GetMyAlbumsResponse, GetMyAlbumsRequest } from "../models/responses/GetMyAlbums";
+import { GetMyAlbumsResponse, GetMyAlbumsRequest, GetAlbumResponse } from "../models/responses/GetMyAlbums";
 import { GetMyTagsResponse } from "../models/responses/GetMyTags";
 import { errorHandler } from "../util/errorHandler";
 import logger from "../util/logger";
@@ -30,6 +30,24 @@ export let getMyAlbums = async (req: Request, res: Response) => {
     const spotifyAlbums = await SpotifyApiManager.GetMySavedAlbums(limit, offset);
     const useTagFilter = normalizedTags && normalizedTags.length > 0;
     const response = GetMyAlbumsResponse.createFromSpotifyAlbums(spotifyAlbums.body.items, tagsByAlbum, useTagFilter);
+
+    return res.json(response);
+  }
+  catch (error) {
+    return errorHandler(error, res);
+  }
+};
+
+export let getAlbumBySpotifyId = async (req: Request, res: Response) => {
+  try {
+    const spotifyAlbumId = req.params["albumId"];
+    const user = <IUser>req.user;
+
+    const tags = await user.getTagsByAlbum(spotifyAlbumId);
+
+    const spotifyAlbums = await SpotifyApiManager.GetAlbum(spotifyAlbumId);
+
+    const response = GetAlbumResponse.createFromSpotifyAlbum(spotifyAlbums, tags);
 
     return res.json(response);
   }
