@@ -8,5 +8,12 @@ export const errorHandler = function (error: any, res: Response): Response {
   }
 
   logger.error(error);
+
+  if (error.name === "WebapiError") {
+    const statusCode = error.statusCode;
+    const errorResponse = new ErrorResponse(`${statusCode}`, `Spotify error: ${error.message}`, statusCode);
+    return res.status(errorResponse.error.statusCode).json(errorResponse);
+  }
+
   return res.status(500).json(new ErrorResponse("500", "Internal error"));
 };

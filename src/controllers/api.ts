@@ -74,6 +74,8 @@ export let setTagOnAlbum = async (req: Request, res: Response) => {
   try {
     const body = TagOnAlbumRequest.checkConsistency(req.body);
 
+    // todo: formal check on tag
+
     const tag = await Tag.findOrCreate(body.tag.name);
     if (!tag) {
       throw new BadRequestErrorResponse("Input tag does not exist");
@@ -120,7 +122,7 @@ export const deleteTagFromAlbum = async (req: Request, res: Response) => {
       throw new BadRequestErrorResponse("Input tag has never been added to input album");
     }
 
-    // todo: startTransaction
+    // todo: startTransaction (see: https://thecodebarbarian.com/a-node-js-perspective-on-mongodb-4-transactions.html)
 
     const user = <IUser>req.user;
     const removeResult = await user.removeAlbumTag(albumTag);
