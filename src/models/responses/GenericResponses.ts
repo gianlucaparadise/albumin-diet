@@ -32,4 +32,8 @@ export class BadRequestErrorResponse extends ErrorResponse {
   }
 }
 
-export class EmptyResponse extends BaseResponse<undefined> { }
+export class EmptyResponse extends BaseResponse<undefined> {
+  constructor() {
+    super(undefined);
+  }
+}

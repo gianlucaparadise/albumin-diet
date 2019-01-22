@@ -96,7 +96,7 @@ export let setTagOnAlbum = async (req: Request, res: Response) => {
     const user = <IUser>req.user;
     const savedUser = await user.addAlbumTag(albumTag);
 
-    return res.json(new EmptyResponse(undefined));
+    return res.json(new EmptyResponse());
   }
   catch (error) {
     return errorHandler(error, res);
@@ -138,7 +138,7 @@ export const deleteTagFromAlbum = async (req: Request, res: Response) => {
 
     // todo: commitTransaction
 
-    return res.json(new EmptyResponse(undefined));
+    return res.json(new EmptyResponse());
   }
   catch (error) {
     return errorHandler(error, res);
