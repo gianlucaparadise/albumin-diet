@@ -966,6 +966,8 @@ declare namespace SpotifyApi {
 
   interface UsersSavedAlbumsNodeResponse extends SpotifyNodeResponse<UsersSavedAlbumsResponse> { }
   interface MultipleAlbumsNodeResponse extends SpotifyNodeResponse<MultipleAlbumsResponse> { }
+  interface AlbumSearchNodeResponse extends SpotifyNodeResponse<AlbumSearchResponse> { }
+  interface ArtistSearchNodeResponse extends SpotifyNodeResponse<ArtistSearchResponse> { }
   //#endregion
 
 }

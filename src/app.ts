@@ -42,6 +42,8 @@ mongoose.connect(mongoUrl, { useNewUrlParser: true }).then(
   // process.exit();
 });
 
+// todo: set up https
+
 // Express configuration
 app.set("port", process.env.PORT || 3000);
 app.set("views", path.join(__dirname, "../views"));
@@ -108,10 +110,13 @@ apiMeRoute.use(passportConfig.authenticate, passportConfig.fillCurrentUser);
 apiMeRoute.get("/profile", userController.getMe);
 
 apiMeRoute.get("/album", apiController.getMyAlbums);
-apiMeRoute.get("/album/:albumId", apiController.getAlbumBySpotifyId); // todo: make this accessible also for non-logged users
 apiMeRoute.get("/tag", apiController.getMyTags);
 apiMeRoute.post("/tag-on-album", apiController.setTagOnAlbum);
 apiMeRoute.delete("/tag-on-album", apiController.deleteTagFromAlbum);
+
+apiMeRoute.get("/album/:albumId", apiController.getAlbumBySpotifyId); // todo: make this accessible also for non-logged users
+apiMeRoute.get("/album/search", apiController.searchAlbums); // todo: make this accessible also for non-logged users
+apiMeRoute.get("/artist/search", apiController.searchArtists); // todo: make this accessible also for non-logged users
 
 app.use("/api/me", apiMeRoute);
 //#endregion

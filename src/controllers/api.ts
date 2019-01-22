@@ -10,6 +10,7 @@ import { AlbumTag } from "../models/AlbumTag";
 import { IUser } from "../models/User";
 import { GetMyAlbumsResponse, GetMyAlbumsRequest, GetAlbumResponse } from "../models/responses/GetMyAlbums";
 import { GetMyTagsResponse } from "../models/responses/GetMyTags";
+import { SearchRequest, SearchAlbumResponse, SearchArtistResponse } from "../models/responses/Search";
 import { errorHandler } from "../util/errorHandler";
 import logger from "../util/logger";
 
@@ -138,6 +139,46 @@ export const deleteTagFromAlbum = async (req: Request, res: Response) => {
     // todo: commitTransaction
 
     return res.json(new EmptyResponse(undefined));
+  }
+  catch (error) {
+    return errorHandler(error, res);
+  }
+};
+
+export const searchAlbums = async (req: Request, res: Response) => {
+  try {
+    const requestBody = <SearchRequest>req.query;
+    const keywords = requestBody.q;
+
+    const limit = requestBody.limit || 20;
+    const offset = requestBody.offset || 0;
+
+    const searchResponse = await SpotifyApiManager.SearchAlbums(keywords, limit, offset);
+    console.log(searchResponse);
+
+    const response = new SearchAlbumResponse(searchResponse.body);
+
+    return res.json(response);
+  }
+  catch (error) {
+    return errorHandler(error, res);
+  }
+};
+
+export const searchArtists = async (req: Request, res: Response) => {
+  try {
+    const requestBody = <SearchRequest>req.query;
+    const keywords = requestBody.q;
+
+    const limit = requestBody.limit || 20;
+    const offset = requestBody.offset || 0;
+
+    const searchResponse = await SpotifyApiManager.SearchArtists(keywords, limit, offset);
+    console.log(searchResponse);
+
+    const response = new SearchArtistResponse(searchResponse.body);
+
+    return res.json(response);
   }
   catch (error) {
     return errorHandler(error, res);

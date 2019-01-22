@@ -75,13 +75,40 @@ export class SpotifyApiManager {
       return Promise.resolve(response);
     }
     catch (error) {
-      // // todo: If I get 401 I should refresh access token and re-send the request
-      // if (error.statusCode == 401) {
-      //   const hasRefreshed = await SpotifyApiManager.RefreshToken();
-      //   if (hasRefreshed) {
-      //     return SpotifyApiManager.GetMySavedAlbums();
-      //   }
-      // }
+      return Promise.reject(error);
+    }
+  }
+
+  public static async SearchAlbums(keywords: string, limit: number, offset: number): Promise<SpotifyApi.AlbumSearchNodeResponse> {
+
+    try {
+      const options = {
+        limit: limit,
+        offset: offset
+      };
+      const response: SpotifyApi.AlbumSearchNodeResponse = await SpotifyApiManager.Api.searchAlbums(keywords, options);
+
+      // todo: filter out singles, but not EPs (see: https://support.tunecore.com/hc/en-ca/articles/115006689928-What-is-the-difference-between-a-Single-an-EP-and-an-Album-)
+
+      return Promise.resolve(response);
+    }
+    catch (error) {
+      return Promise.reject(error);
+    }
+  }
+
+  public static async SearchArtists(keywords: string, limit: number, offset: number): Promise<SpotifyApi.ArtistSearchNodeResponse> {
+
+    try {
+      const options = {
+        limit: limit,
+        offset: offset
+      };
+      const response: SpotifyApi.ArtistSearchNodeResponse = await SpotifyApiManager.Api.searchArtists(keywords, options);
+
+      return Promise.resolve(response);
+    }
+    catch (error) {
       return Promise.reject(error);
     }
   }
