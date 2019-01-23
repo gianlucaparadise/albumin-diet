@@ -1,6 +1,8 @@
 import { SPOTIFY_ID, SPOTIFY_SECRET } from "../util/secrets";
+import { IUser } from "../models/User";
+import logger from "../util/logger";
 
-const SpotifyWebApi = require("spotify-web-api-node");
+import SpotifyWebApi from "spotify-web-api-node";
 
 // credentials are optional
 const spotifyApi = new SpotifyWebApi({
@@ -28,47 +30,82 @@ export class SpotifyApiManager {
     return this.Instance.Api;
   }
 
-  // private static async RefreshToken(): Promise<boolean> {
-  //   try {
-  //     const data = await SpotifyApiManager.Api.refreshAccessToken();
-  //     // todo: I should save the token and send it back to the user
-  //     console.log(`Refreshed accessToken: \n ${data.body["access_token"]}`);
-  //     console.log(`I should save to user`);
-  //     SpotifyApiManager.Api.setAccessToken(data.body["access_token"]);
-  //     Promise.resolve(true);
-  //   } catch (error) {
-  //     return Promise.reject(error);
-  //   }
-  // }
-
-  public static async GetMySavedAlbums(limit: number = 20, offset: number = 0): Promise<SpotifyApi.UsersSavedAlbumsNodeResponse> {
+  private static async RefreshToken(user: IUser): Promise<boolean> {
+    logger.debug("Refreshing spotify token");
 
     try {
-      const response: SpotifyApi.UsersSavedAlbumsNodeResponse = await SpotifyApiManager.Api.getMySavedAlbums({
+      const data = await SpotifyApiManager.Api.refreshAccessToken();
+
+      const accessToken: string = data.body["access_token"];
+
+      const newUser = await user.updateSpotifyAccessToken(accessToken);
+
+      SpotifyApiManager.Api.setAccessToken(accessToken);
+      return Promise.resolve(true);
+
+    } catch (error) {
+      logger.error("Error while refreshing token: ");
+      logger.error(error);
+
+      return Promise.reject(error);
+    }
+  }
+
+  /**
+   * This is something like a middleware for all the requests that needs
+   * the token to be refreshed when needed
+   *
+   * @param user Current user
+   * @param buildRequest Function that returns the request to perform.
+   */
+  private static async request<T>(user: IUser, buildRequest: () => Promise<T>): Promise<T> {
+    try {
+      // I need a request builder instead of the final request because if I don't re-build it,
+      // the request will use the old spotifyApi instance with the old accessToken
+      const req = buildRequest();
+      return await req;
+    }
+    catch (error) {
+      if (error.statusCode == 401) {
+        const hasRefreshed = await SpotifyApiManager.RefreshToken(user);
+        if (hasRefreshed) {
+          // now that is refreshed, I re-try one last time the initial request
+          try {
+            const req = buildRequest();
+            return await req;
+          }
+          catch (error2) {
+            // If I get again an error, I don't want to try another time to avoid a long loop
+            return Promise.reject(error2);
+          }
+        }
+      }
+      return Promise.reject(error);
+    }
+  }
+
+  public static async GetMySavedAlbums(user: IUser, limit: number = 20, offset: number = 0): Promise<SpotifyApi.UsersSavedAlbumsNodeResponse> {
+
+    try {
+      const params: SpotifyApi.PagingRequestObject = {
         limit: limit,
         offset: offset
-      });
+      };
+      const response = await this.request(user, () => SpotifyApiManager.Api.getMySavedAlbums(params));
 
       // todo: filter out singles, but not EPs (see: https://support.tunecore.com/hc/en-ca/articles/115006689928-What-is-the-difference-between-a-Single-an-EP-and-an-Album-)
 
       return Promise.resolve(response);
     }
     catch (error) {
-      // // todo: If I get 401 I should refresh access token and re-send the request
-      // if (error.statusCode == 401) {
-      //   const hasRefreshed = await SpotifyApiManager.RefreshToken();
-      //   if (hasRefreshed) {
-      //     return SpotifyApiManager.GetMySavedAlbums();
-      //   }
-      // }
       return Promise.reject(error);
     }
   }
 
-  public static async GetAlbum(id: string): Promise<SpotifyApi.MultipleAlbumsNodeResponse> {
+  public static async GetAlbum(user: IUser, id: string): Promise<SpotifyApi.MultipleAlbumsNodeResponse> {
 
     try {
-      const response: SpotifyApi.MultipleAlbumsNodeResponse = await SpotifyApiManager.Api.getAlbums([id]);
+      const response = await this.request(user, () => SpotifyApiManager.Api.getAlbums([id]));
 
       // todo: filter out singles, but not EPs (see: https://support.tunecore.com/hc/en-ca/articles/115006689928-What-is-the-difference-between-a-Single-an-EP-and-an-Album-)
 
@@ -86,7 +123,7 @@ export class SpotifyApiManager {
         limit: limit,
         offset: offset
       };
-      const response: SpotifyApi.AlbumSearchNodeResponse = await SpotifyApiManager.Api.searchAlbums(keywords, options);
+      const response = await SpotifyApiManager.Api.searchAlbums(keywords, options);
 
       // todo: filter out singles, but not EPs (see: https://support.tunecore.com/hc/en-ca/articles/115006689928-What-is-the-difference-between-a-Single-an-EP-and-an-Album-)
 
@@ -104,7 +141,7 @@ export class SpotifyApiManager {
         limit: limit,
         offset: offset
       };
-      const response: SpotifyApi.ArtistSearchNodeResponse = await SpotifyApiManager.Api.searchArtists(keywords, options);
+      const response = await SpotifyApiManager.Api.searchArtists(keywords, options);
 
       return Promise.resolve(response);
     }

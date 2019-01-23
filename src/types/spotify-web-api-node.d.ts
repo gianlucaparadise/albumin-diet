@@ -949,6 +949,19 @@ declare namespace SpotifyApi {
     uri: string;
   }
 
+  /**
+   * Base request for all the paged responses
+   *
+   * @param market Optional. An ISO 3166-1 alpha-2 country code or the string from_token
+   * @param limit Optional. The maximum number of results to return. Default: 20. Minimum: 1. Maximum: 50.
+   * @param offset Optional. The index of the first result to return. Default: 0 (i.e., the first result). Maximum offset: 100.000. Use with limit to get the next page of search results.
+   */
+  interface PagingRequestObject {
+    market?: string;
+    limit?: number;
+    offset?: number;
+  }
+
   //#region NodeResponses
   interface UserProfileAuthenticationNodeResponse {
     provider: "spotify";
@@ -970,4 +983,32 @@ declare namespace SpotifyApi {
   interface ArtistSearchNodeResponse extends SpotifyNodeResponse<ArtistSearchResponse> { }
   //#endregion
 
+}
+
+declare module "spotify-web-api-node" {
+  export default class SpotifyWebApi {
+
+    constructor(params: {
+      clientId: string,
+      clientSecret: string,
+    });
+
+    setAccessToken(accessToken: String): void;
+
+    setRefreshToken(refreshToken: String): void;
+
+    getAccessToken(): String;
+
+    getRefreshToken(): String;
+
+    refreshAccessToken(): Promise<any>;
+
+    getMySavedAlbums(options: SpotifyApi.PagingRequestObject): Promise<SpotifyApi.UsersSavedAlbumsNodeResponse>;
+
+    getAlbums(ids: string[]): Promise<SpotifyApi.MultipleAlbumsNodeResponse>;
+
+    searchAlbums(keywords: string, options: SpotifyApi.PagingRequestObject): Promise<SpotifyApi.AlbumSearchNodeResponse>;
+
+    searchArtists(keywords: string, options: SpotifyApi.PagingRequestObject): Promise<SpotifyApi.ArtistSearchNodeResponse>;
+  }
 }

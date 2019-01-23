@@ -28,7 +28,7 @@ export let getMyAlbums = async (req: Request, res: Response) => {
 
     // todo: check how to parallelize spotify request and db query
     const tagsByAlbum = await user.getTagsGroupedByAlbum(normalizedTags);
-    const spotifyAlbums = await SpotifyApiManager.GetMySavedAlbums(limit, offset);
+    const spotifyAlbums = await SpotifyApiManager.GetMySavedAlbums(user, limit, offset);
     const useTagFilter = normalizedTags && normalizedTags.length > 0;
     const response = GetMyAlbumsResponse.createFromSpotifyAlbums(spotifyAlbums.body.items, tagsByAlbum, useTagFilter);
 
@@ -46,7 +46,7 @@ export let getAlbumBySpotifyId = async (req: Request, res: Response) => {
 
     const tags = await user.getTagsByAlbum(spotifyAlbumId);
 
-    const spotifyAlbums = await SpotifyApiManager.GetAlbum(spotifyAlbumId);
+    const spotifyAlbums = await SpotifyApiManager.GetAlbum(user, spotifyAlbumId);
 
     const response = GetAlbumResponse.createFromSpotifyAlbum(spotifyAlbums, tags);
 

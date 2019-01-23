@@ -37,6 +37,13 @@ export interface IUser extends Document {
    * Retrieves the list of tags related to input album
    */
   getTagsByAlbum(spotifyAlbumId: string): Promise<ITag[]>;
+
+  /**
+   * This updates the new refreshed access token
+   *
+   * @param spotifyAccessToken New spotify access token
+   */
+  updateSpotifyAccessToken(spotifyAccessToken: string): Promise<IUser>;
 }
 
 export interface IUserModel extends Model<IUser> {
@@ -180,6 +187,20 @@ userSchema.methods.getTagsByAlbum = async function (spotifyAlbumId: string): Pro
     }, <ITag[]>[]);
 
     return Promise.resolve(result);
+
+  } catch (error) {
+    return Promise.reject(error);
+  }
+};
+
+userSchema.methods.updateSpotifyAccessToken = async function (spotifyAccessToken: string): Promise<IUser> {
+  try {
+    const thisUser = <IUser>this;
+    // todo: encrypt tokens
+    thisUser.spotify.accessToken = spotifyAccessToken;
+    const newUser = await thisUser.save();
+
+    return Promise.resolve(newUser);
 
   } catch (error) {
     return Promise.reject(error);
