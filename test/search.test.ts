@@ -20,6 +20,7 @@ describe("Search album", () => {
       .set("Authorization", `Bearer ${ACCESS_TOKEN}`);
 
     expect(response.status).toBe(200);
+    expect(response.body.data.albums.items.length).toBeGreaterThan(0);
   });
 });
 
@@ -39,5 +40,6 @@ describe("Search artist", () => {
       .set("Authorization", `Bearer ${ACCESS_TOKEN}`);
 
     expect(response.status).toBe(200);
+    expect(response.body.data.artists.items.length).toBeGreaterThan(0);
   });
 });
