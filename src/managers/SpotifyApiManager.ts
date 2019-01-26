@@ -116,14 +116,14 @@ export class SpotifyApiManager {
     }
   }
 
-  public static async SearchAlbums(keywords: string, limit: number, offset: number): Promise<SpotifyApi.AlbumSearchNodeResponse> {
+  public static async SearchAlbums(user: IUser, keywords: string, limit: number, offset: number): Promise<SpotifyApi.AlbumSearchNodeResponse> {
 
     try {
       const options = {
         limit: limit,
         offset: offset
       };
-      const response = await SpotifyApiManager.Api.searchAlbums(keywords, options);
+      const response = await this.request(user, () => SpotifyApiManager.Api.searchAlbums(keywords, options));
 
       // todo: filter out singles, but not EPs (see: https://support.tunecore.com/hc/en-ca/articles/115006689928-What-is-the-difference-between-a-Single-an-EP-and-an-Album-)
 
@@ -134,14 +134,14 @@ export class SpotifyApiManager {
     }
   }
 
-  public static async SearchArtists(keywords: string, limit: number, offset: number): Promise<SpotifyApi.ArtistSearchNodeResponse> {
+  public static async SearchArtists(user: IUser, keywords: string, limit: number, offset: number): Promise<SpotifyApi.ArtistSearchNodeResponse> {
 
     try {
       const options = {
         limit: limit,
         offset: offset
       };
-      const response = await SpotifyApiManager.Api.searchArtists(keywords, options);
+      const response = await this.request(user, () => SpotifyApiManager.Api.searchArtists(keywords, options));
 
       return Promise.resolve(response);
     }

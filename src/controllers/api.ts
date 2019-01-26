@@ -153,7 +153,9 @@ export const searchAlbums = async (req: Request, res: Response) => {
     const limit = requestBody.limit || 20;
     const offset = requestBody.offset || 0;
 
-    const searchResponse = await SpotifyApiManager.SearchAlbums(keywords, limit, offset);
+    const user = <IUser>req.user;
+
+    const searchResponse = await SpotifyApiManager.SearchAlbums(user, keywords, limit, offset);
     console.log(searchResponse);
 
     const response = new SearchAlbumResponse(searchResponse.body);
@@ -173,7 +175,9 @@ export const searchArtists = async (req: Request, res: Response) => {
     const limit = requestBody.limit || 20;
     const offset = requestBody.offset || 0;
 
-    const searchResponse = await SpotifyApiManager.SearchArtists(keywords, limit, offset);
+    const user = <IUser>req.user;
+
+    const searchResponse = await SpotifyApiManager.SearchArtists(user, keywords, limit, offset);
     console.log(searchResponse);
 
     const response = new SearchArtistResponse(searchResponse.body);
