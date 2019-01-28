@@ -116,6 +116,30 @@ export class SpotifyApiManager {
     }
   }
 
+  /**
+   * This API checks if all the tracks of the input album are saved. If so, the album is fully saved.
+   *
+   * @param user Current user
+   * @param album Album to check
+   */
+  public static async IsMySavedAlbum(user: IUser, album: SpotifyApi.AlbumObjectFull): Promise<boolean> {
+
+    try {
+      const trackIds = album.tracks.items.map(t => t.id);
+
+      // FIXME: This API supports max 50 tracks. If input album has more than 50 tracks, I need to check tracks in blocks of 50 tracks
+      const response = await this.request(user, () => SpotifyApiManager.Api.containsMySavedTracks(trackIds));
+      const result = response.body.indexOf(false) == -1;
+
+      // I can't use containsMySavedTracks API because returns true when at least one track is saved. I need to check full albums.
+
+      return Promise.resolve(result);
+    }
+    catch (error) {
+      return Promise.reject(error);
+    }
+  }
+
   public static async SearchAlbums(user: IUser, keywords: string, limit: number, offset: number): Promise<SpotifyApi.AlbumSearchNodeResponse> {
 
     try {

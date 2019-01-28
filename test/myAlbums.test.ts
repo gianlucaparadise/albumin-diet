@@ -2,10 +2,10 @@ import request from "supertest";
 import querystring from "querystring";
 import app from "../src/app";
 import { ACCESS_TOKEN } from "./util/testSecrets";
-import { GetMyAlbumsResponse, GetMyAlbumsRequest } from "../src/models/responses/GetMyAlbums";
+import { GetMyAlbumsResponse, GetMyAlbumsRequest, GetAlbumResponse } from "../src/models/responses/GetMyAlbums";
 
 const testTags = ["This is a test tag", "This is another test tag"];
-const testSpotifyAlbumId = "5cPHT4yMCfETLRYAoBFcOZ";
+const testSpotifyAlbumId = "5cPHT4yMCfETLRYAoBFcOZ"; // Ma Fleur - Cinematic Orchestra
 
 describe("GET MyAlbums", () => {
   afterAll(async () => {
@@ -30,7 +30,8 @@ describe("GET MyAlbums", () => {
       .set("Authorization", `Bearer ${ACCESS_TOKEN}`);
 
     expect(response.status).toBe(200);
-    expect(response.body.data.length).toBeGreaterThan(0);
+    const body = <GetMyAlbumsResponse>response.body;
+    expect(body.data.length).toBeGreaterThan(0);
   });
 
   it("should return multiple albums", async () => {
@@ -68,8 +69,10 @@ describe("GetAlbum by Spotify Id", () => {
       .set("Authorization", `Bearer ${ACCESS_TOKEN}`);
 
     expect(response.status).toBe(200);
-    expect(response.body.data.album.id).toEqual(testSpotifyAlbumId);
-    expect(response.body.data.tags.length).toBeGreaterThan(0);
+    const body = <GetAlbumResponse>response.body;
+    expect(body.data.album.id).toEqual(testSpotifyAlbumId);
+    expect(body.data.tags.length).toBeGreaterThan(0);
+    expect(body.data.isSavedAlbum).toBe(true);
     // todo: write better tests
   });
 });

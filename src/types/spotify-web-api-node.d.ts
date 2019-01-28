@@ -979,6 +979,8 @@ declare namespace SpotifyApi {
 
   interface UsersSavedAlbumsNodeResponse extends SpotifyNodeResponse<UsersSavedAlbumsResponse> { }
   interface MultipleAlbumsNodeResponse extends SpotifyNodeResponse<MultipleAlbumsResponse> { }
+  interface CheckUserSavedAlbumsNodeResponse extends SpotifyNodeResponse<CheckUserSavedAlbumsResponse> { }
+  interface CheckUserSavedTracksNodeResponse extends SpotifyNodeResponse<CheckUsersSavedTracksResponse> { }
   interface AlbumSearchNodeResponse extends SpotifyNodeResponse<AlbumSearchResponse> { }
   interface ArtistSearchNodeResponse extends SpotifyNodeResponse<ArtistSearchResponse> { }
   //#endregion
@@ -1006,6 +1008,16 @@ declare module "spotify-web-api-node" {
     getMySavedAlbums(options: SpotifyApi.PagingRequestObject): Promise<SpotifyApi.UsersSavedAlbumsNodeResponse>;
 
     getAlbums(ids: string[]): Promise<SpotifyApi.MultipleAlbumsNodeResponse>;
+
+    /**
+     * Check if one or more albums is already saved in the current Spotify user’s ‘Your Music’ library.
+     */
+    containsMySavedAlbums(ids: string[]): Promise<SpotifyApi.CheckUserSavedAlbumsNodeResponse>;
+
+    /**
+     * Check if one or more tracks is already saved in the current Spotify user’s ‘Your Music’ library.
+     */
+    containsMySavedTracks(ids: string[]): Promise<SpotifyApi.CheckUserSavedTracksNodeResponse>;
 
     searchAlbums(keywords: string, options: SpotifyApi.PagingRequestObject): Promise<SpotifyApi.AlbumSearchNodeResponse>;
 

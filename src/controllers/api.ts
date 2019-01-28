@@ -48,7 +48,11 @@ export let getAlbumBySpotifyId = async (req: Request, res: Response) => {
 
     const spotifyAlbums = await SpotifyApiManager.GetAlbum(user, spotifyAlbumId);
 
-    const response = GetAlbumResponse.createFromSpotifyAlbum(spotifyAlbums, tags);
+    const album = spotifyAlbums.body.albums[0];
+
+    const isSavedAlbumResponse = await SpotifyApiManager.IsMySavedAlbum(user, album);
+
+    const response = GetAlbumResponse.createFromSpotifyAlbum(spotifyAlbums, tags, isSavedAlbumResponse);
 
     return res.json(response);
   }

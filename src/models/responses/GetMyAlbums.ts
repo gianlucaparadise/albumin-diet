@@ -26,6 +26,11 @@ export class TagsByAlbum {
 class TaggedAlbum {
   album: SpotifyApi.SavedAlbumObject | SpotifyApi.AlbumObjectFull;
   tags: ITag[];
+
+  /**
+   * This is true when this album is one of the current user's saved albums
+   */
+  isSavedAlbum: boolean;
 }
 
 export class GetMyAlbumsResponse extends BaseResponse<TaggedAlbum[]> {
@@ -49,7 +54,7 @@ export class GetMyAlbumsResponse extends BaseResponse<TaggedAlbum[]> {
         }
       }
 
-      const taggedAlbum: TaggedAlbum = { album: spotifyAlbum, tags: tags };
+      const taggedAlbum: TaggedAlbum = { album: spotifyAlbum, tags: tags, isSavedAlbum: true };
       taggedAlbums.push(taggedAlbum);
       return taggedAlbums;
 
@@ -60,10 +65,11 @@ export class GetMyAlbumsResponse extends BaseResponse<TaggedAlbum[]> {
 }
 
 export class GetAlbumResponse extends BaseResponse<TaggedAlbum> {
-  static createFromSpotifyAlbum(spotifyAlbums: SpotifyApi.MultipleAlbumsNodeResponse, tags: ITag[]): GetAlbumResponse {
+  static createFromSpotifyAlbum(spotifyAlbums: SpotifyApi.MultipleAlbumsNodeResponse, tags: ITag[], isSavedAlbum: boolean): GetAlbumResponse {
     const body = new TaggedAlbum();
     body.tags = tags;
     body.album = spotifyAlbums.body.albums[0];
+    body.isSavedAlbum = isSavedAlbum;
 
     const result = new GetAlbumResponse(body);
     return result;
