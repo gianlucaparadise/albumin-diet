@@ -26,6 +26,7 @@ export interface IUser extends Document {
   /**
    * Starting from this user's albumTag list, builds a map of all
    * this user's tags grouped by spotify album id
+   * @param tagFilter If this is evaluated, you will receive only these tags
    */
   getTagsGroupedByAlbum(tagFilter: string[]): Promise<TagsByAlbum>;
   /**

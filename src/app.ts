@@ -114,6 +114,10 @@ apiMeRoute.get("/tag", apiController.getMyTags);
 apiMeRoute.post("/tag-on-album", apiController.setTagOnAlbum);
 apiMeRoute.delete("/tag-on-album", apiController.deleteTagFromAlbum);
 
+apiMeRoute.get("/listening-list", apiController.getListeningList);
+apiMeRoute.post("/listening-list", apiController.addToListeningList);
+apiMeRoute.delete("/listening-list", apiController.deleteFromListeningList);
+
 apiMeRoute.get("/album/search", apiController.searchAlbums);
 apiMeRoute.get("/artist/search", apiController.searchArtists);
 apiMeRoute.get("/album/:albumId", apiController.getAlbumBySpotifyId);

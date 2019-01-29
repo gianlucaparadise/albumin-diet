@@ -1,12 +1,30 @@
 import { BadRequestErrorResponse } from "../responses/GenericResponses";
 
-export class TagOnAlbumRequest {
-  tag: {
-    name: string;
-  };
-
+export class AlbumInListeningListRequest {
   album: {
     spotifyId: string;
+  };
+
+  static checkConsistency(bodyAny: any): AlbumInListeningListRequest {
+    const body = <TagOnAlbumRequest>bodyAny;
+    if (!body) {
+      throw new BadRequestErrorResponse("Missing Body");
+    }
+
+    if (!body.album) {
+      throw new BadRequestErrorResponse("album field is required");
+    }
+
+    if (!body.album.spotifyId) {
+      throw new BadRequestErrorResponse("album.spotifyId field is required");
+    }
+
+    return body;
+  }
+}
+export class TagOnAlbumRequest extends AlbumInListeningListRequest {
+  tag: {
+    name: string;
   };
 
   /**
@@ -20,13 +38,7 @@ export class TagOnAlbumRequest {
       throw new BadRequestErrorResponse("Missing Body");
     }
 
-    if (!body.album) {
-      throw new BadRequestErrorResponse("album field is required");
-    }
-
-    if (!body.album.spotifyId) {
-      throw new BadRequestErrorResponse("album.spotifyId field is required");
-    }
+    AlbumInListeningListRequest.checkConsistency(bodyAny); // this will throw an exception when fails
 
     if (!body.tag) {
       throw new BadRequestErrorResponse("tag field is required");

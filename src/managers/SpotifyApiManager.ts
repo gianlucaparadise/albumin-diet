@@ -102,10 +102,10 @@ export class SpotifyApiManager {
     }
   }
 
-  public static async GetAlbum(user: IUser, id: string): Promise<SpotifyApi.MultipleAlbumsNodeResponse> {
+  public static async GetAlbums(user: IUser, ids: string[]): Promise<SpotifyApi.MultipleAlbumsNodeResponse> {
 
     try {
-      const response = await this.request(user, () => SpotifyApiManager.Api.getAlbums([id]));
+      const response = await this.request(user, () => SpotifyApiManager.Api.getAlbums(ids));
 
       // todo: filter out singles, but not EPs (see: https://support.tunecore.com/hc/en-ca/articles/115006689928-What-is-the-difference-between-a-Single-an-EP-and-an-Album-)
 

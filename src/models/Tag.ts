@@ -2,6 +2,8 @@ import { Document, Schema, Model, model } from "mongoose";
 import { AlbumTag } from "./AlbumTag";
 import logger from "../util/logger";
 
+export const ListeningListTagName = "Listening List";
+
 export interface ITag extends Document {
   uniqueId: string;
   name: string;
