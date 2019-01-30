@@ -1,6 +1,7 @@
 import { IAlbum } from "../Album";
-import { ITag, Tag, ListeningListTagName } from "../Tag";
+import { ITag } from "../Tag";
 import { BaseResponse } from "./GenericResponses";
+import { IUser } from "../User";
 
 export class GetMyAlbumsRequest {
   /**
@@ -23,10 +24,12 @@ export class TagsByAlbum {
   }
 }
 
-export class TaggedAlbum {
+class UserAlbum {
   album: SpotifyApi.AlbumObjectFull;
-  tags: ITag[];
+}
 
+class TaggedAlbum extends UserAlbum {
+  tags: ITag[];
   /**
    * This is true when this album is one of the current user's saved albums
    */
@@ -35,18 +38,6 @@ export class TaggedAlbum {
    * This is true when this album is in the listening list
    */
   isInListeningList: boolean;
-
-  /**
-   * This returns true when the input list of tags contain the ListeningList tag
-   *
-   * @param tags List of album's tags
-   */
-  static containsListeningList(tags: ITag[]): boolean {
-    const listeningListId = Tag.calculateUniqueIdByName(ListeningListTagName);
-
-    const isInListeningList = tags.findIndex(t => t.uniqueId === listeningListId) !== -1;
-    return isInListeningList;
-  }
 }
 
 export class GetMyAlbumsResponse extends BaseResponse<TaggedAlbum[]> {
@@ -57,7 +48,7 @@ export class GetMyAlbumsResponse extends BaseResponse<TaggedAlbum[]> {
    * @param onlyTagged set this to true if you only want all the albums that have at least one tag
    * @param areSavedAlbums set this to true if input albums are all saved albums. Set this to false when no one is a saved album.
    */
-  static createFromSpotifyAlbums(spotifyAlbums: SpotifyApi.AlbumObjectFull[], tagsByAlbum: TagsByAlbum, onlyTagged: boolean, areSavedAlbums: boolean): GetMyAlbumsResponse {
+  static createFromSpotifyAlbums(spotifyAlbums: SpotifyApi.AlbumObjectFull[], tagsByAlbum: TagsByAlbum, onlyTagged: boolean, user: IUser): GetMyAlbumsResponse {
 
     const taggedAlbumList = spotifyAlbums.reduce((taggedAlbums, x) => {
       const spotifyAlbum = x;
@@ -71,8 +62,8 @@ export class GetMyAlbumsResponse extends BaseResponse<TaggedAlbum[]> {
         }
       }
 
-      const isInListeningList = TaggedAlbum.containsListeningList(tags);
-      const taggedAlbum: TaggedAlbum = { album: spotifyAlbum, tags: tags, isSavedAlbum: areSavedAlbums, isInListeningList: isInListeningList };
+      const isInListeningList = user.listeningList.indexOf(spotifyAlbum.id) >= 0;
+      const taggedAlbum: TaggedAlbum = { album: spotifyAlbum, tags: tags, isSavedAlbum: true, isInListeningList: isInListeningList, };
       taggedAlbums.push(taggedAlbum);
       return taggedAlbums;
 
@@ -82,16 +73,23 @@ export class GetMyAlbumsResponse extends BaseResponse<TaggedAlbum[]> {
   }
 }
 
+export class GetListeningListResponse extends BaseResponse<UserAlbum[]> {
+  static createFromSpotifyAlbums(spotifyAlbums: SpotifyApi.AlbumObjectFull[]): GetListeningListResponse {
+    const userAlbumList = spotifyAlbums.map(a => <UserAlbum>{ album: a });
+
+    return new GetListeningListResponse(userAlbumList);
+  }
+}
+
 export class GetAlbumResponse extends BaseResponse<TaggedAlbum> {
-  static createFromSpotifyAlbum(spotifyAlbums: SpotifyApi.MultipleAlbumsNodeResponse, tags: ITag[], isSavedAlbum: boolean): GetAlbumResponse {
-
-    const isInListeningList = TaggedAlbum.containsListeningList(tags);
-
+  static createFromSpotifyAlbum(spotifyAlbums: SpotifyApi.MultipleAlbumsNodeResponse, tags: ITag[], isSavedAlbum: boolean, user: IUser): GetAlbumResponse {
+    const album = spotifyAlbums.body.albums[0];
+    const isInListeningList = user.listeningList.indexOf(album.id) >= 0;
     const body: TaggedAlbum = {
       tags: tags,
-      album: spotifyAlbums.body.albums[0],
+      album: album,
       isSavedAlbum: isSavedAlbum,
-      isInListeningList: isInListeningList
+      isInListeningList: isInListeningList,
     };
 
     const result = new GetAlbumResponse(body);

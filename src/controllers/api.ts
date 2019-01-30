@@ -4,11 +4,11 @@ import { Response, Request, NextFunction } from "express";
 import { SpotifyApiManager } from "../managers/SpotifyApiManager";
 import { TagOnAlbumRequest, AlbumInListeningListRequest } from "../models/requests/SetTagOnAlbumRequest";
 import { EmptyResponse, BadRequestErrorResponse } from "../models/responses/GenericResponses";
-import { Tag, ListeningListTagName } from "../models/Tag";
+import { Tag } from "../models/Tag";
 import { Album } from "../models/Album";
 import { AlbumTag } from "../models/AlbumTag";
 import { IUser } from "../models/User";
-import { GetMyAlbumsResponse, GetMyAlbumsRequest, GetAlbumResponse } from "../models/responses/GetMyAlbums";
+import { GetMyAlbumsResponse, GetMyAlbumsRequest, GetAlbumResponse, GetListeningListResponse } from "../models/responses/GetMyAlbums";
 import { GetMyTagsResponse } from "../models/responses/GetMyTags";
 import { SearchRequest, SearchAlbumResponse, SearchArtistResponse } from "../models/responses/Search";
 import { errorHandler } from "../util/errorHandler";
@@ -31,7 +31,7 @@ export let getMyAlbums = async (req: Request, res: Response) => {
     const spotifyAlbums = await SpotifyApiManager.GetMySavedAlbums(user, limit, offset);
     const useTagFilter = normalizedTags && normalizedTags.length > 0;
     const albumsFull = spotifyAlbums.body.items.map(a => a.album);
-    const response = GetMyAlbumsResponse.createFromSpotifyAlbums(albumsFull, tagsByAlbum, useTagFilter, true);
+    const response = GetMyAlbumsResponse.createFromSpotifyAlbums(albumsFull, tagsByAlbum, useTagFilter, user);
 
     return res.json(response);
   }
@@ -53,7 +53,7 @@ export let getAlbumBySpotifyId = async (req: Request, res: Response) => {
 
     const isSavedAlbumResponse = await SpotifyApiManager.IsMySavedAlbum(user, album);
 
-    const response = GetAlbumResponse.createFromSpotifyAlbum(spotifyAlbums, tags, isSavedAlbumResponse);
+    const response = GetAlbumResponse.createFromSpotifyAlbum(spotifyAlbums, tags, isSavedAlbumResponse, user);
 
     return res.json(response);
   }
@@ -82,50 +82,66 @@ export let setTagOnAlbum = async (req: Request, res: Response) => {
 
     // todo: formal check on tag
 
+    const tag = await Tag.findOrCreate(body.tag.name);
+    if (!tag) {
+      throw new BadRequestErrorResponse("Input tag does not exist");
+    }
+
+    // todo: check if album really exists on spotify
+    const album = await Album.findOrCreate(body.album.spotifyId);
+    if (!album) {
+      throw new BadRequestErrorResponse("Input album has never been tagged");
+    }
+
+    const albumTag = await AlbumTag.findOrCreate(album, tag);
+    if (!albumTag) {
+      throw new BadRequestErrorResponse("Input tag has never been added to input album");
+    }
+
     const user = <IUser>req.user;
-    const tagName = body.tag.name;
-    const albumSpotifyId = body.album.spotifyId;
-    const result = await setTagOnAlbumInternal(user, tagName, albumSpotifyId);
+    const savedUser = await user.addAlbumTag(albumTag);
 
     return res.json(new EmptyResponse());
   }
   catch (error) {
     return errorHandler(error, res);
   }
-};
-
-// TODO: find a better place for this function
-const setTagOnAlbumInternal = async (user: IUser, tagName: string, albumSpotifyId: string): Promise<boolean> => {
-  const tag = await Tag.findOrCreate(tagName);
-  if (!tag) {
-    throw new BadRequestErrorResponse("Input tag does not exist");
-  }
-
-  // todo: check if album really exists on spotify
-  const album = await Album.findOrCreate(albumSpotifyId);
-  if (!album) {
-    throw new BadRequestErrorResponse("Input album has never been tagged");
-  }
-
-  const albumTag = await AlbumTag.findOrCreate(album, tag);
-  if (!albumTag) {
-    throw new BadRequestErrorResponse("Input tag has never been added to input album");
-  }
-
-  const savedUser = await user.addAlbumTag(albumTag);
-
-  return true;
 };
 
 export const deleteTagFromAlbum = async (req: Request, res: Response) => {
   try {
     const body = TagOnAlbumRequest.checkConsistency(req.body);
 
-    const user = <IUser>req.user;
-    const tagName = body.tag.name;
-    const albumSpotifyId = body.album.spotifyId;
+    const tagUniqueId = Tag.calculateUniqueIdByName(body.tag.name);
+    const tag = await Tag.findOne({ "uniqueId": tagUniqueId });
+    if (!tag) {
+      throw new BadRequestErrorResponse("Input tag does not exist");
+    }
 
-    const result = await deleteTagFromAlbumInternal(user, tagName, albumSpotifyId);
+    const album = await Album.findOne({ "publicId.spotify": body.album.spotifyId });
+    if (!album) {
+      throw new BadRequestErrorResponse("Input album has never been tagged");
+    }
+
+    const albumTag = await AlbumTag.findOne({ "tag": tag, "album": album });
+    if (!albumTag) {
+      throw new BadRequestErrorResponse("Input tag has never been added to input album");
+    }
+
+    // todo: startTransaction (see: https://thecodebarbarian.com/a-node-js-perspective-on-mongodb-4-transactions.html)
+
+    const user = <IUser>req.user;
+    const removeResult = await user.removeAlbumTag(albumTag);
+
+    // Clearing orphan documents
+    const isAlbumTagRemoved = await albumTag.removeIfOrphan();
+    if (isAlbumTagRemoved) {
+      // If AlbumTag was orphan, I check if album and tag are now also orphan
+      const isAlbumRemoved = await album.removeIfOrphan();
+      const isTagRemoved = await tag.removeIfOrphan();
+    }
+
+    // todo: commitTransaction
 
     return res.json(new EmptyResponse());
   }
@@ -134,52 +150,18 @@ export const deleteTagFromAlbum = async (req: Request, res: Response) => {
   }
 };
 
-const deleteTagFromAlbumInternal = async (user: IUser, tagName: string, albumSpotifyId: string): Promise<boolean> => {
-  const tagUniqueId = Tag.calculateUniqueIdByName(tagName);
-  const tag = await Tag.findOne({ "uniqueId": tagUniqueId });
-  if (!tag) {
-    throw new BadRequestErrorResponse("Input tag does not exist");
-  }
-
-  const album = await Album.findOne({ "publicId.spotify": albumSpotifyId });
-  if (!album) {
-    throw new BadRequestErrorResponse("Input album has never been tagged");
-  }
-
-  const albumTag = await AlbumTag.findOne({ "tag": tag, "album": album });
-  if (!albumTag) {
-    throw new BadRequestErrorResponse("Input tag has never been added to input album");
-  }
-
-  // todo: startTransaction (see: https://thecodebarbarian.com/a-node-js-perspective-on-mongodb-4-transactions.html)
-
-  const removeResult = await user.removeAlbumTag(albumTag);
-
-  // Clearing orphan documents
-  const isAlbumTagRemoved = await albumTag.removeIfOrphan();
-  if (isAlbumTagRemoved) {
-    // If AlbumTag was orphan, I check if album and tag are now also orphan
-    const isAlbumRemoved = await album.removeIfOrphan();
-    const isTagRemoved = await tag.removeIfOrphan();
-  }
-
-  // todo: commitTransaction
-
-  return true;
-};
-
 export const getListeningList = async (req: Request, res: Response) => {
   try {
     // TODO: pagination
     const user = <IUser>req.user;
-    const normalizedTag = Tag.calculateUniqueIdByName(ListeningListTagName);
+    const spotifyIds = user.listeningList;
+    let albumsFull = <SpotifyApi.AlbumObjectFull[]>[];
+    if (spotifyIds.length > 0) {
+      const spotifyAlbums = await SpotifyApiManager.GetAlbums(user, spotifyIds);
+      albumsFull = spotifyAlbums.body.albums;
+    }
 
-    const tagsByAlbum = await user.getTagsGroupedByAlbum([normalizedTag]);
-
-    const spotifyIds = Object.keys(tagsByAlbum);
-    const spotifyAlbums = await SpotifyApiManager.GetAlbums(user, spotifyIds);
-
-    const response = GetMyAlbumsResponse.createFromSpotifyAlbums(spotifyAlbums.body.albums, tagsByAlbum, true, false);
+    const response = GetListeningListResponse.createFromSpotifyAlbums(albumsFull);
 
     return res.json(response);
   }
@@ -193,9 +175,9 @@ export const addToListeningList = async (req: Request, res: Response) => {
     const body = AlbumInListeningListRequest.checkConsistency(req.body);
 
     const user = <IUser>req.user;
-    const tagName = ListeningListTagName;
     const albumSpotifyId = body.album.spotifyId;
-    const result = await setTagOnAlbumInternal(user, tagName, albumSpotifyId);
+
+    const result = await user.addToListeningList(albumSpotifyId);
 
     return res.json(new EmptyResponse());
   }
@@ -209,9 +191,9 @@ export const deleteFromListeningList = async (req: Request, res: Response) => {
     const body = AlbumInListeningListRequest.checkConsistency(req.body);
 
     const user = <IUser>req.user;
-    const tagName = ListeningListTagName;
     const albumSpotifyId = body.album.spotifyId;
-    const result = await deleteTagFromAlbumInternal(user, tagName, albumSpotifyId);
+
+    const result = await user.removeFromListeningList(albumSpotifyId);
 
     return res.json(new EmptyResponse());
   }

@@ -60,7 +60,6 @@ describe("Listening List tests", () => {
 
     expect(responseGet2.status).toBe(200);
     const body2 = <GetMyAlbumsResponse>responseGet2.body;
-    expect(body2.data.length).toBeGreaterThan(0);
 
     // I expect to NOT find the input album in the response
     const findResult2 = body2.data.findIndex(a => a.album.id === testSpotifyAlbumId);

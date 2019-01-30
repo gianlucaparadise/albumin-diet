@@ -14,6 +14,10 @@ export interface IUser extends Document {
   displayName: string;
   albumTags: Types.Array<IAlbumTag>;
   /**
+   * List of spotify album ids
+   */
+  listeningList: Types.Array<string>;
+  /**
    * Pushes the input album tag in this user's albumTags list
    * @param albumTag AlbumTag to add
    */
@@ -38,6 +42,16 @@ export interface IUser extends Document {
    * Retrieves the list of tags related to input album
    */
   getTagsByAlbum(spotifyAlbumId: string): Promise<ITag[]>;
+
+  /**
+   * Adds the input album in current user's listening list
+   */
+  addToListeningList(spotifyAlbumId: string): Promise<IUser>;
+
+  /**
+   * Remove input album from current user's listening list
+   */
+  removeFromListeningList(spotifyAlbumId: string): Promise<IUser>;
 
   /**
    * This updates the new refreshed access token
@@ -66,6 +80,7 @@ export const userSchema: Schema = new Schema({
   },
   displayName: String,
   albumTags: [{ type: Schema.Types.ObjectId, ref: "AlbumTag" }],
+  listeningList: [{ type: String }],
 }, { timestamps: true });
 
 userSchema.methods.addAlbumTag = async function (albumTag: IAlbumTag): Promise<IUser> {
@@ -190,6 +205,49 @@ userSchema.methods.getTagsByAlbum = async function (spotifyAlbumId: string): Pro
     return Promise.resolve(result);
 
   } catch (error) {
+    return Promise.reject(error);
+  }
+};
+
+userSchema.methods.addToListeningList = async function (spotifyAlbumId: string): Promise<IUser> {
+  try {
+    const thisUser = <IUser>this;
+
+    const index = thisUser.listeningList.indexOf(spotifyAlbumId);
+
+    if (index >= 0) {
+      throw new BadRequestErrorResponse("Input album already is in the current user's listening list");
+    }
+
+    thisUser.listeningList.push(spotifyAlbumId);
+
+    const savedUser = await thisUser.save();
+    return Promise.resolve(savedUser);
+  }
+  catch (error) {
+    logger.error(error);
+    return Promise.reject(error);
+  }
+};
+
+userSchema.methods.removeFromListeningList = async function (spotifyAlbumId: string): Promise<IUser> {
+  try {
+    const user = <IUser>this;
+
+    const index = user.listeningList.indexOf(spotifyAlbumId);
+
+    if (index < 0) {
+      throw new BadRequestErrorResponse("Input Album is not in current user's listening list");
+    }
+
+    user.listeningList.splice(index, 1);
+
+    const savedUser = await user.save();
+    logger.debug(`Album deleted from user's listening list`);
+    return Promise.resolve(savedUser);
+  }
+  catch (error) {
+    logger.error(error);
     return Promise.reject(error);
   }
 };
