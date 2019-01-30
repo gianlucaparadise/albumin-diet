@@ -61,18 +61,3 @@ describe("GET MyAlbums", () => {
     expect(responseBody.data[0].tags.length).toBeGreaterThanOrEqual(testTags.length);
   });
 });
-
-describe("GetAlbum by Spotify Id", () => {
-  it("should return album with logged user's tags", async () => {
-    const response = await request(app)
-      .get(`/api/me/album/${testSpotifyAlbumId}`)
-      .set("Authorization", `Bearer ${ACCESS_TOKEN}`);
-
-    expect(response.status).toBe(200);
-    const body = <GetAlbumResponse>response.body;
-    expect(body.data.album.id).toEqual(testSpotifyAlbumId);
-    expect(body.data.tags.length).toBeGreaterThan(0);
-    expect(body.data.isSavedAlbum).toBe(true);
-    // todo: write better tests
-  });
-});
