@@ -11,7 +11,7 @@ describe("GET MyAlbums", () => {
   afterAll(async () => {
     for (const tag of testTags) {
       const response0 = await request(app)
-        .delete("/api/me/tag-on-album")
+        .delete("/api/me/tag")
         .send({ album: { spotifyId: testSpotifyAlbumId }, tag: { name: tag } })
         .set("Authorization", `Bearer ${ACCESS_TOKEN}`);
     }
@@ -39,7 +39,7 @@ describe("GET MyAlbums", () => {
     //#region settings tags
     for (const tag of testTags) {
       const response0 = await request(app)
-        .post("/api/me/tag-on-album")
+        .post("/api/me/tag")
         .send({ album: { spotifyId: testSpotifyAlbumId }, tag: { name: tag } })
         .set("Authorization", `Bearer ${ACCESS_TOKEN}`);
       expect(response0.status).toBe(200);

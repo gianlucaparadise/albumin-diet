@@ -110,9 +110,10 @@ apiMeRoute.use(passportConfig.authenticate, passportConfig.fillCurrentUser);
 apiMeRoute.get("/profile", userController.getMe);
 
 apiMeRoute.get("/album", apiController.getMyAlbums);
+
 apiMeRoute.get("/tag", apiController.getMyTags);
-apiMeRoute.post("/tag-on-album", apiController.setTagOnAlbum);
-apiMeRoute.delete("/tag-on-album", apiController.deleteTagFromAlbum);
+apiMeRoute.post("/tag", apiController.setTagOnAlbum);
+apiMeRoute.delete("/tag", apiController.deleteTagFromAlbum);
 
 apiMeRoute.get("/listening-list", apiController.getListeningList);
 apiMeRoute.post("/listening-list", apiController.addToListeningList);
