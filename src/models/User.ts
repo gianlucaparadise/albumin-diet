@@ -173,7 +173,17 @@ userSchema.methods.getTags = async function (): Promise<ITag[]> {
       .populate({ path: "albumTags", populate: [{ path: "tag" }] })
       .execPopulate();
 
-    const result = thisUser.albumTags.map(x => x.tag);
+    const result = thisUser.albumTags.reduce((tags, albumTag) => {
+      const foundIndex = tags.findIndex(t => t.id === albumTag.tag.id); // I search for another tag with the same id
+      if (foundIndex >= 0) {
+        // I have already added this tag, I don't want to push it again
+        return tags;
+      }
+
+      tags.push(albumTag.tag);
+      return tags;
+    }, <ITag[]>[]);
+
     return Promise.resolve(result);
 
   } catch (error) {
