@@ -62,20 +62,24 @@ const createToken = function (auth: any) {
     },
     JWT_SECRET,
     {
-      expiresIn: 60 * 120
+      expiresIn: "7 days"
     }
   );
 };
 
 export const generateToken = function (req: any, res: Response, next: NextFunction) {
   req.token = createToken(req.auth);
+
+  // todo: re-write spotify login flow and avoid cookies
+  // res.setHeader("x-auth-token", req.token);
+
+  res.cookie("x-auth-token", req.token);
+
   next();
 };
 
 export const sendToken = function (req: any, res: Response) {
   // todo: this function should be in user controller (user.ts)
-  res.setHeader("x-auth-token", req.token);
-  res.cookie("x-auth-token", req.token);
   if (req.session.callback) {
     res.redirect(req.session.callback);
   }

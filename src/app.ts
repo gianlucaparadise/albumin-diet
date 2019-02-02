@@ -105,7 +105,7 @@ app.get("/", homeController.index);
 
 //#region API Routes
 const apiMeRoute = express.Router();
-apiMeRoute.use(passportConfig.authenticate, passportConfig.fillCurrentUser);
+apiMeRoute.use(passportConfig.authenticate, passportConfig.generateToken, passportConfig.fillCurrentUser);
 
 apiMeRoute.get("/profile", userController.getMe);
 
