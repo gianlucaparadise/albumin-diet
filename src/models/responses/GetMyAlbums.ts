@@ -1,16 +1,13 @@
 import { IAlbum } from "../Album";
 import { ITag } from "../Tag";
-import { BaseResponse } from "./GenericResponses";
+import { BaseResponse, BasePaginationRequest } from "./GenericResponses";
 import { IUser } from "../User";
 
-export class GetMyAlbumsRequest {
+export class GetMyAlbumsRequest extends BasePaginationRequest {
   /**
    * This is a stringified JSON array
    */
   tags?: string;
-
-  limit?: number;
-  offset?: number;
 }
 
 /**

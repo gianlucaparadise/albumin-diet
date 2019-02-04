@@ -3,7 +3,7 @@
 import { Response, Request, NextFunction } from "express";
 import { SpotifyApiManager } from "../managers/SpotifyApiManager";
 import { TagOnAlbumRequest, AlbumInListeningListRequest } from "../models/requests/SetTagOnAlbumRequest";
-import { EmptyResponse, BadRequestErrorResponse } from "../models/responses/GenericResponses";
+import { EmptyResponse, BadRequestErrorResponse, BasePaginationRequest } from "../models/responses/GenericResponses";
 import { Tag } from "../models/Tag";
 import { Album } from "../models/Album";
 import { AlbumTag } from "../models/AlbumTag";
@@ -21,8 +21,8 @@ export let getMyAlbums = async (req: Request, res: Response) => {
     const tags: string[] = JSON.parse(request.tags || "[]");
     const normalizedTags = tags.map(t => Tag.calculateUniqueIdByName(t));
 
-    const limit = request.limit || 20;
-    const offset = request.offset || 0;
+    const limit = parseInt(request.limit) || 20;
+    const offset = parseInt(request.offset) || 0;
 
     const user = <IUser>req.user;
 
@@ -65,6 +65,8 @@ export let getAlbumBySpotifyId = async (req: Request, res: Response) => {
 export const getMyTags = async (req: Request, res: Response) => {
   try {
     const user = <IUser>req.user;
+
+    // todo: paginate this
 
     const tags = await user.getTags();
     const response = new GetMyTagsResponse(tags);
@@ -152,9 +154,17 @@ export const deleteTagFromAlbum = async (req: Request, res: Response) => {
 
 export const getListeningList = async (req: Request, res: Response) => {
   try {
-    // TODO: pagination
+    const request = <BasePaginationRequest>req.query;
+
+    const limit = parseInt(request.limit) || 20;
+    const offset = parseInt(request.offset) || 0;
+
     const user = <IUser>req.user;
-    const spotifyIds = user.listeningList;
+    let spotifyIds: string[] = user.listeningList;
+
+    // I filter spotify ids using offset and limit
+    spotifyIds = spotifyIds.slice(offset, offset + limit);
+
     let albumsFull = <SpotifyApi.AlbumObjectFull[]>[];
     if (spotifyIds.length > 0) {
       const spotifyAlbums = await SpotifyApiManager.GetAlbums(user, spotifyIds);
@@ -207,8 +217,8 @@ export const searchAlbums = async (req: Request, res: Response) => {
     const requestBody = <SearchRequest>req.query;
     const keywords = requestBody.q;
 
-    const limit = requestBody.limit || 20;
-    const offset = requestBody.offset || 0;
+    const limit = parseInt(requestBody.limit) || 20;
+    const offset = parseInt(requestBody.offset) || 0;
 
     const user = <IUser>req.user;
 
@@ -229,8 +239,8 @@ export const searchArtists = async (req: Request, res: Response) => {
     const requestBody = <SearchRequest>req.query;
     const keywords = requestBody.q;
 
-    const limit = requestBody.limit || 20;
-    const offset = requestBody.offset || 0;
+    const limit = parseInt(requestBody.limit) || 20;
+    const offset = parseInt(requestBody.offset) || 0;
 
     const user = <IUser>req.user;
 

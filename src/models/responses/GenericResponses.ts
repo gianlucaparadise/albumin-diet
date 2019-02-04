@@ -1,3 +1,12 @@
+/**
+ * All querystring params are always strings
+ */
+export class BasePaginationRequest {
+  limit?: string;
+  offset?: string;
+
+}
+
 export class BaseResponse<T> {
   error?: {
     errorDescription: string;

@@ -1,13 +1,10 @@
-import { BaseResponse } from "./GenericResponses";
+import { BaseResponse, BasePaginationRequest } from "./GenericResponses";
 
-export class SearchRequest {
+export class SearchRequest extends BasePaginationRequest {
   /**
    * This contains the search keywords
    */
   q: string;
-
-  limit?: number;
-  offset?: number;
 }
 
 export class SearchAlbumResponse extends BaseResponse<SpotifyApi.AlbumSearchResponse> { }
