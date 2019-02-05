@@ -79,8 +79,7 @@ export class GetListeningListResponse extends BaseResponse<UserAlbum[]> {
 }
 
 export class GetAlbumResponse extends BaseResponse<TaggedAlbum> {
-  static createFromSpotifyAlbum(spotifyAlbums: SpotifyApi.MultipleAlbumsNodeResponse, tags: ITag[], isSavedAlbum: boolean, user: IUser): GetAlbumResponse {
-    const album = spotifyAlbums.body.albums[0];
+  static createFromSpotifyAlbum(album: SpotifyApi.AlbumObjectFull, tags: ITag[], isSavedAlbum: boolean, user: IUser): GetAlbumResponse {
     const isInListeningList = user.listeningList.indexOf(album.id) >= 0;
     const body: TaggedAlbum = {
       tags: tags,

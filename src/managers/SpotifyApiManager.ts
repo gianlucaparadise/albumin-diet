@@ -84,6 +84,9 @@ export class SpotifyApiManager {
     }
   }
 
+  /**
+   * This returns user's saved albums from spotify (you may find singles in it)
+   */
   public static async GetMySavedAlbums(user: IUser, limit: number = 20, offset: number = 0): Promise<SpotifyApi.UsersSavedAlbumsNodeResponse> {
 
     try {
@@ -93,8 +96,6 @@ export class SpotifyApiManager {
       };
       const response = await this.request(user, () => SpotifyApiManager.Api.getMySavedAlbums(params));
 
-      // todo: filter out singles, but not EPs (see: https://support.tunecore.com/hc/en-ca/articles/115006689928-What-is-the-difference-between-a-Single-an-EP-and-an-Album-)
-
       return Promise.resolve(response);
     }
     catch (error) {
@@ -102,12 +103,14 @@ export class SpotifyApiManager {
     }
   }
 
+  /**
+   * This returns input albums (may return singles)
+   * @param ids A list of the Spotify IDs for the albums. Maximum: 20 IDs.
+   */
   public static async GetAlbums(user: IUser, ids: string[]): Promise<SpotifyApi.MultipleAlbumsNodeResponse> {
 
     try {
       const response = await this.request(user, () => SpotifyApiManager.Api.getAlbums(ids));
-
-      // todo: filter out singles, but not EPs (see: https://support.tunecore.com/hc/en-ca/articles/115006689928-What-is-the-difference-between-a-Single-an-EP-and-an-Album-)
 
       return Promise.resolve(response);
     }
@@ -148,8 +151,6 @@ export class SpotifyApiManager {
         offset: offset
       };
       const response = await this.request(user, () => SpotifyApiManager.Api.searchAlbums(keywords, options));
-
-      // todo: filter out singles, but not EPs (see: https://support.tunecore.com/hc/en-ca/articles/115006689928-What-is-the-difference-between-a-Single-an-EP-and-an-Album-)
 
       return Promise.resolve(response);
     }

@@ -2,8 +2,9 @@
 
 import { Response, Request, NextFunction } from "express";
 import { SpotifyApiManager } from "../managers/SpotifyApiManager";
+import { AlbumManager } from "../managers/AlbumManager";
 import { TagOnAlbumRequest, AlbumInListeningListRequest } from "../models/requests/SetTagOnAlbumRequest";
-import { EmptyResponse, BadRequestErrorResponse, BasePaginationRequest } from "../models/responses/GenericResponses";
+import { EmptyResponse, BadRequestErrorResponse, BasePaginationRequest, ErrorResponse } from "../models/responses/GenericResponses";
 import { Tag } from "../models/Tag";
 import { Album } from "../models/Album";
 import { AlbumTag } from "../models/AlbumTag";
@@ -28,10 +29,10 @@ export let getMyAlbums = async (req: Request, res: Response) => {
 
     // todo: check how to parallelize spotify request and db query
     const tagsByAlbum = await user.getTagsGroupedByAlbum(normalizedTags);
-    const spotifyAlbums = await SpotifyApiManager.GetMySavedAlbums(user, limit, offset);
+    const spotifyAlbums = await AlbumManager.GetMySavedAlbums(user, limit, offset);
     const useTagFilter = normalizedTags && normalizedTags.length > 0;
-    const albumsFull = spotifyAlbums.body.items.map(a => a.album);
-    const response = GetMyAlbumsResponse.createFromSpotifyAlbums(albumsFull, tagsByAlbum, useTagFilter, user);
+
+    const response = GetMyAlbumsResponse.createFromSpotifyAlbums(spotifyAlbums, tagsByAlbum, useTagFilter, user);
 
     return res.json(response);
   }
@@ -47,13 +48,15 @@ export let getAlbumBySpotifyId = async (req: Request, res: Response) => {
 
     const tags = await user.getTagsByAlbum(spotifyAlbumId);
 
-    const spotifyAlbums = await SpotifyApiManager.GetAlbums(user, [spotifyAlbumId]);
-
-    const album = spotifyAlbums.body.albums[0];
+    const spotifyAlbums = await AlbumManager.GetAlbums(user, [spotifyAlbumId]);
+    if (!spotifyAlbums || spotifyAlbums.length < 1) {
+      throw new ErrorResponse("400", "Input album is a single", 400);
+    }
+    const album = spotifyAlbums[0];
 
     const isSavedAlbumResponse = await SpotifyApiManager.IsMySavedAlbum(user, album);
 
-    const response = GetAlbumResponse.createFromSpotifyAlbum(spotifyAlbums, tags, isSavedAlbumResponse, user);
+    const response = GetAlbumResponse.createFromSpotifyAlbum(album, tags, isSavedAlbumResponse, user);
 
     return res.json(response);
   }
@@ -167,8 +170,7 @@ export const getListeningList = async (req: Request, res: Response) => {
 
     let albumsFull = <SpotifyApi.AlbumObjectFull[]>[];
     if (spotifyIds.length > 0) {
-      const spotifyAlbums = await SpotifyApiManager.GetAlbums(user, spotifyIds);
-      albumsFull = spotifyAlbums.body.albums;
+      albumsFull = await AlbumManager.GetAlbums(user, spotifyIds); // FIXME: this call might break pagination
     }
 
     const response = GetListeningListResponse.createFromSpotifyAlbums(albumsFull);
@@ -222,10 +224,9 @@ export const searchAlbums = async (req: Request, res: Response) => {
 
     const user = <IUser>req.user;
 
-    const searchResponse = await SpotifyApiManager.SearchAlbums(user, keywords, limit, offset);
-    // console.log(searchResponse);
+    const albums = await AlbumManager.SearchAlbums(user, keywords, limit, offset);
 
-    const response = new SearchAlbumResponse(searchResponse.body);
+    const response = new SearchAlbumResponse(albums);
 
     return res.json(response);
   }
@@ -245,7 +246,6 @@ export const searchArtists = async (req: Request, res: Response) => {
     const user = <IUser>req.user;
 
     const searchResponse = await SpotifyApiManager.SearchArtists(user, keywords, limit, offset);
-    // console.log(searchResponse);
 
     const response = new SearchArtistResponse(searchResponse.body);
 

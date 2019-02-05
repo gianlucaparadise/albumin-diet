@@ -624,7 +624,7 @@ declare namespace SpotifyApi {
    * [album object (simplified)](https://developer.spotify.com/web-api/object-model/#album-object-simplified)
    */
   interface AlbumObjectSimplified {
-    album_type: string;
+    album_type: "album" | "single" | "compilation";
     available_markets?: string[];
     external_urls: ExternalUrlObject;
     href: string;
@@ -1007,6 +1007,10 @@ declare module "spotify-web-api-node" {
 
     getMySavedAlbums(options: SpotifyApi.PagingRequestObject): Promise<SpotifyApi.UsersSavedAlbumsNodeResponse>;
 
+    /**
+     * Get Spotify catalog information for multiple albums identified by their Spotify IDs.
+     * @param ids A list of the Spotify IDs for the albums. Maximum: 20 IDs.
+     */
     getAlbums(ids: string[]): Promise<SpotifyApi.MultipleAlbumsNodeResponse>;
 
     /**
