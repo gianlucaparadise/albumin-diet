@@ -1,5 +1,9 @@
 import { Request, Response, NextFunction } from "express";
 import { ErrorResponse } from "../models/responses/GenericResponses";
+import { SpotifyApiManager } from "../managers/SpotifyApiManager";
+import { errorHandler } from "../util/errorHandler";
+import { GetProfileResponse } from "../models/responses/GetProfile";
+import { IUser } from "../models/User";
 
 export let login = (req: Request, res: Response) => {
   res.render("Login");
@@ -28,10 +32,16 @@ export let authSpotifyCallback = (req: Request, res: Response, next: NextFunctio
   next();
 };
 
-export const getMe = function (req: Request, res: Response) {
-  const user = req.user.toObject();
+export const getMe = async function (req: Request, res: Response) {
+  try {
+    const user = <IUser>req.user;
 
-  delete user["__v"];
+    const profile = await SpotifyApiManager.GetProfile(user);
+    const response = new GetProfileResponse(profile.body);
 
-  res.json(user);
+    res.json(response);
+
+  } catch (error) {
+    return errorHandler(error, res);
+  }
 };

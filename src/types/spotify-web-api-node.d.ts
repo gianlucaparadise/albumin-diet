@@ -977,6 +977,7 @@ declare namespace SpotifyApi {
     _json: UserObjectPublic;
   }
 
+  interface UserObjectPrivateNodeResponse extends SpotifyNodeResponse<UserObjectPrivate> { }
   interface UsersSavedAlbumsNodeResponse extends SpotifyNodeResponse<UsersSavedAlbumsResponse> { }
   interface MultipleAlbumsNodeResponse extends SpotifyNodeResponse<MultipleAlbumsResponse> { }
   interface CheckUserSavedAlbumsNodeResponse extends SpotifyNodeResponse<CheckUserSavedAlbumsResponse> { }
@@ -989,6 +990,9 @@ declare namespace SpotifyApi {
 
 declare module "spotify-web-api-node" {
   export default class SpotifyWebApi {
+    // lib docs: https://github.com/thelinmichael/spotify-web-api-node
+    // api docs: https://developer.spotify.com/documentation/web-api/reference/
+    // models docs: https://developer.spotify.com/documentation/web-api/reference/object-model/
 
     constructor(params: {
       clientId: string,
@@ -1004,6 +1008,8 @@ declare module "spotify-web-api-node" {
     getRefreshToken(): String;
 
     refreshAccessToken(): Promise<any>;
+
+    getMe(): Promise<SpotifyApi.UserObjectPrivateNodeResponse>;
 
     getMySavedAlbums(options: SpotifyApi.PagingRequestObject): Promise<SpotifyApi.UsersSavedAlbumsNodeResponse>;
 

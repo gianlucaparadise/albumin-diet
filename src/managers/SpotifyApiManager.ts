@@ -84,6 +84,16 @@ export class SpotifyApiManager {
     }
   }
 
+  public static async GetProfile(user: IUser): Promise<SpotifyApi.UserObjectPrivateNodeResponse> {
+    try {
+      const response = await this.request(user, () => SpotifyApiManager.Api.getMe());
+      return response;
+
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  }
+
   /**
    * This returns user's saved albums from spotify (you may find singles in it)
    */
