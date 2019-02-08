@@ -25,8 +25,7 @@
     "copy-static-assets": "ts-node copyStaticAssets.ts",
     "debug": "npm run build && npm run watch-debug",
     "serve-debug": "nodemon --inspect dist/server.js",
-    "watch-debug": "concurrently -k -p \"[{name}]\" -n \"Sass,TypeScript,Node\" -c \"yellow.bold,cyan.bold,green.bold\" \"npm run watch-sass\" \"npm run watch-ts\" \"npm run serve-debug\"",
-    "postinstall": "rm -r ./node_modules/@types/connect-mongo/node_modules"
+    "watch-debug": "concurrently -k -p \"[{name}]\" -n \"Sass,TypeScript,Node\" -c \"yellow.bold,cyan.bold,green.bold\" \"npm run watch-sass\" \"npm run watch-ts\" \"npm run serve-debug\""
   },
   "dependencies": {
     "async": "^2.6.0",
@@ -63,7 +62,6 @@
     "@types/bluebird": "^3.5.20",
     "@types/body-parser": "^1.16.8",
     "@types/compression": "^0.0.35",
-    "@types/connect-mongo": "^0.0.39",
     "@types/cors": "^2.8.4",
     "@types/dotenv": "^4.0.2",
     "@types/errorhandler": "^0.0.32",

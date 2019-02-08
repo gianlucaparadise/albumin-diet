@@ -6,7 +6,7 @@ import bodyParser from "body-parser";
 import logger from "./util/logger";
 import lusca from "lusca";
 import dotenv from "dotenv";
-import mongo from "connect-mongo"; // todo: check if this module is really needed
+const mongo = require("connect-mongo"); // todo: check if this module is really needed
 import flash from "express-flash";
 import path from "path";
 import mongoose from "mongoose";

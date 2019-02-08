@@ -72,16 +72,6 @@
   dependencies:
     "@types/express" "*"
 
-"@types/connect-mongo@^0.0.39":
-  version "0.0.39"
-  resolved "https://registry.yarnpkg.com/@types/connect-mongo/-/connect-mongo-0.0.39.tgz#802ac2bd41e88e9c45de158007a581e7cb922765"
-  integrity sha512-KxhEwfndMcBstt7wpXERqscNZiSt3oCXtQRTaSs4Fg59+1VD4bGE2p9mDE4muHtcADNNkkbvuUJC2B+uBS+A+A==
-  dependencies:
-    "@types/express" "*"
-    "@types/express-session" "*"
-    "@types/mongodb" "^2"
-    "@types/mongoose" "^4"
-
 "@types/connect@*":
   version "3.4.32"
   resolved "https://registry.yarnpkg.com/@types/connect/-/connect-3.4.32.tgz#aa0e9616b9435ccad02bc52b5b454ffc2c70ba28"
@@ -137,7 +127,7 @@
     "@types/node" "*"
     "@types/range-parser" "*"
 
-"@types/express-session@*", "@types/express-session@^1.15.8":
+"@types/express-session@^1.15.8":
   version "1.15.11"
   resolved "https://registry.yarnpkg.com/@types/express-session/-/express-session-1.15.11.tgz#49bca7a8fb5c00402907e8ec0d3546ee28de2c41"
   integrity sha512-BRgOXYBhmt71CuOR/PQvKBRgcS567xJmE7dT3r/FvTmWc1ZsR5joVH32dgH+z6F4FugniF04tMyXc4UF9M8Hfg==
@@ -234,24 +224,6 @@
   integrity sha512-Hc9nhu9Z33Gq8SP2CZluNlhwbXBCEGAzLMQPEceZG0wUt/ZTzIGaeo8RXu7FWNXfUd6JHh6KHl0YjQlu6TgncQ==
   dependencies:
     "@types/bson" "*"
-    "@types/node" "*"
-
-"@types/mongodb@^2":
-  version "2.2.23"
-  resolved "https://registry.yarnpkg.com/@types/mongodb/-/mongodb-2.2.23.tgz#2a50071a1ef2f93c87e71cbf1a07a46df094c958"
-  integrity sha512-zK2txG9cGIxHZLRKq59mmb4uYbfl/b+G3RcSuW7HHEvUj/O0gsRLgprQu6n/Gn5Mh+PbnAIgrgh4Zhj+OjsRBQ==
-  dependencies:
-    "@types/bson" "*"
-    "@types/events" "*"
-    "@types/node" "*"
-
-"@types/mongoose@^4":
-  version "4.7.39"
-  resolved "https://registry.yarnpkg.com/@types/mongoose/-/mongoose-4.7.39.tgz#08581b757922ebc7f69ccd55f5e4ffe6b06d172d"
-  integrity sha512-EawjWAvMbldUvFtYrSf6g2IAL8JAjziot5hrGt1EPa/UQGdUs1gayZwxx4Y7qUzAfLPUrm0NYSPssopTUA1xAQ==
-  dependencies:
-    "@types/events" "*"
-    "@types/mongodb" "*"
     "@types/node" "*"
 
 "@types/mongoose@^5.3.2":
