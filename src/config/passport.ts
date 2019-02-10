@@ -7,7 +7,7 @@ import { Request, Response, NextFunction } from "express";
 import { SPOTIFY_ID, SPOTIFY_SECRET, JWT_SECRET } from "../util/secrets";
 import { SpotifyApiManager } from "../managers/SpotifyApiManager";
 
-const SpotifyStrategy = require("passport-spotify").Strategy;
+const SpotifyStrategy = require("../../passport-spotify-fix").Strategy;
 
 passport.serializeUser<any, any>((user, done) => {
   done(undefined, user.id);
