@@ -7,7 +7,6 @@ import logger from "./util/logger";
 import lusca from "lusca";
 import dotenv from "dotenv";
 const mongo = require("connect-mongo"); // todo: check if this module is really needed
-import flash from "express-flash";
 import path from "path";
 import mongoose from "mongoose";
 import passport from "passport";
@@ -63,7 +62,6 @@ app.use(session({
 }));
 app.use(passport.initialize());
 app.use(passport.session());
-app.use(flash());
 app.use(lusca.xframe("SAMEORIGIN"));
 app.use(lusca.xssProtection(true));
 app.use((req, res, next) => {
