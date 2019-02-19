@@ -6,7 +6,7 @@ import { GetProfileResponse } from "../models/responses/GetProfile";
 import { IUser } from "../models/User";
 
 export let login = (req: Request, res: Response) => {
-  res.render("Login");
+  res.render("login");
 };
 
 export let prepareAuthSpotify = (req: Request, res: Response, next: NextFunction) => {
