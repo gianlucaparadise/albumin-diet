@@ -5,7 +5,6 @@ import session from "express-session";
 import bodyParser from "body-parser";
 import logger from "./util/logger";
 import lusca from "lusca";
-import dotenv from "dotenv";
 const mongo = require("connect-mongo"); // todo: check if this module is really needed
 import path from "path";
 import mongoose from "mongoose";
@@ -15,9 +14,6 @@ import bluebird from "bluebird";
 import { MONGODB_URI, SESSION_SECRET } from "./util/secrets";
 
 const MongoStore = mongo(session);
-
-// Load environment variables from .env file, where API keys and passwords are configured
-dotenv.config({ path: ".env" });
 
 // Controllers (route handlers)
 import * as homeController from "./controllers/home";
