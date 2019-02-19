@@ -7,10 +7,15 @@
     "email": "gianlucaparadise@gmail.com"
   },
   "license": "Apache-2.0",
+  "engines": {
+    "node": "11.0.0"
+  },
   "scripts": {
+    "heroku-postbuild": "npm run build-ts && npm run copy-static-assets",
     "prestart": "npm run build",
     "start": "npm run serve",
-    "build": "npm run build-ts && npm run tslint && npm run copy-static-assets",
+    "build": "npm run clean && npm run build-ts && npm run tslint && npm run copy-static-assets",
+    "clean": "rm -rf dist",
     "serve": "node dist/server.js",
     "watch-node": "nodemon dist/server.js",
     "watch": "concurrently -k -p \"[{name}]\" -n \"Sass,TypeScript,Node\" -c \"yellow.bold,cyan.bold,green.bold\" \"npm run watch-sass\" \"npm run watch-ts\" \"npm run watch-node\"",
@@ -35,10 +40,8 @@
     "compression": "^1.7.1",
     "connect-mongo": "^2.0.0",
     "cors": "^2.8.5",
-    "dotenv": "^4.0.0",
     "errorhandler": "^1.5.0",
     "express": "^4.16.2",
-    "express-flash": "0.0.2",
     "express-jwt": "^5.3.1",
     "express-session": "^1.15.6",
     "express-validator": "^4.3.0",
@@ -90,6 +93,7 @@
     "jest": "^23.6.0",
     "node-sass": "^4.7.2",
     "nodemon": "^1.13.0",
+    "now-env": "^3.1.0",
     "shelljs": "^0.8.1",
     "supertest": "^3.0.0",
     "ts-jest": "^22.0.4",
