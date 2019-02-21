@@ -56,6 +56,7 @@ app.use(session({
     autoReconnect: true
   })
 }));
+app.enable("trust proxy"); // this is for subdomains cookies
 app.use(passport.initialize());
 app.use(passport.session());
 app.use(lusca.xframe("SAMEORIGIN"));
