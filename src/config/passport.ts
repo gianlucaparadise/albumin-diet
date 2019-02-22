@@ -1,6 +1,7 @@
 import passport from "passport";
 import jwt from "jsonwebtoken";
 import expressJwt from "express-jwt";
+import url from "url";
 
 import { User } from "../models/User";
 import { Request, Response, NextFunction } from "express";
@@ -67,6 +68,9 @@ const createToken = function (auth: any) {
   );
 };
 
+/**
+ * This is used for all the requests to refresh the token
+ */
 export const generateToken = function (req: any, res: Response, next: NextFunction) {
   req.token = createToken(req.auth);
 
@@ -78,10 +82,22 @@ export const generateToken = function (req: any, res: Response, next: NextFuncti
   next();
 };
 
-export const sendToken = function (req: any, res: Response) {
+/**
+ * This is used only for the Login
+ */
+export const generateAndSendToken = function (req: any, res: Response) {
   // todo: this function should be in user controller (user.ts)
 
+  req.token = createToken(req.auth);
+
   if (req.session.callback) {
+    let cookieOptions = undefined;
+    if (req.session.callback) {
+      const host = url.parse(req.session.callback).hostname;
+      cookieOptions = { domain: host };
+    }
+
+    res.cookie("x-auth-token", req.token, cookieOptions);
     res.header("Access-Control-Allow-Origin", req.session.callback);
     res.redirect(req.session.callback);
   }

@@ -124,7 +124,7 @@ app.use("/api/me", apiMeRoute);
 //#region User/Auth routes
 app.get("/login", userController.login);
 app.get("/auth/spotify", userController.prepareAuthSpotify, passportConfig.spotifyAuthenticate, userController.authSpotify);
-app.get("/auth/spotify/callback", passportConfig.spotifyAuthenticateCallback, userController.authSpotifyCallback, passportConfig.generateToken, passportConfig.sendToken);
+app.get("/auth/spotify/callback", passportConfig.spotifyAuthenticateCallback, userController.authSpotifyCallback, passportConfig.generateAndSendToken);
 //#endregion
 
 export default app;
