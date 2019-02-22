@@ -80,7 +80,9 @@ export const generateToken = function (req: any, res: Response, next: NextFuncti
 
 export const sendToken = function (req: any, res: Response) {
   // todo: this function should be in user controller (user.ts)
+
   if (req.session.callback) {
+    res.header("Access-Control-Allow-Origin", req.session.callback);
     res.redirect(req.session.callback);
   }
   else {

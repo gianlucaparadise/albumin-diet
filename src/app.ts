@@ -39,6 +39,16 @@ mongoose.connect(mongoUrl, { useNewUrlParser: true }).then(
 
 // todo: set up https
 
+// enable cors
+const corsOption = {
+  origin: true,
+  methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+  credentials: true,
+  exposedHeaders: ["authorization", "Origin", "X-Requested-With", "Content-Type", "Accept"]
+};
+app.use(cors(corsOption));
+app.enable("trust proxy");
+
 // Express configuration
 app.set("port", process.env.PORT || 3000);
 app.set("views", path.join(__dirname, "../views"));
@@ -56,7 +66,6 @@ app.use(session({
     autoReconnect: true
   })
 }));
-app.enable("trust proxy"); // this is for subdomains cookies
 app.use(passport.initialize());
 app.use(passport.session());
 app.use(lusca.xframe("SAMEORIGIN"));
@@ -83,15 +92,6 @@ app.use((req, res, next) => {
 app.use(
   express.static(path.join(__dirname, "public"), { maxAge: 31557600000 })
 );
-
-// enable cors
-const corsOption = {
-  origin: true,
-  methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
-  credentials: true,
-  exposedHeaders: ["authorization", "Origin", "X-Requested-With", "Content-Type", "Accept"]
-};
-app.use(cors(corsOption));
 
 /**
  * Primary app routes.
