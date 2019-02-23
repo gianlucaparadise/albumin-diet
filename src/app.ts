@@ -44,7 +44,7 @@ const corsOption = {
   origin: true,
   methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
   credentials: true,
-  exposedHeaders: ["authorization", "Origin", "X-Requested-With", "Content-Type", "Accept"]
+  exposedHeaders: ["authorization", "x-auth-token"]
 };
 app.use(cors(corsOption));
 app.enable("trust proxy");
