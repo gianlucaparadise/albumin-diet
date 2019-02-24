@@ -153,11 +153,30 @@ export class SpotifyApiManager {
     }
   }
 
+  /**
+   * Adds input album in current user's library
+   * @param user Current user
+   * @param albumId Album to save
+   */
   public static async AddToMyAlbum(user: IUser, albumId: string): Promise<void> {
     try {
       const response = await this.request(user, () => SpotifyApiManager.Api.addToMySavedAlbums([albumId]));
-      console.log(response);
-      return;
+      return Promise.resolve();
+
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  }
+
+  /**
+   * Removes input album from current user's library
+   * @param user Current user
+   * @param albumId Album to remove
+   */
+  public static async RemoveFromMyAlbum(user: IUser, albumId: string): Promise<void> {
+    try {
+      const response = await this.request(user, () => SpotifyApiManager.Api.removeFromMySavedAlbums([albumId]));
+      return Promise.resolve();
 
     } catch (error) {
       return Promise.reject(error);

@@ -1026,6 +1026,12 @@ declare module "spotify-web-api-node" {
     addToMySavedAlbums(ids: string[]): Promise<SpotifyApi.VoidResponse>;
 
     /**
+     * Remove one or more albums from the current user’s ‘Your Music’ library.
+     * @param ids A list of the Spotify IDs. Maximum: 50 IDs.
+     */
+    removeFromMySavedAlbums(ids: string[]): Promise<SpotifyApi.VoidResponse>;
+
+    /**
      * Check if one or more albums is already saved in the current Spotify user’s ‘Your Music’ library.
      */
     containsMySavedAlbums(ids: string[]): Promise<SpotifyApi.CheckUserSavedAlbumsNodeResponse>;

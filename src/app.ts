@@ -88,6 +88,7 @@ apiMeRoute.get("/profile", userController.getMe);
 
 apiMeRoute.get("/album", apiController.getMyAlbums);
 apiMeRoute.put("/album", apiController.saveAlbum);
+apiMeRoute.delete("/album", apiController.removeAlbum);
 
 apiMeRoute.get("/tag", apiController.getMyTags);
 apiMeRoute.post("/tag", apiController.setTagOnAlbum);

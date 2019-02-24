@@ -41,6 +41,7 @@ export let getMyAlbums = async (req: Request, res: Response) => {
     return errorHandler(error, res);
   }
 };
+
 export let saveAlbum = async (req: Request, res: Response) => {
   try {
     const user = <IUser>req.user;
@@ -48,6 +49,21 @@ export let saveAlbum = async (req: Request, res: Response) => {
 
     const spotifyId = body.album.spotifyId;
     await SpotifyApiManager.AddToMyAlbum(user, spotifyId);
+
+    return res.json(new EmptyResponse());
+  }
+  catch (error) {
+    return errorHandler(error, res);
+  }
+};
+
+export let removeAlbum = async (req: Request, res: Response) => {
+  try {
+    const user = <IUser>req.user;
+    const body = AlbumRequest.checkConsistency(req.body);
+
+    const spotifyId = body.album.spotifyId;
+    await SpotifyApiManager.RemoveFromMyAlbum(user, spotifyId);
 
     return res.json(new EmptyResponse());
   }
