@@ -52,7 +52,7 @@ passport.use(
   )
 );
 
-export let spotifyAuthenticate = passport.authenticate("spotify", { session: false, scope: ["user-library-read"] });
+export let spotifyAuthenticate = passport.authenticate("spotify", { session: false, scope: ["user-library-read", "user-library-modify"] });
 export let spotifyAuthenticateCallback = passport.authenticate("spotify", { failureRedirect: "/login" });
 
 const createToken = function (auth: any) {

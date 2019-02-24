@@ -3,7 +3,8 @@
 import { Response, Request, NextFunction } from "express";
 import { SpotifyApiManager } from "../managers/SpotifyApiManager";
 import { AlbumManager } from "../managers/AlbumManager";
-import { TagOnAlbumRequest, AlbumInListeningListRequest } from "../models/requests/SetTagOnAlbumRequest";
+import { TagOnAlbumRequest } from "../models/requests/SetTagOnAlbumRequest";
+import { AlbumRequest } from "../models/requests/AlbumRequest";
 import { EmptyResponse, BadRequestErrorResponse, BasePaginationRequest, ErrorResponse } from "../models/responses/GenericResponses";
 import { Tag } from "../models/Tag";
 import { Album } from "../models/Album";
@@ -35,6 +36,20 @@ export let getMyAlbums = async (req: Request, res: Response) => {
     const response = GetMyAlbumsResponse.createFromSpotifyAlbums(spotifyAlbums, tagsByAlbum, useTagFilter, user);
 
     return res.json(response);
+  }
+  catch (error) {
+    return errorHandler(error, res);
+  }
+};
+export let saveAlbum = async (req: Request, res: Response) => {
+  try {
+    const user = <IUser>req.user;
+    const body = AlbumRequest.checkConsistency(req.body);
+
+    const spotifyId = body.album.spotifyId;
+    await SpotifyApiManager.AddToMyAlbum(user, spotifyId);
+
+    return res.json(new EmptyResponse());
   }
   catch (error) {
     return errorHandler(error, res);
@@ -184,7 +199,7 @@ export const getListeningList = async (req: Request, res: Response) => {
 
 export const addToListeningList = async (req: Request, res: Response) => {
   try {
-    const body = AlbumInListeningListRequest.checkConsistency(req.body);
+    const body = AlbumRequest.checkConsistency(req.body);
 
     const user = <IUser>req.user;
     const albumSpotifyId = body.album.spotifyId;
@@ -200,7 +215,7 @@ export const addToListeningList = async (req: Request, res: Response) => {
 
 export const deleteFromListeningList = async (req: Request, res: Response) => {
   try {
-    const body = AlbumInListeningListRequest.checkConsistency(req.body);
+    const body = AlbumRequest.checkConsistency(req.body);
 
     const user = <IUser>req.user;
     const albumSpotifyId = body.album.spotifyId;

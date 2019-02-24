@@ -1020,6 +1020,12 @@ declare module "spotify-web-api-node" {
     getAlbums(ids: string[]): Promise<SpotifyApi.MultipleAlbumsNodeResponse>;
 
     /**
+     * Save one or more albums to the current user’s ‘Your Music’ library.
+     * @param ids A list of the Spotify IDs. Maximum: 50 IDs.
+     */
+    addToMySavedAlbums(ids: string[]): Promise<SpotifyApi.VoidResponse>;
+
+    /**
      * Check if one or more albums is already saved in the current Spotify user’s ‘Your Music’ library.
      */
     containsMySavedAlbums(ids: string[]): Promise<SpotifyApi.CheckUserSavedAlbumsNodeResponse>;

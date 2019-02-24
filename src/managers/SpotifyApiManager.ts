@@ -153,6 +153,17 @@ export class SpotifyApiManager {
     }
   }
 
+  public static async AddToMyAlbum(user: IUser, albumId: string): Promise<void> {
+    try {
+      const response = await this.request(user, () => SpotifyApiManager.Api.addToMySavedAlbums([albumId]));
+      console.log(response);
+      return;
+
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  }
+
   public static async SearchAlbums(user: IUser, keywords: string, limit: number, offset: number): Promise<SpotifyApi.AlbumSearchNodeResponse> {
 
     try {
