@@ -10,9 +10,9 @@ import { Tag } from "../models/Tag";
 import { Album } from "../models/Album";
 import { AlbumTag } from "../models/AlbumTag";
 import { IUser } from "../models/User";
-import { GetMyAlbumsResponse, GetMyAlbumsRequest, GetAlbumResponse, GetListeningListResponse } from "../models/responses/GetMyAlbums";
+import { GetMyAlbumsResponse, GetMyAlbumsRequest, GetAlbumResponse, UserAlbumsResponse } from "../models/responses/GetMyAlbums";
 import { GetMyTagsResponse } from "../models/responses/GetMyTags";
-import { SearchRequest, SearchAlbumResponse, SearchArtistResponse } from "../models/responses/Search";
+import { SearchRequest, SearchArtistResponse } from "../models/responses/Search";
 import { errorHandler } from "../util/errorHandler";
 import logger from "../util/logger";
 
@@ -199,12 +199,12 @@ export const getListeningList = async (req: Request, res: Response) => {
     // I filter spotify ids using offset and limit
     spotifyIds = spotifyIds.slice(offset, offset + limit);
 
-    let albumsFull = <SpotifyApi.AlbumObjectFull[]>[];
+    let albumsFull: SpotifyApi.AlbumObjectFull[] = [];
     if (spotifyIds.length > 0) {
       albumsFull = await AlbumManager.GetAlbums(user, spotifyIds); // FIXME: this call might break pagination
     }
 
-    const response = GetListeningListResponse.createFromSpotifyAlbums(albumsFull);
+    const response = UserAlbumsResponse.createFromSpotifyAlbums(albumsFull, true);
 
     return res.json(response);
   }
@@ -257,7 +257,7 @@ export const searchAlbums = async (req: Request, res: Response) => {
 
     const albums = await AlbumManager.SearchAlbums(user, keywords, limit, offset);
 
-    const response = new SearchAlbumResponse(albums);
+    const response = UserAlbumsResponse.createFromSpotifyAlbums(albums, user.listeningList);
 
     return res.json(response);
   }

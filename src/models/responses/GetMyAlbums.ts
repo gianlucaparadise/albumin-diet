@@ -23,6 +23,10 @@ export class TagsByAlbum {
 
 class UserAlbum {
   album: SpotifyApi.AlbumObjectFull;
+  /**
+   * This is true when this album is in the listening list
+   */
+  isInListeningList: boolean;
 }
 
 class TaggedAlbum extends UserAlbum {
@@ -31,10 +35,6 @@ class TaggedAlbum extends UserAlbum {
    * This is true when this album is one of the current user's saved albums
    */
   isSavedAlbum: boolean;
-  /**
-   * This is true when this album is in the listening list
-   */
-  isInListeningList: boolean;
 }
 
 export class GetMyAlbumsResponse extends BaseResponse<TaggedAlbum[]> {
@@ -70,11 +70,23 @@ export class GetMyAlbumsResponse extends BaseResponse<TaggedAlbum[]> {
   }
 }
 
-export class GetListeningListResponse extends BaseResponse<UserAlbum[]> {
-  static createFromSpotifyAlbums(spotifyAlbums: SpotifyApi.AlbumObjectFull[]): GetListeningListResponse {
-    const userAlbumList = spotifyAlbums.map(a => <UserAlbum>{ album: a });
+export class UserAlbumsResponse extends BaseResponse<UserAlbum[]> {
+  static createFromSpotifyAlbums(spotifyAlbums: SpotifyApi.AlbumObjectFull[], listeningList: boolean | string[]): UserAlbumsResponse {
+    const userAlbumList = spotifyAlbums.map(a => {
+      let isInListeningList = false;
 
-    return new GetListeningListResponse(userAlbumList);
+      if (typeof listeningList === "boolean") {
+        isInListeningList = listeningList;
+      }
+      else if (listeningList instanceof Array) {
+        isInListeningList = listeningList.indexOf(a.id) !== -1;
+      }
+
+      const result: UserAlbum = { album: a, isInListeningList: isInListeningList };
+      return result;
+    });
+
+    return new UserAlbumsResponse(userAlbumList);
   }
 }
 

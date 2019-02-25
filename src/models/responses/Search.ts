@@ -7,6 +7,4 @@ export class SearchRequest extends BasePaginationRequest {
   q: string;
 }
 
-export class SearchAlbumResponse extends BaseResponse<SpotifyApi.AlbumObjectFull[]> { }
-
 export class SearchArtistResponse extends BaseResponse<SpotifyApi.ArtistSearchResponse> { }

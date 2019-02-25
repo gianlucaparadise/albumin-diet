@@ -244,13 +244,13 @@ userSchema.methods.removeFromListeningList = async function (spotifyAlbumId: str
   try {
     const user = <IUser>this;
 
-    const index = user.listeningList.indexOf(spotifyAlbumId);
+    const countBeforePull = user.listeningList.length;
+    const pulledId = user.listeningList.pull(spotifyAlbumId);
+    const countAfterPull = user.listeningList.length;
 
-    if (index < 0) {
+    if (countBeforePull === countAfterPull) {
       throw new BadRequestErrorResponse("Input Album is not in current user's listening list");
     }
-
-    user.listeningList.splice(index, 1);
 
     const savedUser = await user.save();
     logger.debug(`Album deleted from user's listening list`);
