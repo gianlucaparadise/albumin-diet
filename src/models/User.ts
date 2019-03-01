@@ -4,6 +4,7 @@ import { TagsByAlbum } from "./responses/GetMyAlbums";
 import { BadRequestErrorResponse } from "./responses/GenericResponses";
 import { ITag } from "./Tag";
 import logger from "../util/logger";
+import { encrypt, decrypt } from "../config/encrypto";
 
 export interface IUser extends Document {
   spotify: {
@@ -17,6 +18,16 @@ export interface IUser extends Document {
    * List of spotify album ids
    */
   listeningList: Types.Array<string>;
+
+  /**
+   * Access token is encrypted on save, but it's not decrypted after load (I can't make it work)
+   */
+  getDecryptedAccessToken(): string;
+  /**
+   * Refresh token is encrypted on save, but it's not decrypted after load (I can't make it work)
+   */
+  getDecryptedRefreshToken(): string;
+
   /**
    * Pushes the input album tag in this user's albumTags list
    * @param albumTag AlbumTag to add
@@ -82,6 +93,52 @@ export const userSchema: Schema = new Schema({
   albumTags: [{ type: Schema.Types.ObjectId, ref: "AlbumTag" }],
   listeningList: [{ type: String }],
 }, { timestamps: true });
+
+userSchema.pre("save", function (next) {
+  const user = <IUser>this;
+
+  // I encrypt tokens and save them
+  if (user.isModified("spotify.accessToken")) {
+    const encrypted = encrypt(user.spotify.accessToken);
+    user.spotify.accessToken = encrypted;
+  }
+
+  if (user.isModified("spotify.refreshToken")) {
+    const encrypted = encrypt(user.spotify.refreshToken);
+    user.spotify.refreshToken = encrypted;
+  }
+
+  return next();
+});
+
+// TODO: decrypt after load (it's not working)
+// userSchema.post("init", function (doc, next) {
+//   // This updates correctly the document, but returns the old values
+//   const user = <IUser>this;
+//   user.spotify.accessToken = decrypt(user.spotify.accessToken);
+//   user.spotify.refreshToken = decrypt(user.spotify.refreshToken);
+//   return user;
+// });
+
+// userSchema.pre("init", function (next, data) {
+//   // This is not working because it seems it's to early
+//   console.log(data);
+//   console.log(this);
+//   const user = <IUser>this;
+//   user.spotify.accessToken = decrypt(user.spotify.accessToken);
+//   user.spotify.refreshToken = decrypt(user.spotify.refreshToken);
+//   next();
+// });
+
+userSchema.methods.getDecryptedAccessToken = function (): string {
+  const thisUser = <IUser>this;
+  return decrypt(thisUser.spotify.accessToken);
+};
+
+userSchema.methods.getDecryptedRefreshToken = function (): string {
+  const thisUser = <IUser>this;
+  return decrypt(thisUser.spotify.refreshToken);
+};
 
 userSchema.methods.addAlbumTag = async function (albumTag: IAlbumTag): Promise<IUser> {
   try {
@@ -265,7 +322,7 @@ userSchema.methods.removeFromListeningList = async function (spotifyAlbumId: str
 userSchema.methods.updateSpotifyAccessToken = async function (spotifyAccessToken: string): Promise<IUser> {
   try {
     const thisUser = <IUser>this;
-    // todo: encrypt tokens
+
     thisUser.spotify.accessToken = spotifyAccessToken;
     const newUser = await thisUser.save();
 
@@ -291,7 +348,6 @@ userSchema.statics.upsertSpotifyUser = async function (profile: SpotifyApi.UserP
 
     // no user was found: we create a new one
     const newUser = new User();
-    // todo: encrypt tokens
     newUser.spotify = {
       id: profile.id,
       accessToken: accessToken,

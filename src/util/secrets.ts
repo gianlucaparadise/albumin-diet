@@ -31,5 +31,8 @@ if (!MONGODB_URI) {
   process.exit(1);
 }
 
+export const USER_CRYPT_SECRET = process.env["USER_CRYPT_SECRET"];
+export const USER_CRYPT_SALT = process.env["USER_CRYPT_SALT"];
+
 export const SPOTIFY_SECRET = process.env["SPOTIFY_SECRET"];
 export const SPOTIFY_ID = process.env["SPOTIFY_ID"];

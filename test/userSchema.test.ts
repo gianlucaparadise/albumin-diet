@@ -6,8 +6,8 @@ const testProfile = {
   id: "myfaketestuser",
   displayName: "My Fake Test User"
 };
-const testAccessToken = "1";
-const testRefreshToken = "2";
+const testAccessToken = "1jnjn3i54jn3i45jn3i4j5n3ij45n3i4j5";
+const testRefreshToken = "2ni353ni45n3i4jn53ij45n3i45n3i4u5";
 
 describe("User schema methods test", () => {
 
@@ -21,14 +21,19 @@ describe("User schema methods test", () => {
     const userNew = await User.upsertSpotifyUser(testProfile, testAccessToken, testRefreshToken);
     expect(userNew).not.toBeNull();
     expect(userNew.spotify.id).toEqual(testProfile.id);
-    expect(userNew.spotify.accessToken).toBe(testAccessToken);
+    expect(userNew.getDecryptedAccessToken()).toBe(testAccessToken);
 
     const newAccessToken = testAccessToken + "new";
     const newRefreshToken = testRefreshToken + "new";
     const userUpdate = await User.upsertSpotifyUser(testProfile, newAccessToken, newRefreshToken);
     expect(userUpdate).not.toBeNull();
-    expect(userUpdate.spotify.accessToken).toBe(newAccessToken);
-    expect(userUpdate.spotify.refreshToken).toBe(newRefreshToken);
+    expect(userUpdate.getDecryptedAccessToken()).toBe(newAccessToken);
+    expect(userUpdate.getDecryptedRefreshToken()).toBe(newRefreshToken);
+
+    const newAccessToken2 = testAccessToken + "supernew";
+    const userUpdate2 = await userUpdate.updateSpotifyAccessToken(newAccessToken2);
+    expect(userUpdate2).not.toBeNull();
+    expect(userUpdate2.getDecryptedAccessToken()).toBe(newAccessToken2);
   });
 
   afterAll(async () => {

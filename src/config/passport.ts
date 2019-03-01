@@ -115,8 +115,8 @@ export const fillCurrentUser = (req: Request, res: Response, next: NextFunction)
   User.findById(authId)
     .then(user => {
       req.user = user;
-      SpotifyApiManager.Api.setAccessToken(user.spotify.accessToken);
-      SpotifyApiManager.Api.setRefreshToken(user.spotify.refreshToken);
+      SpotifyApiManager.Api.setAccessToken(user.getDecryptedAccessToken());
+      SpotifyApiManager.Api.setRefreshToken(user.getDecryptedRefreshToken());
       next();
     })
     .catch(next);
