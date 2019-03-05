@@ -23,17 +23,19 @@ export let getMyAlbums = async (req: Request, res: Response) => {
     const tags: string[] = JSON.parse(request.tags || "[]");
     const normalizedTags = tags.map(t => Tag.calculateUniqueIdByName(t));
 
+    const untagged = request.untagged && request.untagged.toLowerCase() === "true";
+
     const limit = parseInt(request.limit) || 20;
     const offset = parseInt(request.offset) || 0;
 
     const user = <IUser>req.user;
 
     // todo: check how to parallelize spotify request and db query
-    const tagsByAlbum = await user.getTagsGroupedByAlbum(normalizedTags);
+    const tagsByAlbum = await user.getTagsGroupedByAlbum();
     const spotifyAlbums = await AlbumManager.GetMySavedAlbums(user, limit, offset);
-    const useTagFilter = normalizedTags && normalizedTags.length > 0;
 
-    const response = GetMyAlbumsResponse.createFromSpotifyAlbums(spotifyAlbums, tagsByAlbum, useTagFilter, user);
+    // FIXME: this breaks pagination
+    const response = GetMyAlbumsResponse.createFromSpotifyAlbums(spotifyAlbums, tagsByAlbum, normalizedTags, untagged, user);
 
     return res.json(response);
   }
@@ -165,6 +167,7 @@ export const deleteTagFromAlbum = async (req: Request, res: Response) => {
     }
 
     // todo: startTransaction (see: https://thecodebarbarian.com/a-node-js-perspective-on-mongodb-4-transactions.html)
+    // NB: MongoDB currently only supports transactions on replica sets
 
     const user = <IUser>req.user;
     const removeResult = await user.removeAlbumTag(albumTag);

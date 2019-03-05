@@ -41,9 +41,8 @@ export interface IUser extends Document {
   /**
    * Starting from this user's albumTag list, builds a map of all
    * this user's tags grouped by spotify album id
-   * @param tagFilter If this is evaluated, you will receive only these tags
    */
-  getTagsGroupedByAlbum(tagFilter: string[]): Promise<TagsByAlbum>;
+  getTagsGroupedByAlbum(): Promise<TagsByAlbum>;
   /**
    * Retrieves the list of the tags added by this user
    */
@@ -183,7 +182,7 @@ userSchema.methods.removeAlbumTag = async function (albumTag: IAlbumTag): Promis
   }
 };
 
-userSchema.methods.getTagsGroupedByAlbum = async function (tagFilter: string[]): Promise<TagsByAlbum> {
+userSchema.methods.getTagsGroupedByAlbum = async function (): Promise<TagsByAlbum> {
   try {
     const thisUser = <IUser>this;
     await thisUser
@@ -194,14 +193,7 @@ userSchema.methods.getTagsGroupedByAlbum = async function (tagFilter: string[]):
       .execPopulate();
 
     // Grouping albums by spotifyId
-    tagFilter = tagFilter || [];
-
     const taggedAlbums: TagsByAlbum = thisUser.albumTags.reduce((taggedAlbumsMap, albumTag) => {
-
-      if (tagFilter.length > 0 && tagFilter.indexOf(albumTag.tag.uniqueId) < 0) {
-        // If I have filters, I get only the albumTags that I can find in the filter
-        return taggedAlbumsMap;
-      }
 
       const spotifyId = albumTag.album.publicId.spotify;
 

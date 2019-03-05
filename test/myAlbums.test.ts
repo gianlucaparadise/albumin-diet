@@ -44,7 +44,7 @@ describe("GET/PUT/DELETE MyAlbums", () => {
 
   it("should return multiple albums", async () => {
     // First I need to add two tags to the same album, than I retrieve it
-    //#region settings tags
+    //#region setting tags
     for (const tag of testTags) {
       const response0 = await request(app)
         .post("/api/me/tag")
@@ -54,19 +54,38 @@ describe("GET/PUT/DELETE MyAlbums", () => {
     }
     //#endregion
 
-    const reqObj: GetMyAlbumsRequest = { tags: JSON.stringify(testTags) };
-    const req = querystring.stringify(reqObj);
+    //#region getting only tagged
+    const reqObjTagFilter: GetMyAlbumsRequest = { tags: JSON.stringify(testTags) };
+    const reqTagFilter = querystring.stringify(reqObjTagFilter);
 
-    const response = await request(app)
-      .get(`/api/me/album?${req}`)
+    const responseTagFilter = await request(app)
+      .get(`/api/me/album?${reqTagFilter}`)
       .set("Authorization", `Bearer ${ACCESS_TOKEN}`);
 
-    expect(response.status).toBe(200);
-    const responseBody: GetMyAlbumsResponse = response.body;
+    expect(responseTagFilter.status).toBe(200);
+    const responseBodyTagFilter: GetMyAlbumsResponse = responseTagFilter.body;
 
-    expect(responseBody.data).not.toBeNull();
-    expect(responseBody.data.length).toBeGreaterThan(0);
-    expect(responseBody.data[0].tags.length).toBeGreaterThanOrEqual(testTags.length);
+    expect(responseBodyTagFilter.data).not.toBeNull();
+    expect(responseBodyTagFilter.data.length).toBeGreaterThan(0);
+    expect(responseBodyTagFilter.data[0].tags.length).toBeGreaterThanOrEqual(testTags.length);
+    //#endregion
+
+    //#region getting only untagged
+    const reqObjUntagged: GetMyAlbumsRequest = { untagged: "true" };
+    const reqUntagged = querystring.stringify(reqObjUntagged);
+
+    const responseUntagged = await request(app)
+      .get(`/api/me/album?${reqUntagged}`)
+      .set("Authorization", `Bearer ${ACCESS_TOKEN}`);
+
+    expect(responseUntagged.status).toBe(200);
+    const responseBodyUntagged: GetMyAlbumsResponse = responseUntagged.body;
+
+    expect(responseBodyUntagged.data).not.toBeNull();
+    expect(responseBodyUntagged.data.length).toBeGreaterThan(0); // I need at least one saved untagged album
+    const tags = responseBodyUntagged.data[0].tags || [];
+    expect(tags.length).toBeLessThanOrEqual(0);
+    //#endregion
   });
 
   it("should save and delete album", async () => {
