@@ -1,7 +1,7 @@
 import { Document, Schema, Model, model, Types } from "mongoose";
 import { IAlbumTag } from "./AlbumTag";
-import { TagsByAlbum } from "./responses/GetMyAlbums";
-import { BadRequestErrorResponse } from "./responses/GenericResponses";
+import { TagsByAlbum } from "./public/GetMyAlbums";
+import { BadRequestErrorResponse } from "./public/GenericResponses";
 import { ITag } from "./Tag";
 import logger from "../util/logger";
 import { encrypt, decrypt } from "../config/encrypto";

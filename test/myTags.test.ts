@@ -1,7 +1,7 @@
 import request from "supertest";
 import app from "../src/app";
 import { ACCESS_TOKEN } from "./util/testSecrets";
-import { GetMyTagsResponse } from "../src/models/responses/GetMyTags";
+import { GetMyTagsResponse } from "../src/models/public/GetMyTags";
 
 const testTag = "Random tag";
 const testSpotifyAlbumIds = [

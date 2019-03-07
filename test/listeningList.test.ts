@@ -2,8 +2,8 @@ import request from "supertest";
 import querystring from "querystring";
 import app from "../src/app";
 import { ACCESS_TOKEN } from "./util/testSecrets";
-import { GetMyAlbumsResponse, GetAlbumResponse } from "../src/models/responses/GetMyAlbums";
-import { BasePaginationRequest } from "../src/models/responses/GenericResponses";
+import { GetMyAlbumsResponse, GetAlbumResponse } from "../src/models/public/GetMyAlbums";
+import { BasePaginationRequest } from "../src/models/public/GenericResponses";
 
 const testSpotifyAlbumIds = [
   "0BYFg5LjHvQZomF666Kaa2", // Beets 4 - Birocratic

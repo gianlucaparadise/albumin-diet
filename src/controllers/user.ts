@@ -1,8 +1,8 @@
 import { Request, Response, NextFunction } from "express";
-import { ErrorResponse } from "../models/responses/GenericResponses";
+import { ErrorResponse } from "../models/public/GenericResponses";
 import { SpotifyApiManager } from "../managers/SpotifyApiManager";
 import { errorHandler } from "../util/errorHandler";
-import { GetProfileResponse } from "../models/responses/GetProfile";
+import { GetProfileResponse } from "../models/public/GetProfile";
 import { IUser } from "../models/User";
 
 export let login = (req: Request, res: Response) => {

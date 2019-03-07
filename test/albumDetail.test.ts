@@ -1,7 +1,7 @@
 import request from "supertest";
 import app from "../src/app";
 import { ACCESS_TOKEN } from "./util/testSecrets";
-import { GetAlbumResponse } from "../src/models/responses/GetMyAlbums";
+import { GetAlbumResponse } from "../src/models/public/GetMyAlbums";
 
 const testSpotifyAlbumId = "0B0Zwfcy4pAY2JAoxIEkR5"; // Band of Gypsys - Jimi Hendrix
 

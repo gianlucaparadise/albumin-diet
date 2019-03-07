@@ -1,4 +1,4 @@
-import { BadRequestErrorResponse } from "../responses/GenericResponses";
+import { BadRequestErrorResponse } from "./GenericResponses";
 
 /**
  * Generic request class that holds an AlbumId

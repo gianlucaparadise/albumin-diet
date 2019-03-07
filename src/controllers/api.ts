@@ -3,16 +3,16 @@
 import { Response, Request, NextFunction } from "express";
 import { SpotifyApiManager } from "../managers/SpotifyApiManager";
 import { AlbumManager } from "../managers/AlbumManager";
-import { TagOnAlbumRequest } from "../models/requests/SetTagOnAlbumRequest";
-import { AlbumRequest } from "../models/requests/AlbumRequest";
-import { EmptyResponse, BadRequestErrorResponse, BasePaginationRequest, ErrorResponse } from "../models/responses/GenericResponses";
+import { TagOnAlbumRequest } from "../models/public/SetTagOnAlbumRequest";
+import { AlbumRequest } from "../models/public/AlbumRequest";
+import { EmptyResponse, BadRequestErrorResponse, BasePaginationRequest, ErrorResponse } from "../models/public/GenericResponses";
 import { Tag } from "../models/Tag";
 import { Album } from "../models/Album";
 import { AlbumTag } from "../models/AlbumTag";
 import { IUser } from "../models/User";
-import { GetMyAlbumsResponse, GetMyAlbumsRequest, GetAlbumResponse, UserAlbumsResponse } from "../models/responses/GetMyAlbums";
-import { GetMyTagsResponse } from "../models/responses/GetMyTags";
-import { SearchRequest, SearchArtistResponse } from "../models/responses/Search";
+import { GetMyAlbumsResponse, GetMyAlbumsRequest, GetAlbumResponse, UserAlbumsResponse } from "../models/public/GetMyAlbums";
+import { GetMyTagsResponse } from "../models/public/GetMyTags";
+import { SearchRequest, SearchArtistResponse } from "../models/public/Search";
 import { errorHandler } from "../util/errorHandler";
 import logger from "../util/logger";
 

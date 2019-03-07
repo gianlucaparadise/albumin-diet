@@ -1,7 +1,7 @@
 import request from "supertest";
 import app from "../src/app";
 import { ACCESS_TOKEN } from "./util/testSecrets";
-import { TagOnAlbumRequest } from "../src/models/requests/SetTagOnAlbumRequest";
+import { TagOnAlbumRequest } from "../src/models/public/SetTagOnAlbumRequest";
 
 // This fixes missing logs (jest issue #3853)
 // console.log = s => {

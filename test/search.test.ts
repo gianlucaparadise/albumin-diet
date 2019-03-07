@@ -2,7 +2,8 @@ import request from "supertest";
 import querystring from "querystring";
 import app from "../src/app";
 import { ACCESS_TOKEN } from "./util/testSecrets";
-import { SearchRequest, SearchAlbumResponse, SearchArtistResponse } from "../src/models/responses/Search";
+import { SearchRequest, SearchArtistResponse } from "../src/models/public/Search";
+import { UserAlbumsResponse } from "../src/models/public/GetMyAlbums";
 
 describe("Search album", () => {
   it("should return 401", async () => {
@@ -21,7 +22,7 @@ describe("Search album", () => {
       .set("Authorization", `Bearer ${ACCESS_TOKEN}`);
 
     expect(response.status).toBe(200);
-    const body = <SearchAlbumResponse>response.body;
+    const body = <UserAlbumsResponse>response.body;
     expect(body.data.length).toBeGreaterThan(0);
   });
 

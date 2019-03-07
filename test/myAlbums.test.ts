@@ -2,8 +2,8 @@ import request from "supertest";
 import querystring from "querystring";
 import app from "../src/app";
 import { ACCESS_TOKEN } from "./util/testSecrets";
-import { GetMyAlbumsResponse, GetMyAlbumsRequest, GetAlbumResponse } from "../src/models/responses/GetMyAlbums";
-import { AlbumRequest } from "../src/models/requests/AlbumRequest";
+import { GetMyAlbumsResponse, GetMyAlbumsRequest, GetAlbumResponse } from "../src/models/public/GetMyAlbums";
+import { AlbumRequest } from "../src/models/public/AlbumRequest";
 
 const testTags = ["This is a test tag", "This is another test tag"];
 const testSpotifyAlbumId = "5cPHT4yMCfETLRYAoBFcOZ"; // Ma Fleur - Cinematic Orchestra

@@ -1,4 +1,4 @@
-import { BadRequestErrorResponse } from "../responses/GenericResponses";
+import { BadRequestErrorResponse } from "./GenericResponses";
 import { AlbumRequest } from "./AlbumRequest";
 
 export class TagOnAlbumRequest extends AlbumRequest {
