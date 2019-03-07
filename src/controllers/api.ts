@@ -15,6 +15,7 @@ import { GetMyTagsResponse } from "../models/public/GetMyTags";
 import { SearchRequest, SearchArtistResponse } from "../models/public/Search";
 import { errorHandler } from "../util/errorHandler";
 import logger from "../util/logger";
+import { AlbumObjectFull } from "spotify-web-api-node-typings";
 
 export let getMyAlbums = async (req: Request, res: Response) => {
   try {
@@ -202,7 +203,7 @@ export const getListeningList = async (req: Request, res: Response) => {
     // I filter spotify ids using offset and limit
     spotifyIds = spotifyIds.slice(offset, offset + limit);
 
-    let albumsFull: SpotifyApi.AlbumObjectFull[] = [];
+    let albumsFull: AlbumObjectFull[] = [];
     if (spotifyIds.length > 0) {
       albumsFull = await AlbumManager.GetAlbums(user, spotifyIds); // FIXME: this call might break pagination
     }

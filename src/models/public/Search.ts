@@ -1,4 +1,5 @@
 import { BaseResponse, BasePaginationRequest } from "./GenericResponses";
+import { ArtistSearchResponse } from "spotify-web-api-node-typings";
 
 export class SearchRequest extends BasePaginationRequest {
   /**
@@ -7,4 +8,4 @@ export class SearchRequest extends BasePaginationRequest {
   q: string;
 }
 
-export class SearchArtistResponse extends BaseResponse<SpotifyApi.ArtistSearchResponse> { }
+export class SearchArtistResponse extends BaseResponse<ArtistSearchResponse> { }

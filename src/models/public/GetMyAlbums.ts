@@ -1,6 +1,7 @@
 import { IAlbum } from "../interfaces/IAlbum";
 import { ITag } from "../interfaces/ITag";
 import { BaseResponse, BasePaginationRequest } from "./GenericResponses";
+import { AlbumObjectFull } from "spotify-web-api-node-typings";
 import { IUser } from "../interfaces/IUser";
 
 export class GetMyAlbumsRequest extends BasePaginationRequest {
@@ -27,8 +28,7 @@ export class TagsByAlbum {
 }
 
 export class UserAlbum {
-class UserAlbum {
-  album: SpotifyApi.AlbumObjectFull;
+  album: AlbumObjectFull;
   /**
    * This is true when this album is in the listening list
    */
@@ -51,7 +51,7 @@ export class GetMyAlbumsResponse extends BaseResponse<TaggedAlbum[]> {
    * @param tagFilter When evaluated, only the albums with these tags will be returned
    * @param untagged When `true`, only the albums without tags will be returned
    */
-  static createFromSpotifyAlbums(spotifyAlbums: SpotifyApi.AlbumObjectFull[], tagsByAlbum: TagsByAlbum, tagFilter: string[], untagged: boolean, user: IUser): GetMyAlbumsResponse {
+  static createFromSpotifyAlbums(spotifyAlbums: AlbumObjectFull[], tagsByAlbum: TagsByAlbum, tagFilter: string[], untagged: boolean, user: IUser): GetMyAlbumsResponse {
 
     // Grouping albums by spotifyId
     tagFilter = tagFilter || [];
@@ -92,7 +92,7 @@ export class GetMyAlbumsResponse extends BaseResponse<TaggedAlbum[]> {
 }
 
 export class UserAlbumsResponse extends BaseResponse<UserAlbum[]> {
-  static createFromSpotifyAlbums(spotifyAlbums: SpotifyApi.AlbumObjectFull[], listeningList: boolean | string[]): UserAlbumsResponse {
+  static createFromSpotifyAlbums(spotifyAlbums: AlbumObjectFull[], listeningList: boolean | string[]): UserAlbumsResponse {
     const userAlbumList = spotifyAlbums.map(a => {
       let isInListeningList = false;
 
@@ -112,7 +112,7 @@ export class UserAlbumsResponse extends BaseResponse<UserAlbum[]> {
 }
 
 export class GetAlbumResponse extends BaseResponse<TaggedAlbum> {
-  static createFromSpotifyAlbum(album: SpotifyApi.AlbumObjectFull, tags: ITag[], isSavedAlbum: boolean, user: IUser): GetAlbumResponse {
+  static createFromSpotifyAlbum(album: AlbumObjectFull, tags: ITag[], isSavedAlbum: boolean, user: IUser): GetAlbumResponse {
     const isInListeningList = user.listeningList.indexOf(album.id) >= 0;
     const body: TaggedAlbum = {
       tags: tags,

@@ -5,6 +5,7 @@ import { BadRequestErrorResponse } from "./public/GenericResponses";
 import { ITagDocument } from "./Tag";
 import logger from "../util/logger";
 import { encrypt, decrypt } from "../config/encrypto";
+import { UserProfileAuthenticationNodeResponse } from "spotify-web-api-node-typings";
 import { IUser } from "./interfaces/IUser";
 
 export interface IUserDocument extends IUser, Document {
@@ -69,7 +70,7 @@ export interface IUserModel extends Model<IUserDocument> {
    * @param accessToken User's access token
    * @param refreshToken User's refresh token
    */
-  upsertSpotifyUser(profile: SpotifyApi.UserProfileAuthenticationNodeResponse, accessToken: string, refreshToken: string): Promise<IUserDocument>;
+  upsertSpotifyUser(profile: UserProfileAuthenticationNodeResponse, accessToken: string, refreshToken: string): Promise<IUserDocument>;
 }
 
 export const userSchema: Schema = new Schema({
@@ -316,7 +317,7 @@ userSchema.methods.updateSpotifyAccessToken = async function (spotifyAccessToken
   }
 };
 
-userSchema.statics.upsertSpotifyUser = async function (profile: SpotifyApi.UserProfileAuthenticationNodeResponse, accessToken: string, refreshToken: string): Promise<IUserDocument> {
+userSchema.statics.upsertSpotifyUser = async function (profile: UserProfileAuthenticationNodeResponse, accessToken: string, refreshToken: string): Promise<IUserDocument> {
   try {
     const user = await User.findOne({
       "spotify.id": profile.id

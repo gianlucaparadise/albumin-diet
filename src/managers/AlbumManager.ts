@@ -1,8 +1,9 @@
 import { IUserDocument } from "../models/User";
 import { SpotifyApiManager } from "./SpotifyApiManager";
 import logger from "../util/logger";
+import { AlbumObjectFull, SavedAlbumObject } from "spotify-web-api-node-typings";
 
-type GetNextPage = (limit: number, offset: number) => Promise<SpotifyApi.AlbumObjectFull[]>;
+type GetNextPage = (limit: number, offset: number) => Promise<AlbumObjectFull[]>;
 
 /**
  * This class helps filtering out singles to keep Albums and EPs
@@ -25,7 +26,7 @@ export class AlbumManager {
    * - https://support.amuse.io/hc/en-us/articles/207973005-What-is-a-Single-An-EP-An-Album-
    * - Unfortunately there is no official documentation about this
    */
-  public static IsAlbumOrEP(album: SpotifyApi.AlbumObjectFull): boolean {
+  public static IsAlbumOrEP(album: AlbumObjectFull): boolean {
     if (album.album_type === "album") return true; // this is an Album
 
     return album.album_type === "single" && album.tracks.total > 3; // this is an EP
@@ -41,11 +42,11 @@ export class AlbumManager {
    * @param onNextPage This function calls spotify to get a standard page, filters out the singles and returns the result.
    * @returns The requested page
    */
-  private static async extractPage(limit: number, offset: number, onNextPage: GetNextPage): Promise<SpotifyApi.AlbumObjectFull[]> {
+  private static async extractPage(limit: number, offset: number, onNextPage: GetNextPage): Promise<AlbumObjectFull[]> {
     try {
       const maxLimit = 50; // 50 is the max limit allowed by Spotify APIs
       const allAlbumsLength = offset + limit;
-      const allAlbums = <SpotifyApi.AlbumObjectFull[]>[];
+      const allAlbums = <AlbumObjectFull[]>[];
 
       for (let i = 0; allAlbums.length < allAlbumsLength; i += maxLimit) {
 
@@ -69,7 +70,7 @@ export class AlbumManager {
   /**
    * Filter out singles to keep Albums and EPs
    */
-  private static ExtractAlbumsAndEPs(savedAlbums: SpotifyApi.SavedAlbumObject[]): SpotifyApi.AlbumObjectFull[] {
+  private static ExtractAlbumsAndEPs(savedAlbums: SavedAlbumObject[]): AlbumObjectFull[] {
     const result = savedAlbums.reduce((result, savedAlbum) => {
       const album = savedAlbum.album;
 
@@ -79,7 +80,7 @@ export class AlbumManager {
 
       result.push(album);
       return result;
-    }, <SpotifyApi.AlbumObjectFull[]>[]);
+    }, <AlbumObjectFull[]>[]);
 
     return result;
   }
@@ -87,7 +88,7 @@ export class AlbumManager {
   /**
    * This filters out singles to return only Albums and EPs
    */
-  public static async GetMySavedAlbums(user: IUserDocument, limit: number = 20, offset: number = 0): Promise<SpotifyApi.AlbumObjectFull[]> {
+  public static async GetMySavedAlbums(user: IUserDocument, limit: number = 20, offset: number = 0): Promise<AlbumObjectFull[]> {
 
     try {
       const onNextPage = async (spotifyLimit: number, spotifyOffset: number) => {
@@ -112,7 +113,7 @@ export class AlbumManager {
   /**
    * This filters out singles to return only Albums and EPs
    */
-  public static async SearchAlbums(user: IUserDocument, keywords: string, limit: number, offset: number): Promise<SpotifyApi.AlbumObjectFull[]> {
+  public static async SearchAlbums(user: IUserDocument, keywords: string, limit: number, offset: number): Promise<AlbumObjectFull[]> {
     try {
       const onNextPage = async (spotifyLimit: number, spotifyOffset: number) => {
         const response = await SpotifyApiManager.SearchAlbums(user, keywords, spotifyLimit, spotifyOffset);
@@ -139,10 +140,10 @@ export class AlbumManager {
    * This filters out singles
    * @param ids A list of the Spotify IDs for the albums.
    */
-  public static async GetAlbums(user: IUserDocument, ids: string[]): Promise<SpotifyApi.AlbumObjectFull[]> {
+  public static async GetAlbums(user: IUserDocument, ids: string[]): Promise<AlbumObjectFull[]> {
 
     try {
-      const albumsFull = <SpotifyApi.AlbumObjectFull[]>[];
+      const albumsFull = <AlbumObjectFull[]>[];
 
       // Spotify's GetAlbums allows maximum 20 ids in input: I need to get albums in blocks of 20 items.
 
