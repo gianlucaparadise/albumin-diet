@@ -12,6 +12,7 @@
   },
   "private": true,
   "workspaces": [
+    "albumin-diet-types",
     "spotify-web-api-node-typings"
   ],
   "scripts": {
@@ -19,7 +20,7 @@
     "prestart": "npm run build",
     "start": "npm run serve",
     "build": "npm run clean && npm run build-ts && npm run tslint && npm run copy-static-assets",
-    "clean": "rm -rf dist",
+    "clean": "rm -rf dist && rm -rf albumin-diet-types/types",
     "serve": "node dist/server.js",
     "watch-node": "nodemon dist/server.js",
     "watch": "concurrently -k -p \"[{name}]\" -n \"TypeScript,Node\" -c \"cyan.bold,green.bold\" \"npm run watch-ts\" \"npm run watch-node\"",
@@ -34,6 +35,9 @@
     "copy-static-assets": "ts-node copyStaticAssets.ts",
     "debug": "npm run build && npm run watch-debug",
     "serve-debug": "nodemon --inspect dist/server.js",
+    "watch-debug": "concurrently -k -p \"[{name}]\" -n \"Sass,TypeScript,Node\" -c \"yellow.bold,cyan.bold,green.bold\" \"npm run watch-sass\" \"npm run watch-ts\" \"npm run serve-debug\"",
+    "update-types": "yarn workspace albumin-diet-types add spotify-web-api-node-typings@latest",
+    "publish-types": "yarn workspace albumin-diet-types publish",
     "publish-spotify-types": "yarn workspace spotify-web-api-node-typings publish"
   },
   "dependencies": {

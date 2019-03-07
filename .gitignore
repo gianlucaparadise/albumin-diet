@@ -38,5 +38,17 @@ Thumbs.db
 # Ignore built ts files
 dist/**/*
 
+# Ignore declarations except for the public ones
+albumin-diet-types/*
+!albumin-diet-types/index.d.ts
+!albumin-diet-types/package.json
+
+!albumin-diet-types/types
+albumin-diet-types/types/*
+!albumin-diet-types/types/models
+albumin-diet-types/types/models/*
+!albumin-diet-types/types/models/public
+!albumin-diet-types/types/models/interfaces
+
 # Ignore the original boilerplate code used as example
 example

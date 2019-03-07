@@ -9,6 +9,8 @@
     "outDir": "dist",
     "baseUrl": ".",
     "removeComments": true,
+    "declaration": true,
+    "declarationDir": "albumin-diet-types/types/",
     "paths": {
       "*": [
         "node_modules/*",

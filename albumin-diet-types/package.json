@@ -1,0 +1,27 @@
+{
+  "name": "albumin-diet-types",
+  "version": "0.0.14",
+  "description": "Typescript models for the albumin-diet requests and responses",
+  "repository": "https://github.com/gianlucaparadise/albumin-diet.git",
+  "author": {
+    "name": "gianlucaparadise",
+    "email": "gianlucaparadise@gmail.com",
+    "url": "https://github.com/gianlucaparadise"
+  },
+  "main": "index.d.ts",
+  "scripts": {
+    "show-pack": "npm pack && tar -xvzf *.tgz && rm -rf package *.tgz"
+  },
+  "license": "Apache-2.0",
+  "engines": {
+    "node": "11.0.0"
+  },
+  "files": [
+    "types/models/public",
+    "types/models/interfaces",
+    "index.d.ts"
+  ],
+  "dependencies": {
+    "spotify-web-api-node-typings": "^0.0.5"
+  }
+}
