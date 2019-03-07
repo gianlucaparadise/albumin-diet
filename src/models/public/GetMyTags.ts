@@ -1,5 +1,5 @@
 import { BaseResponse } from "./GenericResponses";
-import { ITag } from "../Tag";
+import { ITag } from "../interfaces/ITag";
 
 export class GetMyTagsResponse extends BaseResponse<ITag[]> {
   constructor(body: ITag[]) {

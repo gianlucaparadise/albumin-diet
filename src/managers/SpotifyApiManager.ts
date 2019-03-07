@@ -1,5 +1,5 @@
 import { SPOTIFY_ID, SPOTIFY_SECRET } from "../util/secrets";
-import { IUser } from "../models/User";
+import { IUserDocument } from "../models/User";
 import logger from "../util/logger";
 
 import SpotifyWebApi from "spotify-web-api-node";
@@ -30,7 +30,7 @@ export class SpotifyApiManager {
     return this.Instance.Api;
   }
 
-  private static async RefreshToken(user: IUser): Promise<boolean> {
+  private static async RefreshToken(user: IUserDocument): Promise<boolean> {
     logger.debug("Refreshing spotify token");
 
     try {
@@ -58,7 +58,7 @@ export class SpotifyApiManager {
    * @param user Current user
    * @param buildRequest Function that returns the request to perform.
    */
-  private static async request<T>(user: IUser, buildRequest: () => Promise<T>): Promise<T> {
+  private static async request<T>(user: IUserDocument, buildRequest: () => Promise<T>): Promise<T> {
     try {
       // I need a request builder instead of the final request because if I don't re-build it,
       // the request will use the old spotifyApi instance with the old accessToken
@@ -84,7 +84,7 @@ export class SpotifyApiManager {
     }
   }
 
-  public static async GetProfile(user: IUser): Promise<SpotifyApi.UserObjectPrivateNodeResponse> {
+  public static async GetProfile(user: IUserDocument): Promise<UserObjectPrivateNodeResponse> {
     try {
       const response = await this.request(user, () => SpotifyApiManager.Api.getMe());
       return response;
@@ -97,7 +97,7 @@ export class SpotifyApiManager {
   /**
    * This returns user's saved albums from spotify (you may find singles in it)
    */
-  public static async GetMySavedAlbums(user: IUser, limit: number = 20, offset: number = 0): Promise<SpotifyApi.UsersSavedAlbumsNodeResponse> {
+  public static async GetMySavedAlbums(user: IUserDocument, limit: number = 20, offset: number = 0): Promise<SpotifyApi.UsersSavedAlbumsNodeResponse> {
 
     try {
       const params: SpotifyApi.PagingRequestObject = {
@@ -117,7 +117,7 @@ export class SpotifyApiManager {
    * This returns input albums (may return singles)
    * @param ids A list of the Spotify IDs for the albums. Maximum: 20 IDs.
    */
-  public static async GetAlbums(user: IUser, ids: string[]): Promise<SpotifyApi.MultipleAlbumsNodeResponse> {
+  public static async GetAlbums(user: IUserDocument, ids: string[]): Promise<SpotifyApi.MultipleAlbumsNodeResponse> {
 
     try {
       const response = await this.request(user, () => SpotifyApiManager.Api.getAlbums(ids));
@@ -135,7 +135,7 @@ export class SpotifyApiManager {
    * @param user Current user
    * @param album Album to check
    */
-  public static async IsMySavedAlbum(user: IUser, album: SpotifyApi.AlbumObjectFull): Promise<boolean> {
+  public static async IsMySavedAlbum(user: IUserDocument, album: SpotifyApi.AlbumObjectFull): Promise<boolean> {
 
     try {
       const trackIds = album.tracks.items.map(t => t.id);
@@ -158,7 +158,7 @@ export class SpotifyApiManager {
    * @param user Current user
    * @param albumId Album to save
    */
-  public static async AddToMyAlbum(user: IUser, albumId: string): Promise<void> {
+  public static async AddToMyAlbum(user: IUserDocument, albumId: string): Promise<void> {
     try {
       const response = await this.request(user, () => SpotifyApiManager.Api.addToMySavedAlbums([albumId]));
       return Promise.resolve();
@@ -173,7 +173,7 @@ export class SpotifyApiManager {
    * @param user Current user
    * @param albumId Album to remove
    */
-  public static async RemoveFromMyAlbum(user: IUser, albumId: string): Promise<void> {
+  public static async RemoveFromMyAlbum(user: IUserDocument, albumId: string): Promise<void> {
     try {
       const response = await this.request(user, () => SpotifyApiManager.Api.removeFromMySavedAlbums([albumId]));
       return Promise.resolve();
@@ -183,7 +183,7 @@ export class SpotifyApiManager {
     }
   }
 
-  public static async SearchAlbums(user: IUser, keywords: string, limit: number, offset: number): Promise<SpotifyApi.AlbumSearchNodeResponse> {
+  public static async SearchAlbums(user: IUserDocument, keywords: string, limit: number, offset: number): Promise<SpotifyApi.AlbumSearchNodeResponse> {
 
     try {
       const options = {
@@ -199,7 +199,7 @@ export class SpotifyApiManager {
     }
   }
 
-  public static async SearchArtists(user: IUser, keywords: string, limit: number, offset: number): Promise<SpotifyApi.ArtistSearchNodeResponse> {
+  public static async SearchArtists(user: IUserDocument, keywords: string, limit: number, offset: number): Promise<SpotifyApi.ArtistSearchNodeResponse> {
 
     try {
       const options = {

@@ -3,7 +3,7 @@ import { ErrorResponse } from "../models/public/GenericResponses";
 import { SpotifyApiManager } from "../managers/SpotifyApiManager";
 import { errorHandler } from "../util/errorHandler";
 import { GetProfileResponse } from "../models/public/GetProfile";
-import { IUser } from "../models/User";
+import { IUserDocument } from "../models/User";
 
 export let login = (req: Request, res: Response) => {
   res.render("login");
@@ -34,7 +34,7 @@ export let authSpotifyCallback = (req: Request, res: Response, next: NextFunctio
 
 export const getMe = async function (req: Request, res: Response) {
   try {
-    const user = <IUser>req.user;
+    const user = <IUserDocument>req.user;
 
     const profile = await SpotifyApiManager.GetProfile(user);
     const response = new GetProfileResponse(profile.body);

@@ -1,4 +1,4 @@
-import { IUser } from "../models/User";
+import { IUserDocument } from "../models/User";
 import { SpotifyApiManager } from "./SpotifyApiManager";
 import logger from "../util/logger";
 
@@ -87,7 +87,7 @@ export class AlbumManager {
   /**
    * This filters out singles to return only Albums and EPs
    */
-  public static async GetMySavedAlbums(user: IUser, limit: number = 20, offset: number = 0): Promise<SpotifyApi.AlbumObjectFull[]> {
+  public static async GetMySavedAlbums(user: IUserDocument, limit: number = 20, offset: number = 0): Promise<SpotifyApi.AlbumObjectFull[]> {
 
     try {
       const onNextPage = async (spotifyLimit: number, spotifyOffset: number) => {
@@ -112,7 +112,7 @@ export class AlbumManager {
   /**
    * This filters out singles to return only Albums and EPs
    */
-  public static async SearchAlbums(user: IUser, keywords: string, limit: number, offset: number): Promise<SpotifyApi.AlbumObjectFull[]> {
+  public static async SearchAlbums(user: IUserDocument, keywords: string, limit: number, offset: number): Promise<SpotifyApi.AlbumObjectFull[]> {
     try {
       const onNextPage = async (spotifyLimit: number, spotifyOffset: number) => {
         const response = await SpotifyApiManager.SearchAlbums(user, keywords, spotifyLimit, spotifyOffset);
@@ -139,7 +139,7 @@ export class AlbumManager {
    * This filters out singles
    * @param ids A list of the Spotify IDs for the albums.
    */
-  public static async GetAlbums(user: IUser, ids: string[]): Promise<SpotifyApi.AlbumObjectFull[]> {
+  public static async GetAlbums(user: IUserDocument, ids: string[]): Promise<SpotifyApi.AlbumObjectFull[]> {
 
     try {
       const albumsFull = <SpotifyApi.AlbumObjectFull[]>[];

@@ -1,13 +1,12 @@
 import mongoose from "mongoose";
 import { model, Document, Schema, Model } from "mongoose";
-import { IAlbum } from "./Album";
-import { ITag } from "./Tag";
+import { IAlbumDocument } from "./Album";
+import { ITagDocument } from "./Tag";
 import { User } from "./User";
 import logger from "../util/logger";
+import { IAlbumTag } from "./interfaces/IAlbumTag";
 
-export interface IAlbumTag extends Document {
-  album: IAlbum;
-  tag: ITag;
+export interface IAlbumTagDocument extends IAlbumTag, Document {
   /**
    * Removes this albumTag if it is not linked to any user
    * @returns true if it has been deleted, false otherwise
@@ -15,14 +14,14 @@ export interface IAlbumTag extends Document {
   removeIfOrphan(): Promise<boolean>;
 }
 
-export interface IAlbumTagModel extends Model<IAlbumTag> {
+export interface IAlbumTagModel extends Model<IAlbumTagDocument> {
   /**
    * Returns an AlbumTag with the input tag linked to the input album,
    * or creates one if missing
    * @param album Tagged album
    * @param tag Tag for the album
    */
-  findOrCreate(album: IAlbum, tag: ITag): Promise<IAlbumTag>;
+  findOrCreate(album: IAlbumDocument, tag: ITagDocument): Promise<IAlbumTagDocument>;
 }
 
 const albumTagSchema = new Schema({
@@ -32,7 +31,7 @@ const albumTagSchema = new Schema({
 
 albumTagSchema.methods.removeIfOrphan = async function (): Promise<boolean> {
   try {
-    const albumTag = <IAlbumTag>this;
+    const albumTag = <IAlbumTagDocument>this;
 
     // Checking if there is still a user that has this albumTag in his list
     const isAlbumTagLinked = await User.exists({ "albumTags": albumTag._id });
@@ -51,7 +50,7 @@ albumTagSchema.methods.removeIfOrphan = async function (): Promise<boolean> {
   }
 };
 
-albumTagSchema.statics.findOrCreate = async function (album: IAlbum, tag: ITag): Promise<IAlbumTag> {
+albumTagSchema.statics.findOrCreate = async function (album: IAlbumDocument, tag: ITagDocument): Promise<IAlbumTagDocument> {
   try {
     const albumTag = await AlbumTag.findOne({ album: album._id, tag: tag._id });
 
@@ -74,4 +73,4 @@ albumTagSchema.statics.findOrCreate = async function (album: IAlbum, tag: ITag):
   }
 };
 
-export const AlbumTag: IAlbumTagModel = model<IAlbumTag, IAlbumTagModel>("AlbumTag", albumTagSchema);
+export const AlbumTag: IAlbumTagModel = model<IAlbumTagDocument, IAlbumTagModel>("AlbumTag", albumTagSchema);

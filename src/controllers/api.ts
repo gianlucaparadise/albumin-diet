@@ -9,7 +9,7 @@ import { EmptyResponse, BadRequestErrorResponse, BasePaginationRequest, ErrorRes
 import { Tag } from "../models/Tag";
 import { Album } from "../models/Album";
 import { AlbumTag } from "../models/AlbumTag";
-import { IUser } from "../models/User";
+import { IUserDocument } from "../models/User";
 import { GetMyAlbumsResponse, GetMyAlbumsRequest, GetAlbumResponse, UserAlbumsResponse } from "../models/public/GetMyAlbums";
 import { GetMyTagsResponse } from "../models/public/GetMyTags";
 import { SearchRequest, SearchArtistResponse } from "../models/public/Search";
@@ -28,7 +28,7 @@ export let getMyAlbums = async (req: Request, res: Response) => {
     const limit = parseInt(request.limit) || 20;
     const offset = parseInt(request.offset) || 0;
 
-    const user = <IUser>req.user;
+    const user = <IUserDocument>req.user;
 
     // todo: check how to parallelize spotify request and db query
     const tagsByAlbum = await user.getTagsGroupedByAlbum();
@@ -46,7 +46,7 @@ export let getMyAlbums = async (req: Request, res: Response) => {
 
 export let saveAlbum = async (req: Request, res: Response) => {
   try {
-    const user = <IUser>req.user;
+    const user = <IUserDocument>req.user;
     const body = AlbumRequest.checkConsistency(req.body);
 
     const spotifyId = body.album.spotifyId;
@@ -61,7 +61,7 @@ export let saveAlbum = async (req: Request, res: Response) => {
 
 export let removeAlbum = async (req: Request, res: Response) => {
   try {
-    const user = <IUser>req.user;
+    const user = <IUserDocument>req.user;
     const body = AlbumRequest.checkConsistency(req.body);
 
     const spotifyId = body.album.spotifyId;
@@ -77,7 +77,7 @@ export let removeAlbum = async (req: Request, res: Response) => {
 export let getAlbumBySpotifyId = async (req: Request, res: Response) => {
   try {
     const spotifyAlbumId = req.params["albumId"];
-    const user = <IUser>req.user;
+    const user = <IUserDocument>req.user;
 
     const tags = await user.getTagsByAlbum(spotifyAlbumId);
 
@@ -100,7 +100,7 @@ export let getAlbumBySpotifyId = async (req: Request, res: Response) => {
 
 export const getMyTags = async (req: Request, res: Response) => {
   try {
-    const user = <IUser>req.user;
+    const user = <IUserDocument>req.user;
 
     // todo: paginate this
 
@@ -136,7 +136,7 @@ export let setTagOnAlbum = async (req: Request, res: Response) => {
       throw new BadRequestErrorResponse("Input tag has never been added to input album");
     }
 
-    const user = <IUser>req.user;
+    const user = <IUserDocument>req.user;
     const savedUser = await user.addAlbumTag(albumTag);
 
     return res.json(new EmptyResponse());
@@ -169,7 +169,7 @@ export const deleteTagFromAlbum = async (req: Request, res: Response) => {
     // todo: startTransaction (see: https://thecodebarbarian.com/a-node-js-perspective-on-mongodb-4-transactions.html)
     // NB: MongoDB currently only supports transactions on replica sets
 
-    const user = <IUser>req.user;
+    const user = <IUserDocument>req.user;
     const removeResult = await user.removeAlbumTag(albumTag);
 
     // Clearing orphan documents
@@ -196,7 +196,7 @@ export const getListeningList = async (req: Request, res: Response) => {
     const limit = parseInt(request.limit) || 20;
     const offset = parseInt(request.offset) || 0;
 
-    const user = <IUser>req.user;
+    const user = <IUserDocument>req.user;
     let spotifyIds: string[] = user.listeningList;
 
     // I filter spotify ids using offset and limit
@@ -220,7 +220,7 @@ export const addToListeningList = async (req: Request, res: Response) => {
   try {
     const body = AlbumRequest.checkConsistency(req.body);
 
-    const user = <IUser>req.user;
+    const user = <IUserDocument>req.user;
     const albumSpotifyId = body.album.spotifyId;
 
     const result = await user.addToListeningList(albumSpotifyId);
@@ -236,7 +236,7 @@ export const deleteFromListeningList = async (req: Request, res: Response) => {
   try {
     const body = AlbumRequest.checkConsistency(req.body);
 
-    const user = <IUser>req.user;
+    const user = <IUserDocument>req.user;
     const albumSpotifyId = body.album.spotifyId;
 
     const result = await user.removeFromListeningList(albumSpotifyId);
@@ -256,7 +256,7 @@ export const searchAlbums = async (req: Request, res: Response) => {
     const limit = parseInt(requestBody.limit) || 20;
     const offset = parseInt(requestBody.offset) || 0;
 
-    const user = <IUser>req.user;
+    const user = <IUserDocument>req.user;
 
     const albums = await AlbumManager.SearchAlbums(user, keywords, limit, offset);
 
@@ -277,7 +277,7 @@ export const searchArtists = async (req: Request, res: Response) => {
     const limit = parseInt(requestBody.limit) || 20;
     const offset = parseInt(requestBody.offset) || 0;
 
-    const user = <IUser>req.user;
+    const user = <IUserDocument>req.user;
 
     const searchResponse = await SpotifyApiManager.SearchArtists(user, keywords, limit, offset);
 

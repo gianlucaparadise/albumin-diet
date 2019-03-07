@@ -1,10 +1,9 @@
 import { Document, Schema, Model, model } from "mongoose";
 import { AlbumTag } from "./AlbumTag";
 import logger from "../util/logger";
+import { ITag } from "./interfaces/ITag";
 
-export interface ITag extends Document {
-  uniqueId: string;
-  name: string;
+export interface ITagDocument extends ITag, Document {
   /**
    * Removes this tag if it is not linked to any albumTag
    * @returns true if it has been deleted, false otherwise
@@ -12,14 +11,14 @@ export interface ITag extends Document {
   removeIfOrphan(): Promise<boolean>;
 }
 
-export interface ITagModel extends Model<ITag> {
+export interface ITagModel extends Model<ITagDocument> {
   /**
    * This converts the tag name in a unique id using a certain set of rules
    * @param name Tag Name
    */
   calculateUniqueIdByName(name: string): string;
 
-  findOrCreate(name: string): Promise<ITag>;
+  findOrCreate(name: string): Promise<ITagDocument>;
 }
 
 export const tagSchema = new Schema({
@@ -29,7 +28,7 @@ export const tagSchema = new Schema({
 
 tagSchema.methods.removeIfOrphan = async function (): Promise<boolean> {
   try {
-    const tag = <ITag>this;
+    const tag = <ITagDocument>this;
 
     // Checking if there is still an albumTag that has this tag
     const isTagLinked = await AlbumTag.exists({ "tag": tag._id });
@@ -60,7 +59,7 @@ tagSchema.statics.calculateUniqueIdByName = function (name: String): String {
   return uniqueId;
 };
 
-tagSchema.statics.findOrCreate = async function (name: string): Promise<ITag> {
+tagSchema.statics.findOrCreate = async function (name: string): Promise<ITagDocument> {
   try {
     const uniqueId = Tag.calculateUniqueIdByName(name);
     const tag = await Tag.findOne({ uniqueId: uniqueId });
@@ -85,4 +84,4 @@ tagSchema.statics.findOrCreate = async function (name: string): Promise<ITag> {
   }
 };
 
-export const Tag = model<ITag, ITagModel>("Tag", tagSchema);
+export const Tag = model<ITagDocument, ITagModel>("Tag", tagSchema);

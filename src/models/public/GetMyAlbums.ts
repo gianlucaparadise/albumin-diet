@@ -1,7 +1,7 @@
-import { IAlbum } from "../Album";
-import { ITag } from "../Tag";
+import { IAlbum } from "../interfaces/IAlbum";
+import { ITag } from "../interfaces/ITag";
 import { BaseResponse, BasePaginationRequest } from "./GenericResponses";
-import { IUser } from "../User";
+import { IUser } from "../interfaces/IUser";
 
 export class GetMyAlbumsRequest extends BasePaginationRequest {
   /**
@@ -26,6 +26,7 @@ export class TagsByAlbum {
   }
 }
 
+export class UserAlbum {
 class UserAlbum {
   album: SpotifyApi.AlbumObjectFull;
   /**
@@ -34,7 +35,7 @@ class UserAlbum {
   isInListeningList: boolean;
 }
 
-class TaggedAlbum extends UserAlbum {
+export class TaggedAlbum extends UserAlbum {
   tags: ITag[];
   /**
    * This is true when this album is one of the current user's saved albums

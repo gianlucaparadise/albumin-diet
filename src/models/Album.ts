@@ -1,24 +1,9 @@
 import { Document, Schema, Model, model } from "mongoose";
 import { AlbumTag } from "./AlbumTag";
 import logger from "../util/logger";
+import { IAlbum } from "./interfaces/IAlbum";
 
-export interface IAlbum extends Document {
-  // name: string;
-  publicId: {
-    spotify: string
-  };
-  // url: {
-  //   spotify: string
-  // };
-  // cover: {
-  //   spotify: string
-  // };
-  // info: {
-  //   releaseYear: string
-  // };
-  // artist: {
-  //   name: string
-  // };
+export interface IAlbumDocument extends IAlbum, Document {
   /**
    * Removes this album if it is not linked to any albumTag
    * @returns true if it has been deleted, false otherwise
@@ -26,8 +11,8 @@ export interface IAlbum extends Document {
   removeIfOrphan(): Promise<boolean>;
 }
 
-export interface IAlbumModel extends Model<IAlbum> {
-  findOrCreate(id: string): Promise<IAlbum>;
+export interface IAlbumModel extends Model<IAlbumDocument> {
+  findOrCreate(id: string): Promise<IAlbumDocument>;
 }
 
 export const albumSchema = new Schema({
@@ -51,7 +36,7 @@ export const albumSchema = new Schema({
 
 albumSchema.methods.removeIfOrphan = async function (): Promise<boolean> {
   try {
-    const album = <IAlbum>this;
+    const album = <IAlbumDocument>this;
 
     // Checking if there is still an AlbumTag that links this album
     const isAlbumLinked = await AlbumTag.exists({ "album": album._id });
@@ -70,7 +55,7 @@ albumSchema.methods.removeIfOrphan = async function (): Promise<boolean> {
   }
 };
 
-albumSchema.statics.findOrCreate = async function (id: string): Promise<IAlbum> {
+albumSchema.statics.findOrCreate = async function (id: string): Promise<IAlbumDocument> {
   try {
     const album = await Album.findOne({ "publicId.spotify": id });
     if (album) {
@@ -90,4 +75,4 @@ albumSchema.statics.findOrCreate = async function (id: string): Promise<IAlbum> 
   }
 };
 
-export const Album = model<IAlbum, IAlbumModel>("Album", albumSchema);
+export const Album = model<IAlbumDocument, IAlbumModel>("Album", albumSchema);

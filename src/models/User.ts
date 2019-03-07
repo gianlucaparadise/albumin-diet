@@ -1,23 +1,13 @@
 import { Document, Schema, Model, model, Types } from "mongoose";
-import { IAlbumTag } from "./AlbumTag";
+import { IAlbumTagDocument } from "./AlbumTag";
 import { TagsByAlbum } from "./public/GetMyAlbums";
 import { BadRequestErrorResponse } from "./public/GenericResponses";
-import { ITag } from "./Tag";
+import { ITagDocument } from "./Tag";
 import logger from "../util/logger";
 import { encrypt, decrypt } from "../config/encrypto";
+import { IUser } from "./interfaces/IUser";
 
-export interface IUser extends Document {
-  spotify: {
-    id: String,
-    accessToken: String,
-    refreshToken: String,
-  };
-  displayName: string;
-  albumTags: Types.Array<IAlbumTag>;
-  /**
-   * List of spotify album ids
-   */
-  listeningList: Types.Array<string>;
+export interface IUserDocument extends IUser, Document {
 
   /**
    * Access token is encrypted on save, but it's not decrypted after load (I can't make it work)
@@ -32,12 +22,12 @@ export interface IUser extends Document {
    * Pushes the input album tag in this user's albumTags list
    * @param albumTag AlbumTag to add
    */
-  addAlbumTag(albumTag: IAlbumTag): Promise<boolean>;
+  addAlbumTag(albumTag: IAlbumTagDocument): Promise<boolean>;
   /**
    * Pulls the input album tag from this user's albumTags list
    * @param albumTag AlbumTag to remove
    */
-  removeAlbumTag(albumTag: IAlbumTag): Promise<IUser>;
+  removeAlbumTag(albumTag: IAlbumTagDocument): Promise<IUserDocument>;
   /**
    * Starting from this user's albumTag list, builds a map of all
    * this user's tags grouped by spotify album id
@@ -46,32 +36,32 @@ export interface IUser extends Document {
   /**
    * Retrieves the list of the tags added by this user
    */
-  getTags(): Promise<ITag[]>;
+  getTags(): Promise<ITagDocument[]>;
 
   /**
    * Retrieves the list of tags related to input album
    */
-  getTagsByAlbum(spotifyAlbumId: string): Promise<ITag[]>;
+  getTagsByAlbum(spotifyAlbumId: string): Promise<ITagDocument[]>;
 
   /**
    * Adds the input album in current user's listening list
    */
-  addToListeningList(spotifyAlbumId: string): Promise<IUser>;
+  addToListeningList(spotifyAlbumId: string): Promise<IUserDocument>;
 
   /**
    * Remove input album from current user's listening list
    */
-  removeFromListeningList(spotifyAlbumId: string): Promise<IUser>;
+  removeFromListeningList(spotifyAlbumId: string): Promise<IUserDocument>;
 
   /**
    * This updates the new refreshed access token
    *
    * @param spotifyAccessToken New spotify access token
    */
-  updateSpotifyAccessToken(spotifyAccessToken: string): Promise<IUser>;
+  updateSpotifyAccessToken(spotifyAccessToken: string): Promise<IUserDocument>;
 }
 
-export interface IUserModel extends Model<IUser> {
+export interface IUserModel extends Model<IUserDocument> {
   /**
    * Creates a new user, if missing, or updates found user with the new tokens.
    * The user is searched by spotify id.
@@ -79,7 +69,7 @@ export interface IUserModel extends Model<IUser> {
    * @param accessToken User's access token
    * @param refreshToken User's refresh token
    */
-  upsertSpotifyUser(profile: SpotifyApi.UserProfileAuthenticationNodeResponse, accessToken: string, refreshToken: string): Promise<IUser>;
+  upsertSpotifyUser(profile: SpotifyApi.UserProfileAuthenticationNodeResponse, accessToken: string, refreshToken: string): Promise<IUserDocument>;
 }
 
 export const userSchema: Schema = new Schema({
@@ -94,7 +84,7 @@ export const userSchema: Schema = new Schema({
 }, { timestamps: true });
 
 userSchema.pre("save", function (next) {
-  const user = <IUser>this;
+  const user = <IUserDocument>this;
 
   // I encrypt tokens and save them
   if (user.isModified("spotify.accessToken")) {
@@ -130,21 +120,21 @@ userSchema.pre("save", function (next) {
 // });
 
 userSchema.methods.getDecryptedAccessToken = function (): string {
-  const thisUser = <IUser>this;
+  const thisUser = <IUserDocument>this;
   return decrypt(thisUser.spotify.accessToken);
 };
 
 userSchema.methods.getDecryptedRefreshToken = function (): string {
-  const thisUser = <IUser>this;
+  const thisUser = <IUserDocument>this;
   return decrypt(thisUser.spotify.refreshToken);
 };
 
-userSchema.methods.addAlbumTag = async function (albumTag: IAlbumTag): Promise<IUser> {
+userSchema.methods.addAlbumTag = async function (albumTag: IAlbumTagDocument): Promise<IUserDocument> {
   try {
-    const thisUser = <IUser>this;
+    const thisUser = <IUserDocument>this;
 
     const countBeforeAdd = thisUser.albumTags.length;
-    const added = thisUser.albumTags.addToSet(albumTag._id);
+    const added = (<Types.Array<IAlbumTagDocument>>thisUser.albumTags).addToSet(albumTag._id);
     const countAfterAdd = thisUser.albumTags.length;
 
     if (countAfterAdd === countBeforeAdd) {
@@ -160,12 +150,12 @@ userSchema.methods.addAlbumTag = async function (albumTag: IAlbumTag): Promise<I
   }
 };
 
-userSchema.methods.removeAlbumTag = async function (albumTag: IAlbumTag): Promise<IUser> {
+userSchema.methods.removeAlbumTag = async function (albumTag: IAlbumTagDocument): Promise<IUserDocument> {
   try {
-    const user = <IUser>this;
+    const user = <IUserDocument>this;
 
     const countBeforePull = user.albumTags.length;
-    const pulledId = user.albumTags.pull(albumTag._id);
+    const pulledId = (<Types.Array<IAlbumTagDocument>>user.albumTags).pull(albumTag._id);
     const countAfterPull = user.albumTags.length;
 
     if (countBeforePull === countAfterPull) {
@@ -184,7 +174,7 @@ userSchema.methods.removeAlbumTag = async function (albumTag: IAlbumTag): Promis
 
 userSchema.methods.getTagsGroupedByAlbum = async function (): Promise<TagsByAlbum> {
   try {
-    const thisUser = <IUser>this;
+    const thisUser = <IUserDocument>this;
     await thisUser
       .populate({
         path: "albumTags",
@@ -215,23 +205,24 @@ userSchema.methods.getTagsGroupedByAlbum = async function (): Promise<TagsByAlbu
   }
 };
 
-userSchema.methods.getTags = async function (): Promise<ITag[]> {
+userSchema.methods.getTags = async function (): Promise<ITagDocument[]> {
   try {
-    const thisUser = <IUser>this;
+    const thisUser = <IUserDocument>this;
     await thisUser
       .populate({ path: "albumTags", populate: [{ path: "tag" }] })
       .execPopulate();
 
     const result = thisUser.albumTags.reduce((tags, albumTag) => {
-      const foundIndex = tags.findIndex(t => t.id === albumTag.tag.id); // I search for another tag with the same id
+      const tag = <ITagDocument>albumTag.tag;
+      const foundIndex = tags.findIndex(t => t.id === tag.id); // I search for another tag with the same id
       if (foundIndex >= 0) {
         // I have already added this tag, I don't want to push it again
         return tags;
       }
 
-      tags.push(albumTag.tag);
+      tags.push(tag);
       return tags;
-    }, <ITag[]>[]);
+    }, <ITagDocument[]>[]);
 
     return Promise.resolve(result);
 
@@ -240,9 +231,9 @@ userSchema.methods.getTags = async function (): Promise<ITag[]> {
   }
 };
 
-userSchema.methods.getTagsByAlbum = async function (spotifyAlbumId: string): Promise<ITag[]> {
+userSchema.methods.getTagsByAlbum = async function (spotifyAlbumId: string): Promise<ITagDocument[]> {
   try {
-    const thisUser = <IUser>this;
+    const thisUser = <IUserDocument>this;
     await thisUser
       .populate({
         path: "albumTags",
@@ -257,9 +248,9 @@ userSchema.methods.getTagsByAlbum = async function (spotifyAlbumId: string): Pro
         return tags;
       }
 
-      tags.push(albumTag.tag);
+      tags.push(<ITagDocument>albumTag.tag);
       return tags;
-    }, <ITag[]>[]);
+    }, <ITagDocument[]>[]);
 
     return Promise.resolve(result);
 
@@ -268,9 +259,9 @@ userSchema.methods.getTagsByAlbum = async function (spotifyAlbumId: string): Pro
   }
 };
 
-userSchema.methods.addToListeningList = async function (spotifyAlbumId: string): Promise<IUser> {
+userSchema.methods.addToListeningList = async function (spotifyAlbumId: string): Promise<IUserDocument> {
   try {
-    const thisUser = <IUser>this;
+    const thisUser = <IUserDocument>this;
 
     const index = thisUser.listeningList.indexOf(spotifyAlbumId);
 
@@ -289,12 +280,12 @@ userSchema.methods.addToListeningList = async function (spotifyAlbumId: string):
   }
 };
 
-userSchema.methods.removeFromListeningList = async function (spotifyAlbumId: string): Promise<IUser> {
+userSchema.methods.removeFromListeningList = async function (spotifyAlbumId: string): Promise<IUserDocument> {
   try {
-    const user = <IUser>this;
+    const user = <IUserDocument>this;
 
     const countBeforePull = user.listeningList.length;
-    const pulledId = user.listeningList.pull(spotifyAlbumId);
+    const pulledId = (<Types.Array<string>>user.listeningList).pull(spotifyAlbumId);
     const countAfterPull = user.listeningList.length;
 
     if (countBeforePull === countAfterPull) {
@@ -311,9 +302,9 @@ userSchema.methods.removeFromListeningList = async function (spotifyAlbumId: str
   }
 };
 
-userSchema.methods.updateSpotifyAccessToken = async function (spotifyAccessToken: string): Promise<IUser> {
+userSchema.methods.updateSpotifyAccessToken = async function (spotifyAccessToken: string): Promise<IUserDocument> {
   try {
-    const thisUser = <IUser>this;
+    const thisUser = <IUserDocument>this;
 
     thisUser.spotify.accessToken = spotifyAccessToken;
     const newUser = await thisUser.save();
@@ -325,7 +316,7 @@ userSchema.methods.updateSpotifyAccessToken = async function (spotifyAccessToken
   }
 };
 
-userSchema.statics.upsertSpotifyUser = async function (profile: SpotifyApi.UserProfileAuthenticationNodeResponse, accessToken: string, refreshToken: string): Promise<IUser> {
+userSchema.statics.upsertSpotifyUser = async function (profile: SpotifyApi.UserProfileAuthenticationNodeResponse, accessToken: string, refreshToken: string): Promise<IUserDocument> {
   try {
     const user = await User.findOne({
       "spotify.id": profile.id
@@ -355,4 +346,4 @@ userSchema.statics.upsertSpotifyUser = async function (profile: SpotifyApi.UserP
   }
 };
 
-export const User: IUserModel = model<IUser, IUserModel>("User", userSchema);
+export const User: IUserModel = model<IUserDocument, IUserModel>("User", userSchema);
