@@ -1,5 +1,5 @@
-import { BaseResponse, BasePaginationRequest } from "./GenericResponses";
-import { ArtistSearchResponse } from "spotify-web-api-node-typings";
+import { BaseResponse, BasePaginationRequest } from './GenericResponses';
+import { ArtistSearchResponse } from 'spotify-web-api-node-typings';
 
 export class SearchRequest extends BasePaginationRequest {
   /**

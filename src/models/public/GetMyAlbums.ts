@@ -1,8 +1,19 @@
-import { IAlbum } from "../interfaces/IAlbum";
-import { ITag } from "../interfaces/ITag";
-import { BaseResponse, BasePaginationRequest } from "./GenericResponses";
-import { AlbumObjectFull } from "spotify-web-api-node-typings";
-import { IUser } from "../interfaces/IUser";
+import { IAlbum } from '../interfaces/IAlbum';
+import { ITag } from '../interfaces/ITag';
+import { BaseResponse, BasePaginationRequest } from './GenericResponses';
+import { AlbumObjectFull } from 'spotify-web-api-node-typings';
+import { IUser } from '../interfaces/IUser';
+
+const intersect = function <T>(array1: T[], array2: T[]) {
+  array1 = array1 || [];
+  array2 = array2 || [];
+  return array1.filter(value => array2.indexOf(value) !== -1);
+};
+
+const haveCommonElements = function <T>(array1: T[], array2: T[]) {
+  const intersection = intersect(array1, array2);
+  return intersection && intersection.length > 0;
+};
 
 export class GetMyAlbumsRequest extends BasePaginationRequest {
   /**
@@ -51,7 +62,13 @@ export class GetMyAlbumsResponse extends BaseResponse<TaggedAlbum[]> {
    * @param tagFilter When evaluated, only the albums with these tags will be returned
    * @param untagged When `true`, only the albums without tags will be returned
    */
-  static createFromSpotifyAlbums(spotifyAlbums: AlbumObjectFull[], tagsByAlbum: TagsByAlbum, tagFilter: string[], untagged: boolean, user: IUser): GetMyAlbumsResponse {
+  static createFromSpotifyAlbums(
+    spotifyAlbums: AlbumObjectFull[],
+    tagsByAlbum: TagsByAlbum,
+    tagFilter: string[],
+    untagged: boolean,
+    user: IUser
+  ): GetMyAlbumsResponse {
 
     // Grouping albums by spotifyId
     tagFilter = tagFilter || [];
@@ -72,7 +89,7 @@ export class GetMyAlbumsResponse extends BaseResponse<TaggedAlbum[]> {
         // If I have filters, I get only the albumTags that match at least one filter
         // The filters are meant to be in OR and not in AND
         let matchesFilter = false;
-        matchesFilter = matchesFilter || (untagged && tags.length == 0);
+        matchesFilter = matchesFilter || (untagged && tags.length === 0);
         matchesFilter = matchesFilter || (hasTagFilter && haveCommonElements(tagNames, tagFilter));
 
         if (!matchesFilter) {
@@ -96,10 +113,9 @@ export class UserAlbumsResponse extends BaseResponse<UserAlbum[]> {
     const userAlbumList = spotifyAlbums.map(a => {
       let isInListeningList = false;
 
-      if (typeof listeningList === "boolean") {
+      if (typeof listeningList === 'boolean') {
         isInListeningList = listeningList;
-      }
-      else if (listeningList instanceof Array) {
+      } else if (listeningList instanceof Array) {
         isInListeningList = listeningList.indexOf(a.id) !== -1;
       }
 
@@ -125,14 +141,3 @@ export class GetAlbumResponse extends BaseResponse<TaggedAlbum> {
     return result;
   }
 }
-
-const intersect = function <T>(array1: T[], array2: T[]) {
-  array1 = array1 || [];
-  array2 = array2 || [];
-  return array1.filter(value => array2.indexOf(value) !== -1);
-};
-
-const haveCommonElements = function <T>(array1: T[], array2: T[]) {
-  const intersection = intersect(array1, array2);
-  return intersection && intersection.length > 0;
-};

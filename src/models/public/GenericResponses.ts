@@ -37,7 +37,7 @@ export class ErrorResponse extends BaseResponse<undefined> {
  */
 export class BadRequestErrorResponse extends ErrorResponse {
   constructor(description: string) {
-    super("400", description, 400);
+    super('400', description, 400);
   }
 }
 

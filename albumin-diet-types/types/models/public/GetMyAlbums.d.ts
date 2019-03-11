@@ -1,8 +1,8 @@
-import { IAlbum } from "../interfaces/IAlbum";
-import { ITag } from "../interfaces/ITag";
-import { BaseResponse, BasePaginationRequest } from "./GenericResponses";
-import { AlbumObjectFull } from "spotify-web-api-node-typings";
-import { IUser } from "../interfaces/IUser";
+import { IAlbum } from '../interfaces/IAlbum';
+import { ITag } from '../interfaces/ITag';
+import { BaseResponse, BasePaginationRequest } from './GenericResponses';
+import { AlbumObjectFull } from 'spotify-web-api-node-typings';
+import { IUser } from '../interfaces/IUser';
 export declare class GetMyAlbumsRequest extends BasePaginationRequest {
     tags?: string;
     untagged?: string;

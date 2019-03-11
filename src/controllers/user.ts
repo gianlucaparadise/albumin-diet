@@ -1,12 +1,12 @@
-import { Request, Response, NextFunction } from "express";
-import { ErrorResponse } from "../models/public/GenericResponses";
-import { SpotifyApiManager } from "../managers/SpotifyApiManager";
-import { errorHandler } from "../util/errorHandler";
-import { GetProfileResponse } from "../models/public/GetProfile";
-import { IUserDocument } from "../models/User";
+import { Request, Response, NextFunction } from 'express';
+import { ErrorResponse } from '../models/public/GenericResponses';
+import { SpotifyApiManager } from '../managers/SpotifyApiManager';
+import { errorHandler } from '../util/errorHandler';
+import { GetProfileResponse } from '../models/public/GetProfile';
+import { IUserDocument } from '../models/User';
 
 export let login = (req: Request, res: Response) => {
-  res.render("login");
+  res.render('login');
 };
 
 export let prepareAuthSpotify = (req: Request, res: Response, next: NextFunction) => {
@@ -21,7 +21,7 @@ export let authSpotify = (req: Request, res: Response) => {
 
 export let authSpotifyCallback = (req: Request, res: Response, next: NextFunction) => {
   if (!req.user) {
-    return res.status(401).send(new ErrorResponse("401", "User Not Authenticated"));
+    return res.status(401).send(new ErrorResponse('401', 'User Not Authenticated'));
   }
 
   // prepare token for API

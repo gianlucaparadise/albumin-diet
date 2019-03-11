@@ -1,33 +1,32 @@
-"use strict";
-
-import { Response, Request, NextFunction } from "express";
-import { SpotifyApiManager } from "../managers/SpotifyApiManager";
-import { AlbumManager } from "../managers/AlbumManager";
-import { TagOnAlbumRequest } from "../models/public/SetTagOnAlbumRequest";
-import { AlbumRequest } from "../models/public/AlbumRequest";
-import { EmptyResponse, BadRequestErrorResponse, BasePaginationRequest, ErrorResponse } from "../models/public/GenericResponses";
-import { Tag } from "../models/Tag";
-import { Album } from "../models/Album";
-import { AlbumTag } from "../models/AlbumTag";
-import { IUserDocument } from "../models/User";
-import { GetMyAlbumsResponse, GetMyAlbumsRequest, GetAlbumResponse, UserAlbumsResponse } from "../models/public/GetMyAlbums";
-import { GetMyTagsResponse } from "../models/public/GetMyTags";
-import { SearchRequest, SearchArtistResponse } from "../models/public/Search";
-import { errorHandler } from "../util/errorHandler";
-import logger from "../util/logger";
-import { AlbumObjectFull } from "spotify-web-api-node-typings";
+import { Response, Request, NextFunction } from 'express';
+import { SpotifyApiManager } from '../managers/SpotifyApiManager';
+import { AlbumManager } from '../managers/AlbumManager';
+import { TagOnAlbumRequest } from '../models/public/SetTagOnAlbumRequest';
+import { AlbumRequest } from '../models/public/AlbumRequest';
+import { EmptyResponse, BadRequestErrorResponse, BasePaginationRequest, ErrorResponse } from '../models/public/GenericResponses';
+import { Tag } from '../models/Tag';
+import { Album } from '../models/Album';
+import { AlbumTag } from '../models/AlbumTag';
+import { IUserDocument } from '../models/User';
+import { GetMyAlbumsResponse, GetMyAlbumsRequest, GetAlbumResponse, UserAlbumsResponse } from '../models/public/GetMyAlbums';
+import { GetMyTagsResponse } from '../models/public/GetMyTags';
+import { SearchRequest, SearchArtistResponse } from '../models/public/Search';
+import { errorHandler } from '../util/errorHandler';
+import logger from '../util/logger';
+import { AlbumObjectFull } from 'spotify-web-api-node-typings';
 
 export let getMyAlbums = async (req: Request, res: Response) => {
   try {
+    console.log(req.query);
     const request = <GetMyAlbumsRequest>req.query;
 
-    const tags: string[] = JSON.parse(request.tags || "[]");
+    const tags: string[] = JSON.parse(request.tags || '[]');
     const normalizedTags = tags.map(t => Tag.calculateUniqueIdByName(t));
 
-    const untagged = request.untagged && request.untagged.toLowerCase() === "true";
+    const untagged = request.untagged && request.untagged.toLowerCase() === 'true';
 
-    const limit = parseInt(request.limit) || 20;
-    const offset = parseInt(request.offset) || 0;
+    const limit = parseInt(request.limit, 10) || 20;
+    const offset = parseInt(request.offset, 10) || 0;
 
     const user = <IUserDocument>req.user;
 
@@ -39,8 +38,7 @@ export let getMyAlbums = async (req: Request, res: Response) => {
     const response = GetMyAlbumsResponse.createFromSpotifyAlbums(spotifyAlbums, tagsByAlbum, normalizedTags, untagged, user);
 
     return res.json(response);
-  }
-  catch (error) {
+  } catch (error) {
     return errorHandler(error, res);
   }
 };
@@ -54,8 +52,7 @@ export let saveAlbum = async (req: Request, res: Response) => {
     await SpotifyApiManager.AddToMyAlbum(user, spotifyId);
 
     return res.json(new EmptyResponse());
-  }
-  catch (error) {
+  } catch (error) {
     return errorHandler(error, res);
   }
 };
@@ -69,22 +66,21 @@ export let removeAlbum = async (req: Request, res: Response) => {
     await SpotifyApiManager.RemoveFromMyAlbum(user, spotifyId);
 
     return res.json(new EmptyResponse());
-  }
-  catch (error) {
+  } catch (error) {
     return errorHandler(error, res);
   }
 };
 
 export let getAlbumBySpotifyId = async (req: Request, res: Response) => {
   try {
-    const spotifyAlbumId = req.params["albumId"];
+    const spotifyAlbumId = req.params['albumId'];
     const user = <IUserDocument>req.user;
 
     const tags = await user.getTagsByAlbum(spotifyAlbumId);
 
     const spotifyAlbums = await AlbumManager.GetAlbums(user, [spotifyAlbumId]);
     if (!spotifyAlbums || spotifyAlbums.length < 1) {
-      throw new ErrorResponse("400", "Input album is a single", 400);
+      throw new ErrorResponse('400', 'Input album is a single', 400);
     }
     const album = spotifyAlbums[0];
 
@@ -93,8 +89,7 @@ export let getAlbumBySpotifyId = async (req: Request, res: Response) => {
     const response = GetAlbumResponse.createFromSpotifyAlbum(album, tags, isSavedAlbumResponse, user);
 
     return res.json(response);
-  }
-  catch (error) {
+  } catch (error) {
     return errorHandler(error, res);
   }
 };
@@ -109,8 +104,7 @@ export const getMyTags = async (req: Request, res: Response) => {
     const response = new GetMyTagsResponse(tags);
 
     return res.json(response);
-  }
-  catch (error) {
+  } catch (error) {
     return errorHandler(error, res);
   }
 };
@@ -123,26 +117,25 @@ export let setTagOnAlbum = async (req: Request, res: Response) => {
 
     const tag = await Tag.findOrCreate(body.tag.name);
     if (!tag) {
-      throw new BadRequestErrorResponse("Input tag does not exist");
+      throw new BadRequestErrorResponse('Input tag does not exist');
     }
 
     // todo: check if album really exists on spotify
     const album = await Album.findOrCreate(body.album.spotifyId);
     if (!album) {
-      throw new BadRequestErrorResponse("Input album has never been tagged");
+      throw new BadRequestErrorResponse('Input album has never been tagged');
     }
 
     const albumTag = await AlbumTag.findOrCreate(album, tag);
     if (!albumTag) {
-      throw new BadRequestErrorResponse("Input tag has never been added to input album");
+      throw new BadRequestErrorResponse('Input tag has never been added to input album');
     }
 
     const user = <IUserDocument>req.user;
     const savedUser = await user.addAlbumTag(albumTag);
 
     return res.json(new EmptyResponse());
-  }
-  catch (error) {
+  } catch (error) {
     return errorHandler(error, res);
   }
 };
@@ -152,19 +145,19 @@ export const deleteTagFromAlbum = async (req: Request, res: Response) => {
     const body = TagOnAlbumRequest.checkConsistency(req.body);
 
     const tagUniqueId = Tag.calculateUniqueIdByName(body.tag.name);
-    const tag = await Tag.findOne({ "uniqueId": tagUniqueId });
+    const tag = await Tag.findOne({ 'uniqueId': tagUniqueId });
     if (!tag) {
-      throw new BadRequestErrorResponse("Input tag does not exist");
+      throw new BadRequestErrorResponse('Input tag does not exist');
     }
 
-    const album = await Album.findOne({ "publicId.spotify": body.album.spotifyId });
+    const album = await Album.findOne({ 'publicId.spotify': body.album.spotifyId });
     if (!album) {
-      throw new BadRequestErrorResponse("Input album has never been tagged");
+      throw new BadRequestErrorResponse('Input album has never been tagged');
     }
 
-    const albumTag = await AlbumTag.findOne({ "tag": tag, "album": album });
+    const albumTag = await AlbumTag.findOne({ 'tag': tag, 'album': album });
     if (!albumTag) {
-      throw new BadRequestErrorResponse("Input tag has never been added to input album");
+      throw new BadRequestErrorResponse('Input tag has never been added to input album');
     }
 
     // todo: startTransaction (see: https://thecodebarbarian.com/a-node-js-perspective-on-mongodb-4-transactions.html)
@@ -184,8 +177,7 @@ export const deleteTagFromAlbum = async (req: Request, res: Response) => {
     // todo: commitTransaction
 
     return res.json(new EmptyResponse());
-  }
-  catch (error) {
+  } catch (error) {
     return errorHandler(error, res);
   }
 };
@@ -194,8 +186,8 @@ export const getListeningList = async (req: Request, res: Response) => {
   try {
     const request = <BasePaginationRequest>req.query;
 
-    const limit = parseInt(request.limit) || 20;
-    const offset = parseInt(request.offset) || 0;
+    const limit = parseInt(request.limit, 10) || 20;
+    const offset = parseInt(request.offset, 10) || 0;
 
     const user = <IUserDocument>req.user;
     let spotifyIds: string[] = user.listeningList;
@@ -211,8 +203,7 @@ export const getListeningList = async (req: Request, res: Response) => {
     const response = UserAlbumsResponse.createFromSpotifyAlbums(albumsFull, true);
 
     return res.json(response);
-  }
-  catch (error) {
+  } catch (error) {
     return errorHandler(error, res);
   }
 };
@@ -227,8 +218,7 @@ export const addToListeningList = async (req: Request, res: Response) => {
     const result = await user.addToListeningList(albumSpotifyId);
 
     return res.json(new EmptyResponse());
-  }
-  catch (error) {
+  } catch (error) {
     return errorHandler(error, res);
   }
 };
@@ -243,8 +233,7 @@ export const deleteFromListeningList = async (req: Request, res: Response) => {
     const result = await user.removeFromListeningList(albumSpotifyId);
 
     return res.json(new EmptyResponse());
-  }
-  catch (error) {
+  } catch (error) {
     return errorHandler(error, res);
   }
 };
@@ -254,8 +243,8 @@ export const searchAlbums = async (req: Request, res: Response) => {
     const requestBody = <SearchRequest>req.query;
     const keywords = requestBody.q;
 
-    const limit = parseInt(requestBody.limit) || 20;
-    const offset = parseInt(requestBody.offset) || 0;
+    const limit = parseInt(requestBody.limit, 10) || 20;
+    const offset = parseInt(requestBody.offset, 10) || 0;
 
     const user = <IUserDocument>req.user;
 
@@ -264,8 +253,7 @@ export const searchAlbums = async (req: Request, res: Response) => {
     const response = UserAlbumsResponse.createFromSpotifyAlbums(albums, user.listeningList);
 
     return res.json(response);
-  }
-  catch (error) {
+  } catch (error) {
     return errorHandler(error, res);
   }
 };
@@ -275,8 +263,8 @@ export const searchArtists = async (req: Request, res: Response) => {
     const requestBody = <SearchRequest>req.query;
     const keywords = requestBody.q;
 
-    const limit = parseInt(requestBody.limit) || 20;
-    const offset = parseInt(requestBody.offset) || 0;
+    const limit = parseInt(requestBody.limit, 10) || 20;
+    const offset = parseInt(requestBody.offset, 10) || 0;
 
     const user = <IUserDocument>req.user;
 
@@ -285,8 +273,7 @@ export const searchArtists = async (req: Request, res: Response) => {
     const response = new SearchArtistResponse(searchResponse.body);
 
     return res.json(response);
-  }
-  catch (error) {
+  } catch (error) {
     return errorHandler(error, res);
   }
 };

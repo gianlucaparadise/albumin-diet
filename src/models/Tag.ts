@@ -1,7 +1,7 @@
-import { Document, Schema, Model, model } from "mongoose";
-import { AlbumTag } from "./AlbumTag";
-import logger from "../util/logger";
-import { ITag } from "./interfaces/ITag";
+import { Document, Schema, Model, model } from 'mongoose';
+import { AlbumTag } from './AlbumTag';
+import logger from '../util/logger';
+import { ITag } from './interfaces/ITag';
 
 export interface ITagDocument extends ITag, Document {
   /**
@@ -31,7 +31,7 @@ tagSchema.methods.removeIfOrphan = async function (): Promise<boolean> {
     const tag = <ITagDocument>this;
 
     // Checking if there is still an albumTag that has this tag
-    const isTagLinked = await AlbumTag.exists({ "tag": tag._id });
+    const isTagLinked = await AlbumTag.exists({ 'tag': tag._id });
     logger.debug(`is tag orphan: ${!isTagLinked}`);
 
     if (isTagLinked) {
@@ -49,8 +49,8 @@ tagSchema.methods.removeIfOrphan = async function (): Promise<boolean> {
 
 tagSchema.statics.calculateUniqueIdByName = function (name: String): String {
   const uniqueId = name
-    .replace(/[\s_,'`]+/g, "-") // replace all unwanted chars with dashes
-    .replace(/-+/g, "-") // this removes consequent dashes
+    .replace(/[\s_,'`]+/g, '-') // replace all unwanted chars with dashes
+    .replace(/-+/g, '-') // this removes consequent dashes
     .trim() // todo: I should trim dashes
     .toLowerCase();
 
@@ -78,10 +78,9 @@ tagSchema.statics.findOrCreate = async function (name: string): Promise<ITagDocu
     const savedTag = await newTag.save();
 
     return Promise.resolve(savedTag);
-  }
-  catch (error) {
+  } catch (error) {
     return Promise.reject(error);
   }
 };
 
-export const Tag = model<ITagDocument, ITagModel>("Tag", tagSchema);
+export const Tag = model<ITagDocument, ITagModel>('Tag', tagSchema);

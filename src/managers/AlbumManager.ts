@@ -1,7 +1,7 @@
-import { IUserDocument } from "../models/User";
-import { SpotifyApiManager } from "./SpotifyApiManager";
-import logger from "../util/logger";
-import { AlbumObjectFull, SavedAlbumObject } from "spotify-web-api-node-typings";
+import { IUserDocument } from '../models/User';
+import { SpotifyApiManager } from './SpotifyApiManager';
+import logger from '../util/logger';
+import { AlbumObjectFull, SavedAlbumObject } from 'spotify-web-api-node-typings';
 
 type GetNextPage = (limit: number, offset: number) => Promise<AlbumObjectFull[]>;
 
@@ -27,9 +27,9 @@ export class AlbumManager {
    * - Unfortunately there is no official documentation about this
    */
   public static IsAlbumOrEP(album: AlbumObjectFull): boolean {
-    if (album.album_type === "album") return true; // this is an Album
+    if (album.album_type === 'album') { return true; } // this is an Album
 
-    return album.album_type === "single" && album.tracks.total > 3; // this is an EP
+    return album.album_type === 'single' && album.tracks.total > 3; // this is an EP
   }
 
   /**
@@ -71,15 +71,15 @@ export class AlbumManager {
    * Filter out singles to keep Albums and EPs
    */
   private static ExtractAlbumsAndEPs(savedAlbums: SavedAlbumObject[]): AlbumObjectFull[] {
-    const result = savedAlbums.reduce((result, savedAlbum) => {
+    const result = savedAlbums.reduce((accumulator, savedAlbum) => {
       const album = savedAlbum.album;
 
       if (!AlbumManager.IsAlbumOrEP(album)) {
-        return result;
+        return accumulator;
       }
 
-      result.push(album);
-      return result;
+      accumulator.push(album);
+      return accumulator;
     }, <AlbumObjectFull[]>[]);
 
     return result;
@@ -117,7 +117,8 @@ export class AlbumManager {
     try {
       const onNextPage = async (spotifyLimit: number, spotifyOffset: number) => {
         const response = await SpotifyApiManager.SearchAlbums(user, keywords, spotifyLimit, spotifyOffset);
-        if (!response || !response.body || !response.body.albums || !response.body.albums.items || response.body.albums.items.length === 0) {
+        if (!response || !response.body || !response.body.albums || !response.body.albums.items ||
+          response.body.albums.items.length === 0) {
           // I don't have albums anymore
           return [];
         }
@@ -158,8 +159,7 @@ export class AlbumManager {
       }
 
       return albumsFull;
-    }
-    catch (error) {
+    } catch (error) {
       return Promise.reject(error);
     }
   }

@@ -1,13 +1,13 @@
-import passport from "passport";
-import jwt from "jsonwebtoken";
-import expressJwt from "express-jwt";
+import passport from 'passport';
+import jwt from 'jsonwebtoken';
+import expressJwt from 'express-jwt';
 
-import { User } from "../models/User";
-import { Request, Response, NextFunction } from "express";
-import { SPOTIFY_ID, SPOTIFY_SECRET, JWT_SECRET } from "../util/secrets";
-import { SpotifyApiManager } from "../managers/SpotifyApiManager";
+import { User } from '../models/User';
+import { Request, Response, NextFunction } from 'express';
+import { SPOTIFY_ID, SPOTIFY_SECRET, JWT_SECRET } from '../util/secrets';
+import { SpotifyApiManager } from '../managers/SpotifyApiManager';
 
-const SpotifyStrategy = require("../../passport-spotify-fix").Strategy;
+const SpotifyStrategy = require('../../passport-spotify-fix').Strategy;
 
 passport.serializeUser<any, any>((user, done) => {
   done(undefined, user.id);
@@ -35,7 +35,7 @@ passport.use(
     {
       clientID: SPOTIFY_ID,
       clientSecret: SPOTIFY_SECRET,
-      callbackURL: "/auth/spotify/callback"
+      callbackURL: '/auth/spotify/callback'
     },
     async function (accessToken: any, refreshToken: any, expires_in: any, profile: any, done: any) {
       console.log(`accessToken: ${accessToken}\nrefreshToken: ${refreshToken}\nexpires_in: ${expires_in}`);
@@ -44,16 +44,15 @@ passport.use(
         const user = await User.upsertSpotifyUser(profile, accessToken, refreshToken);
 
         done(undefined, user);
-      }
-      catch (error) {
+      } catch (error) {
         done(error, undefined);
       }
     }
   )
 );
 
-export let spotifyAuthenticate = passport.authenticate("spotify", { session: false, scope: ["user-library-read", "user-library-modify"] });
-export let spotifyAuthenticateCallback = passport.authenticate("spotify", { failureRedirect: "/login" });
+export let spotifyAuthenticate = passport.authenticate('spotify', { session: false, scope: ['user-library-read', 'user-library-modify'] });
+export let spotifyAuthenticateCallback = passport.authenticate('spotify', { failureRedirect: '/login' });
 
 const createToken = function (auth: any) {
   return jwt.sign(
@@ -62,7 +61,7 @@ const createToken = function (auth: any) {
     },
     JWT_SECRET,
     {
-      expiresIn: "7 days"
+      expiresIn: '7 days'
     }
   );
 };
@@ -73,7 +72,7 @@ const createToken = function (auth: any) {
 export const generateToken = function (req: any, res: Response, next: NextFunction) {
   req.token = createToken(req.auth);
 
-  res.setHeader("x-auth-token", req.token);
+  res.setHeader('x-auth-token', req.token);
 
   next();
 };
@@ -90,21 +89,20 @@ export const generateAndSendToken = function (req: any, res: Response) {
     // todo: re-write spotify login flow and avoid token in querystring
     // I know this it's not good to pass a token in querystring, but I just can't make cookies work with CORS
     const callbackUrl = new URL(req.session.callback);
-    callbackUrl.searchParams.set("x-auth-token", req.token);
+    callbackUrl.searchParams.set('x-auth-token', req.token);
 
     res.redirect(callbackUrl.toString());
-  }
-  else {
+  } else {
     res.status(200).send({ auth: req.auth, token: req.token });
   }
 };
 
 export const authenticate = expressJwt({
   secret: JWT_SECRET,
-  requestProperty: "auth",
+  requestProperty: 'auth',
   getToken: function fromHeader(req) {
-    if (req.headers.authorization && req.headers.authorization.split(" ")[0] === "Bearer") {
-      return req.headers.authorization.split(" ")[1];
+    if (req.headers.authorization && req.headers.authorization.split(' ')[0] === 'Bearer') {
+      return req.headers.authorization.split(' ')[1];
     }
     return undefined;
   }

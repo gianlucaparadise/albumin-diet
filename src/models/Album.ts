@@ -1,7 +1,7 @@
-import { Document, Schema, Model, model } from "mongoose";
-import { AlbumTag } from "./AlbumTag";
-import logger from "../util/logger";
-import { IAlbum } from "./interfaces/IAlbum";
+import { Document, Schema, Model, model } from 'mongoose';
+import { AlbumTag } from './AlbumTag';
+import logger from '../util/logger';
+import { IAlbum } from './interfaces/IAlbum';
 
 export interface IAlbumDocument extends IAlbum, Document {
   /**
@@ -39,7 +39,7 @@ albumSchema.methods.removeIfOrphan = async function (): Promise<boolean> {
     const album = <IAlbumDocument>this;
 
     // Checking if there is still an AlbumTag that links this album
-    const isAlbumLinked = await AlbumTag.exists({ "album": album._id });
+    const isAlbumLinked = await AlbumTag.exists({ 'album': album._id });
     logger.debug(`is album orphan: ${!isAlbumLinked}`);
 
     if (isAlbumLinked) {
@@ -57,7 +57,7 @@ albumSchema.methods.removeIfOrphan = async function (): Promise<boolean> {
 
 albumSchema.statics.findOrCreate = async function (id: string): Promise<IAlbumDocument> {
   try {
-    const album = await Album.findOne({ "publicId.spotify": id });
+    const album = await Album.findOne({ 'publicId.spotify': id });
     if (album) {
       logger.debug(`Album found: ${id}`);
       return Promise.resolve(album);
@@ -69,10 +69,9 @@ albumSchema.statics.findOrCreate = async function (id: string): Promise<IAlbumDo
     const savedAlbum = await newAlbum.save();
 
     return Promise.resolve(savedAlbum);
-  }
-  catch (error) {
+  } catch (error) {
     return Promise.reject(error);
   }
 };
 
-export const Album = model<IAlbumDocument, IAlbumModel>("Album", albumSchema);
+export const Album = model<IAlbumDocument, IAlbumModel>('Album', albumSchema);

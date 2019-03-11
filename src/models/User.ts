@@ -1,12 +1,12 @@
-import { Document, Schema, Model, model, Types } from "mongoose";
-import { IAlbumTagDocument } from "./AlbumTag";
-import { TagsByAlbum } from "./public/GetMyAlbums";
-import { BadRequestErrorResponse } from "./public/GenericResponses";
-import { ITagDocument } from "./Tag";
-import logger from "../util/logger";
-import { encrypt, decrypt } from "../config/encrypto";
-import { UserProfileAuthenticationNodeResponse } from "spotify-web-api-node-typings";
-import { IUser } from "./interfaces/IUser";
+import { Document, Schema, Model, model, Types } from 'mongoose';
+import { IAlbumTagDocument } from './AlbumTag';
+import { TagsByAlbum } from './public/GetMyAlbums';
+import { BadRequestErrorResponse } from './public/GenericResponses';
+import { ITagDocument } from './Tag';
+import logger from '../util/logger';
+import { encrypt, decrypt } from '../config/encrypto';
+import { UserProfileAuthenticationNodeResponse } from 'spotify-web-api-node-typings';
+import { IUser } from './interfaces/IUser';
 
 export interface IUserDocument extends IUser, Document {
 
@@ -80,20 +80,20 @@ export const userSchema: Schema = new Schema({
     refreshToken: String,
   },
   displayName: String,
-  albumTags: [{ type: Schema.Types.ObjectId, ref: "AlbumTag" }],
+  albumTags: [{ type: Schema.Types.ObjectId, ref: 'AlbumTag' }],
   listeningList: [{ type: String }],
 }, { timestamps: true });
 
-userSchema.pre("save", function (next) {
+userSchema.pre('save', function (next) {
   const user = <IUserDocument>this;
 
   // I encrypt tokens and save them
-  if (user.isModified("spotify.accessToken")) {
+  if (user.isModified('spotify.accessToken')) {
     const encrypted = encrypt(user.spotify.accessToken);
     user.spotify.accessToken = encrypted;
   }
 
-  if (user.isModified("spotify.refreshToken")) {
+  if (user.isModified('spotify.refreshToken')) {
     const encrypted = encrypt(user.spotify.refreshToken);
     user.spotify.refreshToken = encrypted;
   }
@@ -108,16 +108,6 @@ userSchema.pre("save", function (next) {
 //   user.spotify.accessToken = decrypt(user.spotify.accessToken);
 //   user.spotify.refreshToken = decrypt(user.spotify.refreshToken);
 //   return user;
-// });
-
-// userSchema.pre("init", function (next, data) {
-//   // This is not working because it seems it's to early
-//   console.log(data);
-//   console.log(this);
-//   const user = <IUser>this;
-//   user.spotify.accessToken = decrypt(user.spotify.accessToken);
-//   user.spotify.refreshToken = decrypt(user.spotify.refreshToken);
-//   next();
 // });
 
 userSchema.methods.getDecryptedAccessToken = function (): string {
@@ -139,13 +129,12 @@ userSchema.methods.addAlbumTag = async function (albumTag: IAlbumTagDocument): P
     const countAfterAdd = thisUser.albumTags.length;
 
     if (countAfterAdd === countBeforeAdd) {
-      throw new BadRequestErrorResponse("Input tag already is one of the current user's tags");
+      throw new BadRequestErrorResponse('Input tag already is one of the current user\'s tags');
     }
 
     const savedUser = await thisUser.save();
     return Promise.resolve(savedUser);
-  }
-  catch (error) {
+  } catch (error) {
     logger.error(error);
     return Promise.reject(error);
   }
@@ -160,14 +149,13 @@ userSchema.methods.removeAlbumTag = async function (albumTag: IAlbumTagDocument)
     const countAfterPull = user.albumTags.length;
 
     if (countBeforePull === countAfterPull) {
-      throw new BadRequestErrorResponse("Input tag is not one of the current user's tags");
+      throw new BadRequestErrorResponse('Input tag is not one of the current user\'s tags');
     }
 
     const savedUser = await user.save();
     logger.debug(`AlbumTag deleted from user`);
     return Promise.resolve(savedUser);
-  }
-  catch (error) {
+  } catch (error) {
     logger.error(error);
     return Promise.reject(error);
   }
@@ -178,8 +166,8 @@ userSchema.methods.getTagsGroupedByAlbum = async function (): Promise<TagsByAlbu
     const thisUser = <IUserDocument>this;
     await thisUser
       .populate({
-        path: "albumTags",
-        populate: [{ path: "tag", select: "uniqueId name" }, { path: "album" }],
+        path: 'albumTags',
+        populate: [{ path: 'tag', select: 'uniqueId name' }, { path: 'album' }],
       })
       .execPopulate();
 
@@ -210,7 +198,7 @@ userSchema.methods.getTags = async function (): Promise<ITagDocument[]> {
   try {
     const thisUser = <IUserDocument>this;
     await thisUser
-      .populate({ path: "albumTags", populate: [{ path: "tag" }] })
+      .populate({ path: 'albumTags', populate: [{ path: 'tag' }] })
       .execPopulate();
 
     const result = thisUser.albumTags.reduce((tags, albumTag) => {
@@ -237,8 +225,8 @@ userSchema.methods.getTagsByAlbum = async function (spotifyAlbumId: string): Pro
     const thisUser = <IUserDocument>this;
     await thisUser
       .populate({
-        path: "albumTags",
-        populate: [{ path: "tag" }, { path: "album", select: "publicId.spotify" }],
+        path: 'albumTags',
+        populate: [{ path: 'tag' }, { path: 'album', select: 'publicId.spotify' }],
         // match: { "album.publicId.spotify": spotifyAlbumId },
       })
       .execPopulate();
@@ -267,15 +255,14 @@ userSchema.methods.addToListeningList = async function (spotifyAlbumId: string):
     const index = thisUser.listeningList.indexOf(spotifyAlbumId);
 
     if (index >= 0) {
-      throw new BadRequestErrorResponse("Input album already is in the current user's listening list");
+      throw new BadRequestErrorResponse('Input album already is in the current user\'s listening list');
     }
 
     thisUser.listeningList.push(spotifyAlbumId);
 
     const savedUser = await thisUser.save();
     return Promise.resolve(savedUser);
-  }
-  catch (error) {
+  } catch (error) {
     logger.error(error);
     return Promise.reject(error);
   }
@@ -290,14 +277,13 @@ userSchema.methods.removeFromListeningList = async function (spotifyAlbumId: str
     const countAfterPull = user.listeningList.length;
 
     if (countBeforePull === countAfterPull) {
-      throw new BadRequestErrorResponse("Input Album is not in current user's listening list");
+      throw new BadRequestErrorResponse('Input Album is not in current user\'s listening list');
     }
 
     const savedUser = await user.save();
     logger.debug(`Album deleted from user's listening list`);
     return Promise.resolve(savedUser);
-  }
-  catch (error) {
+  } catch (error) {
     logger.error(error);
     return Promise.reject(error);
   }
@@ -317,17 +303,21 @@ userSchema.methods.updateSpotifyAccessToken = async function (spotifyAccessToken
   }
 };
 
-userSchema.statics.upsertSpotifyUser = async function (profile: UserProfileAuthenticationNodeResponse, accessToken: string, refreshToken: string): Promise<IUserDocument> {
+userSchema.statics.upsertSpotifyUser = async function (
+  profile: UserProfileAuthenticationNodeResponse,
+  accessToken: string,
+  refreshToken: string): Promise<IUserDocument> {
+
   try {
     const user = await User.findOne({
-      "spotify.id": profile.id
+      'spotify.id': profile.id
     });
 
     if (user) {
       user.spotify = Object.assign(user.spotify, { accessToken: accessToken, refreshToken: refreshToken });
       user.displayName = profile.displayName;
-      const savedUser = await user.save();
-      return Promise.resolve(savedUser);
+      const savedUser0 = await user.save();
+      return Promise.resolve(savedUser0);
     }
 
     // no user was found: we create a new one
@@ -341,10 +331,9 @@ userSchema.statics.upsertSpotifyUser = async function (profile: UserProfileAuthe
 
     const savedUser = await newUser.save();
     return Promise.resolve(savedUser);
-  }
-  catch (error) {
+  } catch (error) {
     return Promise.reject(error);
   }
 };
 
-export const User: IUserModel = model<IUserDocument, IUserModel>("User", userSchema);
+export const User: IUserModel = model<IUserDocument, IUserModel>('User', userSchema);

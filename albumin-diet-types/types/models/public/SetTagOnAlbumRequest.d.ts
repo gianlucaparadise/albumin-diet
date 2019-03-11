@@ -1,4 +1,4 @@
-import { AlbumRequest } from "./AlbumRequest";
+import { AlbumRequest } from './AlbumRequest';
 export declare class TagOnAlbumRequest extends AlbumRequest {
     tag: {
         name: string;

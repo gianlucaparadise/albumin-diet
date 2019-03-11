@@ -1,4 +1,4 @@
-import { IAlbumTag } from "./IAlbumTag";
+import { IAlbumTag } from './IAlbumTag';
 
 export interface IUser {
   spotify: {

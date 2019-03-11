@@ -1,10 +1,10 @@
-import mongoose from "mongoose";
-import { model, Document, Schema, Model } from "mongoose";
-import { IAlbumDocument } from "./Album";
-import { ITagDocument } from "./Tag";
-import { User } from "./User";
-import logger from "../util/logger";
-import { IAlbumTag } from "./interfaces/IAlbumTag";
+import mongoose from 'mongoose';
+import { model, Document, Schema, Model } from 'mongoose';
+import { IAlbumDocument } from './Album';
+import { ITagDocument } from './Tag';
+import { User } from './User';
+import logger from '../util/logger';
+import { IAlbumTag } from './interfaces/IAlbumTag';
 
 export interface IAlbumTagDocument extends IAlbumTag, Document {
   /**
@@ -25,8 +25,8 @@ export interface IAlbumTagModel extends Model<IAlbumTagDocument> {
 }
 
 const albumTagSchema = new Schema({
-  album: { type: Schema.Types.ObjectId, ref: "Album" },
-  tag: { type: Schema.Types.ObjectId, ref: "Tag" },
+  album: { type: Schema.Types.ObjectId, ref: 'Album' },
+  tag: { type: Schema.Types.ObjectId, ref: 'Tag' },
 }, { timestamps: true });
 
 albumTagSchema.methods.removeIfOrphan = async function (): Promise<boolean> {
@@ -34,7 +34,7 @@ albumTagSchema.methods.removeIfOrphan = async function (): Promise<boolean> {
     const albumTag = <IAlbumTagDocument>this;
 
     // Checking if there is still a user that has this albumTag in his list
-    const isAlbumTagLinked = await User.exists({ "albumTags": albumTag._id });
+    const isAlbumTagLinked = await User.exists({ 'albumTags': albumTag._id });
     logger.debug(`is albumTag orphan: ${!isAlbumTagLinked}`);
 
     if (isAlbumTagLinked) {
@@ -73,4 +73,4 @@ albumTagSchema.statics.findOrCreate = async function (album: IAlbumDocument, tag
   }
 };
 
-export const AlbumTag: IAlbumTagModel = model<IAlbumTagDocument, IAlbumTagModel>("AlbumTag", albumTagSchema);
+export const AlbumTag: IAlbumTagModel = model<IAlbumTagDocument, IAlbumTagModel>('AlbumTag', albumTagSchema);

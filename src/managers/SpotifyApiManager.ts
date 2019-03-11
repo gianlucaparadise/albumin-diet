@@ -1,9 +1,14 @@
-import { SPOTIFY_ID, SPOTIFY_SECRET } from "../util/secrets";
-import { IUserDocument } from "../models/User";
-import logger from "../util/logger";
+import { SPOTIFY_ID, SPOTIFY_SECRET } from '../util/secrets';
+import { IUserDocument } from '../models/User';
+import logger from '../util/logger';
 
-import SpotifyWebApi from "spotify-web-api-node";
-import { UserObjectPrivateNodeResponse, UsersSavedAlbumsNodeResponse, PagingRequestObject, MultipleAlbumsNodeResponse, AlbumObjectFull, AlbumSearchNodeResponse, ArtistSearchNodeResponse } from "spotify-web-api-node-typings";
+import SpotifyWebApi from 'spotify-web-api-node';
+import {
+  UserObjectPrivateNodeResponse, UsersSavedAlbumsNodeResponse,
+  PagingRequestObject, MultipleAlbumsNodeResponse,
+  AlbumObjectFull, AlbumSearchNodeResponse,
+  ArtistSearchNodeResponse
+} from 'spotify-web-api-node-typings';
 
 // credentials are optional
 const spotifyApi = new SpotifyWebApi({
@@ -32,12 +37,12 @@ export class SpotifyApiManager {
   }
 
   private static async RefreshToken(user: IUserDocument): Promise<boolean> {
-    logger.debug("Refreshing spotify token");
+    logger.debug('Refreshing spotify token');
 
     try {
       const data = await SpotifyApiManager.Api.refreshAccessToken();
 
-      const accessToken: string = data.body["access_token"];
+      const accessToken: string = data.body['access_token'];
 
       const newUser = await user.updateSpotifyAccessToken(accessToken);
 
@@ -45,7 +50,7 @@ export class SpotifyApiManager {
       return Promise.resolve(true);
 
     } catch (error) {
-      logger.error("Error while refreshing token: ");
+      logger.error('Error while refreshing token: ');
       logger.error(error);
 
       return Promise.reject(error);
@@ -65,17 +70,15 @@ export class SpotifyApiManager {
       // the request will use the old spotifyApi instance with the old accessToken
       const req = buildRequest();
       return await req;
-    }
-    catch (error) {
-      if (error.statusCode == 401) {
+    } catch (error) {
+      if (error.statusCode === 401) {
         const hasRefreshed = await SpotifyApiManager.RefreshToken(user);
         if (hasRefreshed) {
           // now that is refreshed, I re-try one last time the initial request
           try {
             const req = buildRequest();
             return await req;
-          }
-          catch (error2) {
+          } catch (error2) {
             // If I get again an error, I don't want to try another time to avoid a long loop
             return Promise.reject(error2);
           }
@@ -108,8 +111,7 @@ export class SpotifyApiManager {
       const response = await this.request(user, () => SpotifyApiManager.Api.getMySavedAlbums(params));
 
       return Promise.resolve(response);
-    }
-    catch (error) {
+    } catch (error) {
       return Promise.reject(error);
     }
   }
@@ -124,8 +126,7 @@ export class SpotifyApiManager {
       const response = await this.request(user, () => SpotifyApiManager.Api.getAlbums(ids));
 
       return Promise.resolve(response);
-    }
-    catch (error) {
+    } catch (error) {
       return Promise.reject(error);
     }
   }
@@ -143,13 +144,12 @@ export class SpotifyApiManager {
 
       // FIXME: This API supports max 50 tracks. If input album has more than 50 tracks, I need to check tracks in blocks of 50 tracks
       const response = await this.request(user, () => SpotifyApiManager.Api.containsMySavedTracks(trackIds));
-      const result = response.body.indexOf(false) == -1;
+      const result = response.body.indexOf(false) === -1;
 
       // I can't use containsMySavedTracks API because returns true when at least one track is saved. I need to check full albums.
 
       return Promise.resolve(result);
-    }
-    catch (error) {
+    } catch (error) {
       return Promise.reject(error);
     }
   }
@@ -194,13 +194,13 @@ export class SpotifyApiManager {
       const response = await this.request(user, () => SpotifyApiManager.Api.searchAlbums(keywords, options));
 
       return Promise.resolve(response);
-    }
-    catch (error) {
+    } catch (error) {
       return Promise.reject(error);
     }
   }
 
-  public static async SearchArtists(user: IUserDocument, keywords: string, limit: number, offset: number): Promise<ArtistSearchNodeResponse> {
+  public static async SearchArtists(user: IUserDocument, keywords: string,
+    limit: number, offset: number): Promise<ArtistSearchNodeResponse> {
 
     try {
       const options = {
@@ -210,8 +210,7 @@ export class SpotifyApiManager {
       const response = await this.request(user, () => SpotifyApiManager.Api.searchArtists(keywords, options));
 
       return Promise.resolve(response);
-    }
-    catch (error) {
+    } catch (error) {
       return Promise.reject(error);
     }
   }
