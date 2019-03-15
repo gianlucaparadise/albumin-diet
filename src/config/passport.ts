@@ -6,6 +6,7 @@ import { User } from '../models/User';
 import { Request, Response, NextFunction } from 'express';
 import { SPOTIFY_ID, SPOTIFY_SECRET, JWT_SECRET } from '../util/secrets';
 import { SpotifyApiManager } from '../managers/SpotifyApiManager';
+import { SendTokenResponse } from '../models/public/GetProfile';
 
 const SpotifyStrategy = require('../../passport-spotify-fix').Strategy;
 
@@ -93,7 +94,8 @@ export const generateAndSendToken = function (req: any, res: Response) {
 
     res.redirect(callbackUrl.toString());
   } else {
-    res.status(200).send({ auth: req.auth, token: req.token });
+    const tokenResponse: SendTokenResponse = { auth: req.auth, token: req.token };
+    res.status(200).send(tokenResponse);
   }
 };
 
