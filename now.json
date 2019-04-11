@@ -1,0 +1,25 @@
+{
+  "version": 2,
+  "name": "albumin-diet-engine",
+  "alias": "albumin-diet-engine",
+  "builds": [
+    {
+      "src": "**/*.ts",
+      "use": "@now/node"
+    },
+    {
+      "src": "src/public/*",
+      "use": "@now/static"
+    },
+    {
+      "src": "*.pug",
+      "use": "@now/static"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/(.*)",
+      "dest": "/src/app.ts"
+    }
+  ]
+}

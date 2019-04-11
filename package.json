@@ -11,6 +11,7 @@
     "node": "11.0.0"
   },
   "private": true,
+  "main": "src/app.ts",
   "workspaces": [
     "albumin-diet-types",
     "spotify-web-api-node-typings"
@@ -18,7 +19,8 @@
   "scripts": {
     "heroku-postbuild": "npm run build-ts && npm run copy-static-assets",
     "prestart": "npm run build",
-    "start": "npm run serve",
+    "start": "ts-node src/app.ts",
+    "start-server": "npm run serve",
     "build": "npm run clean && npm run build-ts && npm run tslint && npm run copy-static-assets",
     "clean": "rm -rf dist && rm -rf albumin-diet-types/types",
     "serve": "node dist/server.js",
@@ -38,7 +40,9 @@
     "watch-debug": "concurrently -k -p \"[{name}]\" -n \"Sass,TypeScript,Node\" -c \"yellow.bold,cyan.bold,green.bold\" \"npm run watch-sass\" \"npm run watch-ts\" \"npm run serve-debug\"",
     "update-types": "yarn workspace albumin-diet-types add spotify-web-api-node-typings@latest",
     "publish-types": "yarn workspace albumin-diet-types publish",
-    "publish-spotify-types": "yarn workspace spotify-web-api-node-typings publish"
+    "publish-spotify-types": "yarn workspace spotify-web-api-node-typings publish",
+    "deploy": "now && npm run rm-deploys",
+    "rm-deploys": "now rm --safe --yes albumin-diet-engine"
   },
   "dependencies": {
     "async": "^2.6.0",
