@@ -4,17 +4,6 @@ import { BaseResponse, BasePaginationRequest } from './GenericResponses';
 import { AlbumObjectFull } from 'spotify-web-api-node-typings';
 import { IUser } from '../interfaces/IUser';
 
-const intersect = function <T>(array1: T[], array2: T[]) {
-  array1 = array1 || [];
-  array2 = array2 || [];
-  return array1.filter(value => array2.indexOf(value) !== -1);
-};
-
-const haveCommonElements = function <T>(array1: T[], array2: T[]) {
-  const intersection = intersect(array1, array2);
-  return intersection && intersection.length > 0;
-};
-
 export class GetMyAlbumsRequest extends BasePaginationRequest {
   /**
    * This is a stringified JSON array
@@ -65,37 +54,37 @@ export class GetMyAlbumsResponse extends BaseResponse<TaggedAlbum[]> {
   static createFromSpotifyAlbums(
     spotifyAlbums: AlbumObjectFull[],
     tagsByAlbum: TagsByAlbum,
-    tagFilter: string[],
-    untagged: boolean,
+    // tagFilter: string[],
+    // untagged: boolean,
     user: IUser
   ): GetMyAlbumsResponse {
 
     // Grouping albums by spotifyId
-    tagFilter = tagFilter || [];
+    // tagFilter = tagFilter || [];
 
-    const hasTagFilter = tagFilter.length > 0;
-    const hasFilters = untagged || hasTagFilter;
+    // const hasTagFilter = tagFilter.length > 0;
+    // const hasFilters = untagged || hasTagFilter;
 
     const taggedAlbumList = spotifyAlbums.reduce((taggedAlbums, x) => {
       const spotifyAlbum = x;
       const grouped = tagsByAlbum[x.id];
       const tags = grouped ? grouped.tags : [];
-      const tagNames = tags.map(t => t.uniqueId);
+      // const tagNames = tags.map(t => t.uniqueId);
 
       // If no filters in input: I return them all
       // If I have filters in input: I return only the one that matches at least one filter
 
-      if (hasFilters) {
-        // If I have filters, I get only the albumTags that match at least one filter
-        // The filters are meant to be in OR and not in AND
-        let matchesFilter = false;
-        matchesFilter = matchesFilter || (untagged && tags.length === 0);
-        matchesFilter = matchesFilter || (hasTagFilter && haveCommonElements(tagNames, tagFilter));
+      // if (hasFilters) {
+      //   // If I have filters, I get only the albumTags that match at least one filter
+      //   // The filters are meant to be in OR and not in AND
+      //   let matchesFilter = false;
+      //   matchesFilter = matchesFilter || (untagged && tags.length === 0);
+      //   matchesFilter = matchesFilter || (hasTagFilter && haveCommonElements(tagNames, tagFilter));
 
-        if (!matchesFilter) {
-          return taggedAlbums;
-        }
-      }
+      //   if (!matchesFilter) {
+      //     return taggedAlbums;
+      //   }
+      // }
 
       const isInListeningList = user.listeningList.indexOf(spotifyAlbum.id) >= 0;
       const taggedAlbum: TaggedAlbum = { album: spotifyAlbum, tags: tags, isSavedAlbum: true, isInListeningList: isInListeningList, };

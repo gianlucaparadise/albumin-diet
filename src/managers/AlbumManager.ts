@@ -2,8 +2,20 @@ import { IUserDocument } from '../models/User';
 import { SpotifyApiManager } from './SpotifyApiManager';
 import logger from '../util/logger';
 import { AlbumObjectFull, SavedAlbumObject } from 'spotify-web-api-node-typings';
+import { TagsByAlbum } from '../models/public/GetMyAlbums';
 
 type GetNextPage = (limit: number, offset: number) => Promise<AlbumObjectFull[]>;
+
+const intersect = function <T>(array1: T[], array2: T[]) {
+  array1 = array1 || [];
+  array2 = array2 || [];
+  return array1.filter(value => array2.indexOf(value) !== -1);
+};
+
+const haveCommonElements = function <T>(array1: T[], array2: T[]) {
+  const intersection = intersect(array1, array2);
+  return intersection && intersection.length > 0;
+};
 
 /**
  * This class helps filtering out singles to keep Albums and EPs
@@ -30,6 +42,38 @@ export class AlbumManager {
     if (album.album_type === 'album') { return true; } // this is an Album
 
     return album.album_type === 'single' && album.tracks.total > 3; // this is an EP
+  }
+
+  /**
+   * Return `true` when the input album matches the filters or there aren't filters in input.
+   * @param tagsByAlbum user's tags grouped by album spotify id
+   * @param tagFilter When evaluated, only the albums with these tags will be returned
+   * @param untagged When `true`, only the albums without tags will be returned
+   */
+  public static MatchesFilters(album: AlbumObjectFull, tagsByAlbum: TagsByAlbum, tagFilter: string[], untagged: boolean): boolean {
+    tagFilter = tagFilter || [];
+
+    const hasTagFilter = tagFilter.length > 0;
+    const hasFilters = untagged || hasTagFilter;
+
+    // If no filters in input: I return them all
+    // If I have filters in input: I return only the one that matches at least one filter
+
+    if (!hasFilters) {
+      return true;
+    }
+
+    const grouped = tagsByAlbum[album.id];
+    const tags = grouped ? grouped.tags : [];
+    const tagNames = tags.map(t => t.uniqueId);
+
+    // If I have filters, I get only the albumTags that match at least one filter
+    // The filters are meant to be in OR and not in AND
+    let matchesFilter = false;
+    matchesFilter = matchesFilter || (untagged && tags.length === 0);
+    matchesFilter = matchesFilter || (hasTagFilter && haveCommonElements(tagNames, tagFilter));
+
+    return matchesFilter;
   }
 
   /**
@@ -69,12 +113,24 @@ export class AlbumManager {
 
   /**
    * Filter out singles to keep Albums and EPs
+   * @param tagsByAlbum user's tags grouped by album spotify id
+   * @param tagFilter When evaluated, only the albums with these tags will be returned
+   * @param untagged When `true`, only the albums without tags will be returned
    */
-  private static ExtractAlbumsAndEPs(savedAlbums: SavedAlbumObject[]): AlbumObjectFull[] {
+  private static ExtractAlbumsAndEPs(
+    savedAlbums: SavedAlbumObject[],
+    tagsByAlbum: TagsByAlbum = null,
+    tagFilter: string[] = null,
+    untagged: boolean = null
+  ): AlbumObjectFull[] {
     const result = savedAlbums.reduce((accumulator, savedAlbum) => {
       const album = savedAlbum.album;
 
       if (!AlbumManager.IsAlbumOrEP(album)) {
+        return accumulator;
+      }
+
+      if (!AlbumManager.MatchesFilters(album, tagsByAlbum, tagFilter, untagged)) {
         return accumulator;
       }
 
@@ -87,8 +143,18 @@ export class AlbumManager {
 
   /**
    * This filters out singles to return only Albums and EPs
+   * @param tagsByAlbum user's tags grouped by album spotify id
+   * @param tagFilter When evaluated, only the albums with these tags will be returned
+   * @param untagged When `true`, only the albums without tags will be returned
    */
-  public static async GetMySavedAlbums(user: IUserDocument, limit: number = 20, offset: number = 0): Promise<AlbumObjectFull[]> {
+  public static async GetMySavedAlbums(
+    user: IUserDocument,
+    tagsByAlbum: TagsByAlbum,
+    tagFilter: string[],
+    untagged: boolean,
+    limit: number = 20,
+    offset: number = 0
+  ): Promise<AlbumObjectFull[]> {
 
     try {
       const onNextPage = async (spotifyLimit: number, spotifyOffset: number) => {
@@ -98,7 +164,7 @@ export class AlbumManager {
           return [];
         }
 
-        return AlbumManager.ExtractAlbumsAndEPs(response.body.items);
+        return AlbumManager.ExtractAlbumsAndEPs(response.body.items, tagsByAlbum, tagFilter, untagged);
       };
 
       const result = await this.extractPage(limit, offset, onNextPage);

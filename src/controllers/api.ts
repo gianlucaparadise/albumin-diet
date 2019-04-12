@@ -30,12 +30,10 @@ export let getMyAlbums = async (req: Request, res: Response) => {
 
     const user = <IUserDocument>req.user;
 
-    // todo: check how to parallelize spotify request and db query
     const tagsByAlbum = await user.getTagsGroupedByAlbum();
-    const spotifyAlbums = await AlbumManager.GetMySavedAlbums(user, limit, offset);
+    const spotifyAlbums = await AlbumManager.GetMySavedAlbums(user, tagsByAlbum, normalizedTags, untagged, limit, offset);
 
-    // FIXME: this breaks pagination
-    const response = GetMyAlbumsResponse.createFromSpotifyAlbums(spotifyAlbums, tagsByAlbum, normalizedTags, untagged, user);
+    const response = GetMyAlbumsResponse.createFromSpotifyAlbums(spotifyAlbums, tagsByAlbum, user);
 
     return res.json(response);
   } catch (error) {

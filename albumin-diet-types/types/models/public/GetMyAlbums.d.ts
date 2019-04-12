@@ -22,7 +22,7 @@ export declare class TaggedAlbum extends UserAlbum {
     isSavedAlbum: boolean;
 }
 export declare class GetMyAlbumsResponse extends BaseResponse<TaggedAlbum[]> {
-    static createFromSpotifyAlbums(spotifyAlbums: AlbumObjectFull[], tagsByAlbum: TagsByAlbum, tagFilter: string[], untagged: boolean, user: IUser): GetMyAlbumsResponse;
+    static createFromSpotifyAlbums(spotifyAlbums: AlbumObjectFull[], tagsByAlbum: TagsByAlbum, user: IUser): GetMyAlbumsResponse;
 }
 export declare class UserAlbumsResponse extends BaseResponse<UserAlbum[]> {
     static createFromSpotifyAlbums(spotifyAlbums: AlbumObjectFull[], listeningList: boolean | string[]): UserAlbumsResponse;
