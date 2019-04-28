@@ -1,10 +1,8 @@
 import logger from './logger';
 import fs from 'fs';
 
-if (fs.existsSync('.env')) {
-  require('dotenv').config({
-    path: '.env',
-  });
+if (fs.existsSync('now-secrets.json')) {
+  require('now-env');
 }
 
 export const ENVIRONMENT = process.env.NOW_ENV; // i'm using env variables from zeit/now

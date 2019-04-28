@@ -2,6 +2,16 @@
   "version": 2,
   "name": "albumin-diet-engine",
   "alias": "albumin-diet-engine",
+  "env": {
+    "JWT_SECRET": "@jwt_secret",
+    "MONGODB_URI": "@mongodb_uri",
+    "SESSION_SECRET": "@session_secret",
+    "USER_CRYPT_SECRET": "@user_crypt_secret",
+    "USER_CRYPT_SALT": "@user_crypt_salt",
+    "SPOTIFY_ID": "@spotify_id",
+    "SPOTIFY_SECRET": "@spotify_secret",
+    "NOW_ENV": "stage"
+  },
   "builds": [
     {
       "src": "**/*.ts",
