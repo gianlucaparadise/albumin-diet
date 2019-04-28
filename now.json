@@ -14,7 +14,7 @@
   },
   "builds": [
     {
-      "src": "**/*.ts",
+      "src": "src/app.ts",
       "use": "@now/node"
     },
     {

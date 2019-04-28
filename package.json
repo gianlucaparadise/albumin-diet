@@ -8,7 +8,7 @@
   },
   "license": "Apache-2.0",
   "engines": {
-    "node": "11.0.0"
+    "node": ">= 8.10.0"
   },
   "private": true,
   "main": "src/app.ts",
@@ -20,7 +20,7 @@
     "heroku-postbuild": "npm run build-ts && npm run copy-static-assets",
     "prestart": "npm run build",
     "start": "ts-node src/app.ts",
-    "start-server": "npm run serve",
+    "start-server": "npm run build && npm run serve",
     "build": "npm run clean && npm run build-ts && npm run tslint && npm run copy-static-assets",
     "clean": "rm -rf dist && rm -rf albumin-diet-types/types",
     "serve": "node dist/server.js",

@@ -12,9 +12,6 @@
     "show-pack": "npm pack && tar -xvzf *.tgz && rm -rf package *.tgz"
   },
   "license": "Apache-2.0",
-  "engines": {
-    "node": "11.0.0"
-  },
   "files": [
     "index.d.ts",
     "spotify-web-api-typings.d.ts",
