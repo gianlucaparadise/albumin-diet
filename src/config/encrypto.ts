@@ -4,15 +4,17 @@ import { USER_CRYPT_SECRET, USER_CRYPT_SALT } from '../util/secrets';
 import logger from '../util/logger';
 
 const IV_LENGTH = 16; // For AES, this is always 16
-const algorithm = 'aes-192-cbc';
+const algorithm = 'aes-256-cbc';
+
+const keyBufferFull = Buffer.from(USER_CRYPT_SECRET + USER_CRYPT_SALT); // With this line I may have a buffer longer than 32 bytes
+const keyBuffer = Buffer.alloc(32, keyBufferFull); // I need a 32 bytes buffer as key
 
 export function encrypt(text: String) {
   if (text === null || typeof text === 'undefined') {
     return text;
   }
 
-  // FIXME: Use the async `crypto.scrypt()` instead.
-  const key = (<any>crypto).scryptSync(USER_CRYPT_SECRET, USER_CRYPT_SALT, 24);
+  const key = Buffer.from(keyBuffer);
   const iv = crypto.randomBytes(IV_LENGTH);
 
   const cipher = crypto.createCipheriv(algorithm, key, iv);
@@ -28,8 +30,7 @@ export function decrypt(encryptedTextAndIv: String): string {
     return encryptedTextAndIv.toString();
   }
 
-  // FIXME: Use the async `crypto.scrypt()` instead.
-  const key = (<any>crypto).scryptSync(USER_CRYPT_SECRET, USER_CRYPT_SALT, 24);
+  const key = Buffer.from(keyBuffer);
 
   const segments = encryptedTextAndIv.split('|');
   const iv = segments.shift();
