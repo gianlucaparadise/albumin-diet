@@ -5,9 +5,11 @@ if (fs.existsSync('now-secrets.json')) {
   require('now-env');
 }
 
-export const ENVIRONMENT = process.env.NOW_ENV; // i'm using env variables from zeit/now
-const prod = ENVIRONMENT === 'production'; // Anything else is treated as 'dev'
-const stage = ENVIRONMENT === 'stage';
+const ENVIRONMENT = process.env.NOW_ENV; // i'm using env variables from zeit/now
+export const prod = ENVIRONMENT === 'production'; // Anything else is treated as 'dev'
+export const stage = ENVIRONMENT === 'stage';
+export const dev = !prod && !stage;
+
 
 export const SESSION_SECRET = process.env['SESSION_SECRET'];
 export const JWT_SECRET = process.env['JWT_SECRET'];
