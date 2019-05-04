@@ -1,6 +1,7 @@
 import passport from 'passport';
 import jwt from 'jsonwebtoken';
 import expressJwt from 'express-jwt';
+import url from 'url';
 
 import { User } from '../models/User';
 import { Request, Response, NextFunction } from 'express';
@@ -88,8 +89,8 @@ export const generateAndSendToken = function (req: any, res: Response) {
 
   if (req.session.callback) {
     // todo: re-write spotify login flow and avoid token in querystring
-    // I know this it's not good to pass a token in querystring, but I just can't make cookies work with CORS
-    const callbackUrl = new URL(req.session.callback);
+    // I know this is not good to pass a token in querystring, but I just can't make cookies work with CORS
+    const callbackUrl = new url.URL(req.session.callback);
     callbackUrl.searchParams.set('x-auth-token', req.token);
 
     res.redirect(callbackUrl.toString());

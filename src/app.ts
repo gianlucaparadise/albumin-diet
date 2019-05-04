@@ -30,7 +30,7 @@ const app = express();
 // Connect to MongoDB
 const mongoUrl = MONGODB_URI;
 (<any>mongoose).Promise = bluebird;
-mongoose.connect(mongoUrl, { useNewUrlParser: true }).then(
+mongoose.connect(mongoUrl, { useCreateIndex: true, useNewUrlParser: true }).then(
   () => { /** ready to use. The `mongoose.connect()` promise resolves to undefined. */ },
 ).catch(err => {
   console.log('MongoDB connection error. Please make sure MongoDB is running. ' + err);
@@ -62,7 +62,7 @@ app.use(session({
   saveUninitialized: true,
   secret: SESSION_SECRET,
   store: new MongoStore({
-    url: mongoUrl,
+    mongooseConnection: mongoose.connection,
     autoReconnect: true
   })
 }));
