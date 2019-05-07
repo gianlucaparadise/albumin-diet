@@ -1,6 +1,6 @@
 {
   "name": "albumin-diet-types",
-  "version": "0.0.15",
+  "version": "0.0.17",
   "description": "Typescript models for the albumin-diet requests and responses",
   "repository": "https://github.com/gianlucaparadise/albumin-diet.git",
   "author": {
@@ -19,6 +19,6 @@
     "index.d.ts"
   ],
   "dependencies": {
-    "spotify-web-api-node-typings": "^0.0.5"
+    "spotify-web-api-node-typings": "^0.0.6"
   }
 }

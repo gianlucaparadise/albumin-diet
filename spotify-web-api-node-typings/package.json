@@ -1,6 +1,6 @@
 {
   "name": "spotify-web-api-node-typings",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "description": "Typescript models for the spotify-web-api-node npm package",
   "author": {
     "name": "gianlucaparadise",
