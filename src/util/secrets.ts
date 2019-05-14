@@ -1,9 +1,9 @@
 import logger from './logger';
-import fs from 'fs';
+// import fs from 'fs';
 
-if (fs.existsSync('now-secrets.json')) {
-  require('now-env');
-}
+// if (fs.existsSync('now-secrets.json')) {
+//   require('now-env');
+// }
 
 const ENVIRONMENT = process.env.NOW_ENV; // i'm using env variables from zeit/now
 export const prod = ENVIRONMENT === 'production'; // Anything else is treated as 'dev'
