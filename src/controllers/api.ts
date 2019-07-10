@@ -49,7 +49,9 @@ export let saveAlbum = async (req: Request, res: Response) => {
     const spotifyId = body.album.spotifyId;
     await SpotifyApiManager.AddToMyAlbum(user, spotifyId);
 
-    return res.json(new EmptyResponse());
+    const response = await _getAlbumBySpotifyId(user, spotifyId);
+
+    return res.json(response);
   } catch (error) {
     return errorHandler(error, res);
   }
@@ -69,11 +71,7 @@ export let removeAlbum = async (req: Request, res: Response) => {
   }
 };
 
-export let getAlbumBySpotifyId = async (req: Request, res: Response) => {
-  try {
-    const spotifyAlbumId = req.params['albumId'];
-    const user = <IUserDocument>req.user;
-
+async function _getAlbumBySpotifyId(user: IUserDocument, spotifyAlbumId: string) {
     const tags = await user.getTagsByAlbum(spotifyAlbumId);
 
     const spotifyAlbums = await AlbumManager.GetAlbums(user, [spotifyAlbumId]);
@@ -85,6 +83,15 @@ export let getAlbumBySpotifyId = async (req: Request, res: Response) => {
     const isSavedAlbumResponse = await SpotifyApiManager.IsMySavedAlbum(user, album);
 
     const response = GetAlbumResponse.createFromSpotifyAlbum(album, tags, isSavedAlbumResponse, user);
+    return response;
+}
+
+export let getAlbumBySpotifyId = async (req: Request, res: Response) => {
+  try {
+    const spotifyAlbumId = req.params['albumId'];
+    const user = <IUserDocument>req.user;
+
+    const response = await _getAlbumBySpotifyId(user, spotifyAlbumId);
 
     return res.json(response);
   } catch (error) {

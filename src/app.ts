@@ -1,4 +1,4 @@
-import express from 'express';
+import express, { NextFunction, Response, Request } from 'express';
 import cors from 'cors';
 import compression from 'compression';  // compresses requests
 import session from 'express-session';
@@ -74,6 +74,19 @@ app.use(lusca.xssProtection(true));
 app.use(
   express.static(path.join(__dirname, 'public'), { maxAge: 31557600000 })
 );
+
+// error handler
+app.use((err: any, req: Request, res: Response, next: NextFunction) => {
+
+  // body parser error checking
+  if (err.status === 400 && err instanceof SyntaxError && 'body' in err) {
+      console.error('Error while parsing json');
+      console.error(err);
+      return res.sendStatus(400); // Bad request
+  }
+
+  next();
+});
 
 /**
  * Primary app routes.
