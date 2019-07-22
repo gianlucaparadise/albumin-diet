@@ -1,6 +1,6 @@
 {
   "name": "albumin-diet-types",
-  "version": "0.0.17",
+  "version": "0.0.19",
   "description": "Typescript models for the albumin-diet requests and responses",
   "repository": "https://github.com/gianlucaparadise/albumin-diet.git",
   "author": {

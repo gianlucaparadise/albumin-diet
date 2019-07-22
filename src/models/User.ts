@@ -7,6 +7,7 @@ import logger from '../util/logger';
 import { encrypt, decrypt } from '../config/encrypto';
 import { UserProfileAuthenticationNodeResponse } from 'spotify-web-api-node-typings';
 import { IUser } from './interfaces/IUser';
+import { TagDescriptor } from './public/GetMyTags';
 
 export interface IUserDocument extends IUser, Document {
 
@@ -37,7 +38,7 @@ export interface IUserDocument extends IUser, Document {
   /**
    * Retrieves the list of the tags added by this user
    */
-  getTags(): Promise<ITagDocument[]>;
+  getTags(): Promise<TagDescriptor[]>;
 
   /**
    * Retrieves the list of tags related to input album
@@ -194,7 +195,7 @@ userSchema.methods.getTagsGroupedByAlbum = async function (): Promise<TagsByAlbu
   }
 };
 
-userSchema.methods.getTags = async function (): Promise<ITagDocument[]> {
+userSchema.methods.getTags = async function (): Promise<TagDescriptor[]> {
   try {
     const thisUser = <IUserDocument>this;
     await thisUser
@@ -203,15 +204,17 @@ userSchema.methods.getTags = async function (): Promise<ITagDocument[]> {
 
     const result = thisUser.albumTags.reduce((tags, albumTag) => {
       const tag = <ITagDocument>albumTag.tag;
-      const foundIndex = tags.findIndex(t => t.id === tag.id); // I search for another tag with the same id
-      if (foundIndex >= 0) {
+      const foundTag = tags.find(t => (t.tag as ITagDocument).id === tag.id); // I search for another tag with the same id
+      if (foundTag) {
         // I have already added this tag, I don't want to push it again
+        foundTag.count++;
         return tags;
       }
 
-      tags.push(tag);
+      const descriptor: TagDescriptor = { tag: tag, count: 1};
+      tags.push(descriptor);
       return tags;
-    }, <ITagDocument[]>[]);
+    }, <TagDescriptor[]>[]);
 
     return Promise.resolve(result);
 
