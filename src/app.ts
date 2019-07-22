@@ -115,12 +115,13 @@ apiMeRoute.get('/album/search', apiController.searchAlbums);
 apiMeRoute.get('/artist/search', apiController.searchArtists);
 apiMeRoute.get('/album/:albumId', apiController.getAlbumBySpotifyId);
 
-app.use('/api/me', apiMeRoute);
+app.use('/api/v1/me', apiMeRoute);
 //#endregion
 
 //#region User/Auth routes
-app.get('/login', userController.login);
-app.get('/auth/spotify',
+app.get('/login', userController.login); // frontend route
+
+app.get('/auth/v1/spotify',
   userController.prepareAuthSpotify,
   passportConfig.spotifyAuthenticate,
   userController.authSpotify);
@@ -129,7 +130,6 @@ app.get('/auth/spotify/callback',
   passportConfig.spotifyAuthenticateCallback,
   userController.authSpotifyCallback,
   passportConfig.generateAndSendToken);
-
 //#endregion
 
 export default app;
