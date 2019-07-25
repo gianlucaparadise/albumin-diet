@@ -2,7 +2,7 @@
   "name": "albumin-diet-types",
   "version": "0.0.19",
   "description": "Typescript models for the albumin-diet requests and responses",
-  "repository": "https://github.com/gianlucaparadise/albumin-diet.git",
+  "repository": "https://github.com/gianlucaparadise/albumin-diet-engine.git",
   "author": {
     "name": "gianlucaparadise",
     "email": "gianlucaparadise@gmail.com",

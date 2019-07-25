@@ -1,7 +1,7 @@
 {
-  "name": "albumin-diet",
+  "name": "albumin-diet-engine",
   "version": "0.0.1",
-  "repository": "https://github.com/gianlucaparadise/albumin-diet.git",
+  "repository": "https://github.com/gianlucaparadise/albumin-diet-engine.git",
   "author": {
     "name": "gianlucaparadise",
     "email": "gianlucaparadise@gmail.com"
