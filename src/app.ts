@@ -5,13 +5,13 @@ import session from 'express-session';
 import bodyParser from 'body-parser';
 import logger from './util/logger';
 import lusca from 'lusca';
-const mongo = require('connect-mongo'); // todo: check if this module is really needed
+const mongo = require('connect-mongo');
 import path from 'path';
 import mongoose from 'mongoose';
 import passport from 'passport';
 import expressValidator from 'express-validator';
 import bluebird from 'bluebird';
-import { MONGODB_URI, SESSION_SECRET } from './util/secrets';
+import { MONGODB_URI, MONGODB_SESSIONS_URI, SESSION_SECRET } from './util/secrets';
 
 const MongoStore = mongo(session);
 
@@ -28,9 +28,13 @@ import './models/plugins/mongoose-extensions';
 const app = express();
 
 // Connect to MongoDB
-const mongoUrl = MONGODB_URI;
 (<any>mongoose).Promise = bluebird;
-mongoose.connect(mongoUrl, { useCreateIndex: true, useNewUrlParser: true }).then(
+
+// Sessions DB connection
+const connectionSessionsDb = mongoose.createConnection(MONGODB_SESSIONS_URI, { useCreateIndex: true, useNewUrlParser: true });
+
+// Default DB connection
+mongoose.connect(MONGODB_URI, { useCreateIndex: true, useNewUrlParser: true }).then(
   () => { /** ready to use. The `mongoose.connect()` promise resolves to undefined. */ },
 ).catch(err => {
   console.log('MongoDB connection error. Please make sure MongoDB is running. ' + err);
@@ -62,7 +66,7 @@ app.use(session({
   saveUninitialized: true,
   secret: SESSION_SECRET,
   store: new MongoStore({
-    mongooseConnection: mongoose.connection,
+    mongooseConnection: connectionSessionsDb,
     autoReconnect: true
   })
 }));

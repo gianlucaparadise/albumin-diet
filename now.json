@@ -5,6 +5,7 @@
   "env": {
     "JWT_SECRET": "@jwt_secret",
     "MONGODB_URI": "@mongodb_uri",
+    "MONGODB_SESSIONS_URI": "@mongodb_sessions_uri",
     "SESSION_SECRET": "@session_secret",
     "USER_CRYPT_SECRET": "@user_crypt_secret",
     "USER_CRYPT_SALT": "@user_crypt_salt",
