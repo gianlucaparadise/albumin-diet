@@ -58,7 +58,7 @@
     "express-session": "^1.15.6",
     "express-validator": "^4.3.0",
     "jsonwebtoken": "^8.4.0",
-    "lodash": "^4.17.5",
+    "lodash": "^4.17.13",
     "lusca": "^1.5.2",
     "mongoose": "^5.3.14",
     "nodemailer": "^4.4.1",
