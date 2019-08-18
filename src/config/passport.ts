@@ -111,14 +111,17 @@ export const authenticate = expressJwt({
   }
 });
 
-export const fillCurrentUser = (req: Request, res: Response, next: NextFunction) => {
+export const fillCurrentUser = async (req: Request, res: Response, next: NextFunction) => {
   const authId = (<any>req).auth.id;
-  User.findById(authId)
-    .then(user => {
-      req.user = user;
-      SpotifyApiManager.Api.setAccessToken(user.getDecryptedAccessToken());
-      SpotifyApiManager.Api.setRefreshToken(user.getDecryptedRefreshToken());
-      next();
-    })
-    .catch(next);
+
+  try {
+    const user = await User.findById(authId);
+    req.user = user;
+    SpotifyApiManager.Api.setAccessToken(user.getDecryptedAccessToken());
+    SpotifyApiManager.Api.setRefreshToken(user.getDecryptedRefreshToken());
+    next();
+
+  } catch (error) {
+    next(error);
+  }
 };
