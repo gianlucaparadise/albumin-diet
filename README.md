@@ -1,19 +1,68 @@
-# Albumin diet
+# Albumin Diet Engine
 
-Albumin diet is an application that aims to make a music streaming platform (Spotify) less playlist-centric and more album oriented.
-With Albumin diet you can:
+## Overview
+
+Albumin Diet is an application that aims to make a music streaming platform (Spotify) less playlist-centric and more album oriented.
+With Albumin Diet you can:
 
 * Tag your saved albums with your custom-made tags
 * Browse your saved albums by tag
+* Save an album in your listening-list and listen to them later
 
-# Tech notes
+## Ecosystem
 
-Albumin diet is built using MongoDB + Node.js + Typescript.
+Albumin Diet has born to test the capabilities of several technologies. The whole ecosystem is made of the following applications:
 
-# Dev notes
+* [albumin-diet-engine](https://github.com/gianlucaparadise/albumin-diet-engine) (this repository)
+  * Backend
+* [albumin-diet-portal](https://github.com/gianlucaparadise/albumin-diet-portal)
+  * Frontend Web
+* [albumin-diet-mobapp](https://github.com/gianlucaparadise/albumin-diet-mobapp)
+  * Frontend Mobile App
 
-If `yarn build` fails, run:
+## Tech notes
 
-```shell
-rm -r ./node_modules/@types/connect-mongo/node_modules
+I used this project to test the capabilities of the following technologies:
+
+* MongoDB
+* Express
+* Typescript
+* Node.js
+* Jest (for unit testing)
+* Now.sh
+* Spotify API
+
+## Dev notes
+
+To run this application locally, you need to perform the following steps:
+
+1. Clone the repository
+
+```sh
+git clone https://github.com/gianlucaparadise/albumin-diet-engine && cd albumin-diet-engine
+```
+
+2. Install the dependencies
+
+```sh
+yarn install
+```
+
+3. Fill the example env file with your information
+    * **N.B.** You may need to create a db on mLab.com
+
+```sh
+cp .example.env .env && vi .env # use your favorite editor instead of vi
+```
+
+4. Install `now` globally
+
+```sh
+yarn global add now
+```
+
+5. Run the server using `now`
+
+```sh
+now dev
 ```
