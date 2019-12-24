@@ -9,6 +9,12 @@ With Albumin Diet you can:
 * Browse your saved albums by tag
 * Save an album in your listening-list and listen to them later
 
+## Try it
+
+You can follow the instructions on the [web](https://github.com/gianlucaparadise/albumin-diet-portal) repository and on the [mobile-app](https://github.com/gianlucaparadise/albumin-diet-mobapp) repository.
+
+**N.B.** This is intended to be a POC and is using a free DBaaS with limited storage available. All your data may be lost without warning.
+
 ## Ecosystem
 
 Albumin Diet has born to test the capabilities of several technologies. The whole ecosystem is made of the following applications:
