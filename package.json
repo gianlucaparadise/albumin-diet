@@ -41,8 +41,8 @@
     "update-types": "yarn workspace albumin-diet-types add spotify-web-api-node-typings@latest",
     "publish-types": "yarn workspace albumin-diet-types publish",
     "publish-spotify-types": "yarn workspace spotify-web-api-node-typings publish",
-    "deploy": "now && npm run rm-deploys",
-    "rm-deploys": "now rm --safe --yes albumin-diet-engine"
+    "deploy": "vercel && npm run rm-deploys",
+    "rm-deploys": "vercel rm --safe --yes albumin-diet-engine"
   },
   "dependencies": {
     "async": "^2.6.0",

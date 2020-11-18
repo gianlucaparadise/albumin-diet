@@ -52,3 +52,4 @@ albumin-diet-types/types/models/*
 
 # Ignore the original boilerplate code used as example
 example
+.vercel

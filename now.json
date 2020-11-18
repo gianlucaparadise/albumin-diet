@@ -1,6 +1,5 @@
 {
   "version": 2,
-  "name": "albumin-diet-engine",
   "alias": "albumin-diet-engine",
   "env": {
     "JWT_SECRET": "@jwt_secret",

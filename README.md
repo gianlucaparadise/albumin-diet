@@ -35,7 +35,7 @@ I used this project to test the capabilities of the following technologies:
 * Typescript
 * Node.js
 * Jest (for unit testing)
-* Now.sh
+* Vercel
 * Spotify API
 
 ## Dev notes
@@ -61,14 +61,14 @@ yarn install
 cp .example.env .env && vi .env # use your favorite editor instead of vi
 ```
 
-4. Install `now` globally
+4. Install `vercel` globally
 
 ```sh
-yarn global add now
+yarn global add vercel
 ```
 
-5. Run the server using `now`
+5. Run the server using `vercel`
 
 ```sh
-now dev
+vercel dev
 ```
