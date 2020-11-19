@@ -3,8 +3,8 @@
   "alias": "albumin-diet-engine",
   "env": {
     "JWT_SECRET": "@jwt_secret",
-    "MONGODB_URI": "@mongodb_uri",
-    "MONGODB_SESSIONS_URI": "@mongodb_sessions_uri",
+    "MONGODB_URI": "@albumin_diet_engine_mongodb_uri",
+    "MONGODB_SESSIONS_URI": "@albumin_diet_engine_mongodb_sessions_uri",
     "SESSION_SECRET": "@session_secret",
     "USER_CRYPT_SECRET": "@user_crypt_secret",
     "USER_CRYPT_SALT": "@user_crypt_salt",
