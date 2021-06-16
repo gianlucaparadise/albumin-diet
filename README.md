@@ -55,7 +55,7 @@ yarn install
 ```
 
 3. Fill the example env file with your information
-    * **N.B.** You may need to create a db on mLab.com
+    * **N.B.** You may need to create a db on MongoDB Atlas
 
 ```sh
 cp .example.env .env && vi .env # use your favorite editor instead of vi
